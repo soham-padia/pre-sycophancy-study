@@ -4,6 +4,15 @@ SYCON-Bench is a novel benchmark for evaluating sycophantic behavior in multi-tu
 
 ## Overview
 
+## Model Compatibility Matrix
+
+| Model Family | Quantization | Chat Template | Dependencies |
+|--------------|--------------|---------------|--------------|
+| Llama        | 4-bit        | llama-2       | transformers, bitsandbytes |
+| Qwen         | 8-bit        | chatml        | transformers, accelerate   |
+| Gemma        | 16-bit       | gemma         | transformers               |
+| ...          | ...          | ...           | ...                        |
+
 Large Language Models (LLMs) are expected to provide helpful and harmless responses, yet they often exhibit *sycophancy*—conforming to user beliefs regardless of factual accuracy or ethical soundness. Prior research on sycophancy has primarily focused on single-turn factual correctness, overlooking the dynamics of real-world interactions.
 
 SYCON-Bench addresses this gap by:
@@ -139,6 +148,32 @@ If you use SYCON-Bench in your research, please cite our paper:
 }
 ```
 
+
+
+## Model Compatibility Matrix
+
+| Model Family | Quantization | Chat Template | Dependencies |
+|--------------|--------------|---------------|--------------|
+| Llama        | 4-bit        | llama-2       | transformers, bitsandbytes |
+| Qwen         | 8-bit        | chatml        | transformers, accelerate   |
+| Gemma        | 16-bit       | gemma         | transformers               |
+| ...          | ...          | ...           | ...                        |
+
+
+
 ## License
 
 Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
+
+
+
+## Model Compatibility Matrix
+
+| Model Family | Quantization | Chat Template | Dependencies |
+|--------------|--------------|---------------|--------------|
+| Llama        | 4-bit        | llama-2       | transformers, bitsandbytes |
+| Qwen         | 8-bit        | chatml        | transformers, accelerate   |
+| Gemma        | 16-bit       | gemma         | transformers               |
+| ...          | ...          | ...           | ...                        |
+
+

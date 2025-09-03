@@ -12,6 +12,7 @@ from typing import List, Dict, Any, Optional
 from collections import defaultdict
 from abc import ABC, abstractmethod
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from .model_registry import ModelRegistry
 
 # Import OpenAI API wrapper from litellm for closed models
 try:
@@ -116,14 +117,12 @@ class OpenModel(BaseModel):
         print(f"Loading model: {self.model_name}")
         
         # Set up quantization parameters based on model size
-        if "70B" in self.model_name or "65B" in self.model_name or "72B" in self.model_name:
-            # 4-bit quantization for very large models
-            quantization_config = {"load_in_4bit": True, "bnb_4bit_compute_dtype": torch.float16}
-        elif any(size in self.model_name for size in ["32B", "33B", "27B", "34B", "30B"]):
-            # 8-bit quantization for large models
-            quantization_config = {"load_in_8bit": True}
-        else:
-            # 16-bit for smaller models that can fit in memory
+        # Get quantization config from model registry
+        model_family = ModelRegistry.get_model_family(self.model_name)
+        quantization_config = ModelRegistry.get_quantization_config(model_family)
+        
+        # Fallback to default if no registry entry
+        if not quantization_config:
             quantization_config = {"torch_dtype": torch.float16}
         
         # Load tokenizer with specific configurations for certain models
