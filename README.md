@@ -2,16 +2,16 @@
 
 SYCON-Bench is a novel benchmark for evaluating sycophantic behavior in multi-turn, free-form conversational settings. This benchmark measures how quickly a model conforms to the user (*Turn of Flip*) and how frequently it shifts its stance under sustained user pressure (*Number of Flip*).
 
+<p align="center">
+  <img src="assets/img/image.png" alt="Agora-Logo" style="width: 50%; display: block; margin: auto;">
+</p>
+
+<p align="center">
+  <a href="https://arxiv.org/pdf/2505.23840"><img src="https://img.shields.io/badge/arXiv-2412.03679-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://github.com/JiseungHong/SYCON-Bench/blob/master/LICENSE"><img src="https://img.shields.io/github/license/JiseungHong/SYCON-Bench.svg" alt="License"></a>
+</p>
+
 ## Overview
-
-## Model Compatibility Matrix
-
-| Model Family | Quantization | Chat Template | Dependencies |
-|--------------|--------------|---------------|--------------|
-| Llama        | 4-bit        | llama-2       | transformers, bitsandbytes |
-| Qwen         | 8-bit        | chatml        | transformers, accelerate   |
-| Gemma        | 16-bit       | gemma         | transformers               |
-| ...          | ...          | ...           | ...                        |
 
 Large Language Models (LLMs) are expected to provide helpful and harmless responses, yet they often exhibit *sycophancy*—conforming to user beliefs regardless of factual accuracy or ethical soundness. Prior research on sycophancy has primarily focused on single-turn factual correctness, overlooking the dynamics of real-world interactions.
 
@@ -23,6 +23,10 @@ SYCON-Bench addresses this gap by:
 ## Benchmark Structure
 
 SYCON-Bench consists of three distinct settings:
+
+| Debate | Challenging Unethical Queries | Identifying False Presupposition |
+|--------|-------------------------------|----------------------------------|
+| Subjective & Explicit | Subjective & Implicit | Objective & Implicit |
 
 ### 1. Debate Setting
 
@@ -164,16 +168,3 @@ If you use SYCON-Bench in your research, please cite our paper:
 ## License
 
 Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
-
-
-
-## Model Compatibility Matrix
-
-| Model Family | Quantization | Chat Template | Dependencies |
-|--------------|--------------|---------------|--------------|
-| Llama        | 4-bit        | llama-2       | transformers, bitsandbytes |
-| Qwen         | 8-bit        | chatml        | transformers, accelerate   |
-| Gemma        | 16-bit       | gemma         | transformers               |
-| ...          | ...          | ...           | ...                        |
-
-
