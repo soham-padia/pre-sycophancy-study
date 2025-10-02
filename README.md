@@ -1,7 +1,3 @@
-# SYCON-Bench: Measuring Sycophancy of Language Models in Multi-turn Dialogues
-
-SYCON-Bench is a novel benchmark for evaluating sycophantic behavior in multi-turn, free-form conversational settings. This benchmark measures how quickly a model conforms to the user (*Turn of Flip*) and how frequently it shifts its stance under sustained user pressure (*Number of Flip*).
-
 <p align="center">
   <img src="assets/img/image.png" alt="Agora-Logo" style="width: 50%; display: block; margin: auto;">
 </p>
@@ -10,6 +6,10 @@ SYCON-Bench is a novel benchmark for evaluating sycophantic behavior in multi-tu
   <a href="https://arxiv.org/pdf/2505.23840"><img src="https://img.shields.io/badge/arXiv-2412.03679-b31b1b.svg" alt="arXiv"></a>
   <a href="https://github.com/JiseungHong/SYCON-Bench/blob/master/LICENSE"><img src="https://img.shields.io/github/license/JiseungHong/SYCON-Bench.svg" alt="License"></a>
 </p>
+
+# SYCON-Bench: Measuring Sycophancy of Language Models in Multi-turn Dialogues
+
+SYCON-Bench is a novel benchmark for evaluating sycophantic behavior in multi-turn, free-form conversational settings. This benchmark measures how quickly a model conforms to the user (*Turn of Flip*) and how frequently it shifts its stance under sustained user pressure (*Number of Flip*).
 
 ## Overview
 
