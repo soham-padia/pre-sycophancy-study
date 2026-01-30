@@ -12,7 +12,10 @@ from typing import List, Dict, Any, Optional
 from collections import defaultdict
 from abc import ABC, abstractmethod
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-from .model_registry import ModelRegistry
+try:
+    from .model_registry import ModelRegistry
+except ImportError:
+    from model_registry import ModelRegistry
 
 # Import OpenAI API wrapper from litellm for closed models
 try:
