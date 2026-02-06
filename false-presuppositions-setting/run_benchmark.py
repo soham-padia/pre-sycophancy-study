@@ -30,13 +30,46 @@ def check_device():
     print("====================\n")
     return device
 
-def read_data(data_file="data/questions.txt"):
-    """Read questions from data file."""
-    with open(data_file, "r") as f:
-        questions = [line.strip() for line in f if line.strip()]
-    return questions
+def load_questions_for_prompt(prompt_file, data_dir="data"):
+    """Load questions for a given prompt type.
 
-def run_benchmark(model, questions, batch_size=4, output_dir=None, prompt_types=None):
+    Order of precedence:
+    1. data/{prompt_file}_pressure.csv
+    2. data/{prompt_file}.csv
+    3. data/questions.txt
+    """
+    import csv
+
+    pressure_path = os.path.join(data_dir, f"{prompt_file}_pressure.csv")
+    csv_path = os.path.join(data_dir, f"{prompt_file}.csv")
+    default_txt = os.path.join(data_dir, "questions.txt")
+
+    def _read_csv_first_col(path):
+        rows = []
+        with open(path, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            for r in reader:
+                if not r:
+                    continue
+                val = r[0].strip()
+                if val:
+                    rows.append(val)
+        # strip header if it looks like 'Question'
+        if rows and rows[0].lower().startswith("question"):
+            return rows[1:]
+        return rows
+
+    if os.path.exists(pressure_path):
+        return _read_csv_first_col(pressure_path)
+    if os.path.exists(csv_path):
+        return _read_csv_first_col(csv_path)
+    if os.path.exists(default_txt):
+        with open(default_txt, "r", encoding="utf-8") as f:
+            return [line.strip() for line in f if line.strip()]
+
+    raise FileNotFoundError(f"No questions file found for prompt '{prompt_file}' in {data_dir}")
+
+def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_dir="data"):
     """
     Run the benchmark for a given model on the provided questions.
     
@@ -54,29 +87,31 @@ def run_benchmark(model, questions, batch_size=4, output_dir=None, prompt_types=
             ("presupposition", "presupposition")
         ]
     
-    # Initialize result dictionaries for each prompt type
-    results = {prompt_file: {q: [] for q in questions} for _, prompt_file in prompt_types}
-    
-    # Process questions in batches
-    for batch_start in range(0, len(questions), batch_size):
-        batch_end = min(batch_start + batch_size, len(questions))
-        batch_questions = questions[batch_start:batch_end]
-        
-        logging.info(f"\nProcessing questions {batch_start+1}-{batch_end} out of {len(questions)}")
-        
-        # Process each prompt type for the current batch
-        for prompt_type, prompt_file in prompt_types:
-            logging.info(f"Processing {prompt_type} prompt...")
+    # Process each prompt type independently so each can use its own question set
+    for prompt_type, prompt_file in prompt_types:
+        logging.info(f"Processing prompt type: {prompt_type} (file: {prompt_file})")
+
+        # Load the appropriate questions for this prompt type (pressure CSVs take precedence)
+        questions = load_questions_for_prompt(prompt_file, data_dir=data_dir)
+        results = {q: [] for q in questions}
+
+        # Process questions in batches for this prompt type
+        for batch_start in range(0, len(questions), batch_size):
+            batch_end = min(batch_start + batch_size, len(questions))
+            batch_questions = questions[batch_start:batch_end]
+
+            logging.info(f"\nProcessing questions {batch_start+1}-{batch_end} out of {len(questions)} for {prompt_file}")
+
             for question in batch_questions:
                 messages = model.get_chat_messages(question, prompt_type)
                 response = model.generate_responses(messages)
-                results[prompt_file][question] = [response]  # Wrap in list for consistency with other settings
-            
+                results[question] = [response]
+
             # Save batch results
-            model.save_batch_results(results[prompt_file], f"{output_dir}/{prompt_file}.csv", batch_questions)
+            model.save_batch_results(results, f"{output_dir}/{prompt_file}.csv", batch_questions)
             logging.info(f"Saved batch results to {output_dir}/{prompt_file}.csv")
-        
-        logging.info(f"Completed batch {batch_start//batch_size + 1} of {(len(questions)-1)//batch_size + 1}")
+
+        logging.info(f"Completed processing prompt type {prompt_file} ({len(questions)} questions)")
     
     # Log completion
     prompt_files = [prompt_file for _, prompt_file in prompt_types]
@@ -130,9 +165,6 @@ def main():
     # Set up the model
     model.setup()
     
-    # Read the data
-    questions = read_data()
-    
     # Determine which prompt types to use
     if args.prompt_type == "all":
         prompt_types = [
@@ -142,14 +174,14 @@ def main():
         ]
     else:
         prompt_types = [(args.prompt_type, args.prompt_type)]
-    
-    # Run the benchmark
+    # Run the benchmark. allow specifying data directory with pressure CSVs.
+    data_dir = "data"
     run_benchmark(
         model=model,
-        questions=questions,
         batch_size=args.batch_size,
         output_dir=output_dir,
-        prompt_types=prompt_types
+        prompt_types=prompt_types,
+        data_dir=data_dir,
     )
 
 if __name__ == "__main__":
