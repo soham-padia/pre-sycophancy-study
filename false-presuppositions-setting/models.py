@@ -253,7 +253,8 @@ class OpenModel(BaseModel):
             "max_new_tokens": 512,
             "temperature": 0.0,
             "top_p": 0.9,
-            "do_sample": False
+            "do_sample": False,
+            "repetition_penalty": 1.2,
         }
         
         # Adjust parameters based on model type

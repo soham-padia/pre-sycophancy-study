@@ -10,6 +10,8 @@ import time
 import torch
 from models import ModelFactory
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def check_device():
     """Check and print available compute devices."""
     print("\n=== Device Check ===")
@@ -64,7 +66,7 @@ def load_multiturn_map(prompt_file, data_dir="data"):
     with open(map_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_dir="data"):
+def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_dir="data", max_batches=None):
     """
     Run the benchmark using multi-turn conversations.
     
@@ -78,6 +80,7 @@ def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_
         output_dir: Directory to save results
         prompt_types: List of prompt types to use (default: all prompt types)
         data_dir: Directory containing multi-turn CSVs
+        max_batches: Optional limit on batches processed per prompt type
     """
     import csv
     
@@ -102,7 +105,11 @@ def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_
         results = {q: [None] * 6 for q in questions}
         
         # Process questions in batches
-        for batch_start in range(0, len(questions), batch_size):
+        for batch_index, batch_start in enumerate(range(0, len(questions), batch_size), start=1):
+            if max_batches is not None and batch_index > max_batches:
+                logging.info(f"Reached max_batches={max_batches} for {prompt_file}; stopping early.")
+                break
+
             batch_end = min(batch_start + batch_size, len(questions))
             batch_questions = questions[batch_start:batch_end]
 
@@ -137,12 +144,12 @@ def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_
                 
                 for turn in range(1, 6):
                     pressure_prompt = pressure_variants[turn - 1]
-                    full_prompt = f"{question} — {pressure_prompt}"
                     
                     logging.info(f"    Turn {turn} (pressure): {pressure_prompt[:60]}...")
                     
-                    # Get model response with conversation history
-                    messages = model.get_chat_messages_multiturn(conversation, full_prompt, prompt_type)
+                    # The base question is already in the chat history, so only add the
+                    # current pressure prompt for follow-up turns.
+                    messages = model.get_chat_messages_multiturn(conversation, pressure_prompt, prompt_type)
                     response_turn = model.generate_responses(messages)
                     results[question][turn] = response_turn
                     logging.info(f"    Response: {response_turn[:100]}...")
@@ -205,6 +212,7 @@ def main():
     parser.add_argument("--api_key", type=str, help="API key for closed models")
     parser.add_argument("--base_url", type=str, help="Base URL for API (for closed models)")
     parser.add_argument("--batch_size", type=int, default=4, help="Number of questions to process in each batch")
+    parser.add_argument("--max_batches", type=int, default=None, help="Maximum number of batches to process per prompt type")
     parser.add_argument("--output_dir", type=str, default=None, help="Custom output directory")
     parser.add_argument("--prompt_type", type=str, choices=["all", "base", "critical", "presupposition"], 
                         default="all", help="Prompt type to use")
@@ -232,13 +240,14 @@ def main():
     model_id = args.model_name.split("/")[-1]
     
     # Ensure the output directory exists
-    output_dir = args.output_dir if args.output_dir else f"output/{model_id}"
+    output_dir = args.output_dir if args.output_dir else os.path.join(SCRIPT_DIR, "output", model_id)
     os.makedirs(output_dir, exist_ok=True)
     
     # Log information about the run
     logging.info(f"Processing model: {args.model_name}")
     logging.info(f"Output directory: {output_dir}")
     logging.info(f"Batch size: {args.batch_size}")
+    logging.info(f"Max batches: {args.max_batches}")
     
     # Create the model
     model = ModelFactory.create_model(args.model_name, api_key=args.api_key, base_url=args.base_url)
@@ -256,13 +265,14 @@ def main():
     else:
         prompt_types = [(args.prompt_type, args.prompt_type)]
     # Run the benchmark. allow specifying data directory with pressure CSVs.
-    data_dir = "data"
+    data_dir = os.path.join(SCRIPT_DIR, "data")
     run_benchmark(
         model=model,
         batch_size=args.batch_size,
         output_dir=output_dir,
         prompt_types=prompt_types,
         data_dir=data_dir,
+        max_batches=args.max_batches,
     )
 
 if __name__ == "__main__":
