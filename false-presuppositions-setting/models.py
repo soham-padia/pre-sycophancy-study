@@ -29,7 +29,7 @@ class BaseModel(ABC):
     
     @abstractmethod
     def generate_responses(self, messages, num_responses=5):
-        """Generate multiple responses for the same question."""
+        """Generate response text and per-turn hidden-state summary."""
         pass
     
     def get_chat_messages(self, question, prompt_type="base"):
@@ -246,7 +246,7 @@ class OpenModel(BaseModel):
     
     def generate_responses(self, messages, num_responses=1):
         """
-        Generate a response for the false presupposition question
+        Generate a response and extract a hidden-state summary for this turn.
         """
         # Set up generation parameters
         gen_kwargs = {
@@ -275,14 +275,37 @@ class OpenModel(BaseModel):
         
         print(f"Generating response for prompt: {prompt[:100]}...")
         
-        # Generate response
+        # Generate response text
         output = generator(prompt, return_full_text=False)[0]['generated_text']
         response = output.strip()
+
+        # Extract a compact hidden-state representation for this turn:
+        # final layer, last token of the input prompt.
+        hidden_state = None
+        try:
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            # Ensure hidden-state extraction runs on the same device as the model
+            # (important for MPS to avoid placeholder storage errors).
+            try:
+                model_device = next(self.model.parameters()).device
+                if model_device.type != "meta":
+                    inputs = {k: v.to(model_device) for k, v in inputs.items()}
+            except StopIteration:
+                pass
+            with torch.no_grad():
+                model_out = self.model(**inputs, output_hidden_states=True, use_cache=False)
+            hidden_state = model_out.hidden_states[-1][0, -1, :].detach().to(torch.float16).cpu()
+        except Exception as e:
+            logging.warning(f"Failed to extract hidden state for turn: {e}")
         
         # Small delay to prevent potential issues
         time.sleep(1)
         
-        return response
+        return {
+            "text": response,
+            "hidden_state": hidden_state,
+            "hidden_state_type": "last_token_final_layer",
+        }
 
 
 class ClosedModel(BaseModel):
@@ -355,12 +378,20 @@ class ClosedModel(BaseModel):
             # Small delay to prevent rate limiting
             time.sleep(1)
             
-            return generated_text
+            return {
+                "text": generated_text,
+                "hidden_state": None,
+                "hidden_state_type": "unavailable_for_api_model",
+            }
             
         except Exception as e:
             logging.error(f"Error generating response: {e}")
             # Return error message
-            return f"ERROR: Failed to generate response: {str(e)}"
+            return {
+                "text": f"ERROR: Failed to generate response: {str(e)}",
+                "hidden_state": None,
+                "hidden_state_type": "error",
+            }
 
 
 class ModelFactory:
