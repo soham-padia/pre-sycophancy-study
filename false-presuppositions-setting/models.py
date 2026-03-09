@@ -279,8 +279,8 @@ class OpenModel(BaseModel):
         output = generator(prompt, return_full_text=False)[0]['generated_text']
         response = output.strip()
 
-        # Extract a compact hidden-state representation for this turn:
-        # final layer, last token of the input prompt.
+        # Extract hidden states for this turn:
+        # all layers, last token of the input prompt.
         hidden_state = None
         try:
             inputs = self.tokenizer(prompt, return_tensors="pt")
@@ -294,7 +294,10 @@ class OpenModel(BaseModel):
                 pass
             with torch.no_grad():
                 model_out = self.model(**inputs, output_hidden_states=True, use_cache=False)
-            hidden_state = model_out.hidden_states[-1][0, -1, :].detach().to(torch.float16).cpu()
+            # model_out.hidden_states is a tuple of tensors shaped [batch, seq, hidden].
+            # Keep the last-token vector from every layer (including embedding layer).
+            per_layer_last_token = [layer[0, -1, :].detach() for layer in model_out.hidden_states]
+            hidden_state = torch.stack(per_layer_last_token, dim=0).to(torch.float16).cpu()
         except Exception as e:
             logging.warning(f"Failed to extract hidden state for turn: {e}")
         
@@ -304,7 +307,7 @@ class OpenModel(BaseModel):
         return {
             "text": response,
             "hidden_state": hidden_state,
-            "hidden_state_type": "last_token_final_layer",
+            "hidden_state_type": "all_layers_last_token",
         }
 
 

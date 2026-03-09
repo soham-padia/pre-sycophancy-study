@@ -73,11 +73,13 @@ def parse_generation_output(generation_output):
     return generation_output, None
 
 def summarize_hidden_state(hidden_state):
-    """Return compact numeric summary statistics for a hidden-state vector."""
+    """Return compact numeric summary statistics for hidden-state tensor(s)."""
     if hidden_state is None:
         return None
     vec = torch.as_tensor(hidden_state, dtype=torch.float32)
     return {
+        "shape": list(vec.shape),
+        "layer_count": int(vec.shape[0]) if vec.ndim >= 2 else 1,
         "dim": int(vec.numel()),
         "mean": float(vec.mean().item()),
         "std": float(vec.std(unbiased=False).item()),
@@ -271,12 +273,12 @@ def save_hidden_state_results(hidden_states, questions_batch, vector_output_file
     Save hidden-state vectors to JSON, compact summaries to JSON, and full hidden
     states to a binary .pt file.
 
-    Vector JSON format:
+    Vector JSON format (all layers, last token):
       {
         "<Question>": {
-          "Hidden_State_Turn_0": [...],
+          "Hidden_State_Turn_0": [[...], [...], ...],
           ...
-          "Hidden_State_Turn_5": [...]
+          "Hidden_State_Turn_5": [[...], [...], ...]
         },
         ...
       }
