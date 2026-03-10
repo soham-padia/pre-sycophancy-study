@@ -1,8 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-ROOT="/home/padia.so/Workspace/CS6120-Sycophancy-Detection"
-JOB_FILE="${ROOT}/sbatch/false_presuppositions_qwen35_loop.sbatch"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+JOB_FILE="${SCRIPT_DIR}/false_presuppositions_qwen35_loop.sbatch"
+LOG_DIR="${ROOT}/logs"
+mkdir -p "${LOG_DIR}"
 
 MODEL_NAME="${1:-Qwen/Qwen3.5-9B}"
 PROMPT_TYPE="${PROMPT_TYPE:-all}"
@@ -22,4 +25,9 @@ echo "BATCH_SIZE=${BATCH_SIZE}"
 echo "MAX_BATCHES_PER_JOB=${MAX_BATCHES_PER_JOB}"
 echo "OUTPUT_DIR=${OUTPUT_DIR}"
 
-sbatch --export=ALL,MODEL_NAME="${MODEL_NAME}",PROMPT_TYPE="${PROMPT_TYPE}",BATCH_SIZE="${BATCH_SIZE}",MAX_BATCHES_PER_JOB="${MAX_BATCHES_PER_JOB}",RUN_REPORT="${RUN_REPORT}",AUTO_RESUBMIT="${AUTO_RESUBMIT}",PROMPT_LIST="${PROMPT_LIST}",OUTPUT_DIR="${OUTPUT_DIR}" "${JOB_FILE}"
+sbatch \
+  --chdir="${ROOT}" \
+  --output="${LOG_DIR}/%x-%j.out" \
+  --error="${LOG_DIR}/%x-%j.err" \
+  --export=ALL,ROOT_DIR="${ROOT}",MODEL_NAME="${MODEL_NAME}",PROMPT_TYPE="${PROMPT_TYPE}",BATCH_SIZE="${BATCH_SIZE}",MAX_BATCHES_PER_JOB="${MAX_BATCHES_PER_JOB}",RUN_REPORT="${RUN_REPORT}",AUTO_RESUBMIT="${AUTO_RESUBMIT}",PROMPT_LIST="${PROMPT_LIST}",OUTPUT_DIR="${OUTPUT_DIR}" \
+  "${JOB_FILE}"

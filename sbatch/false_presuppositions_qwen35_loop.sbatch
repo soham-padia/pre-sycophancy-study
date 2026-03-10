@@ -5,13 +5,10 @@
 #SBATCH --mem=64G
 #SBATCH --time=08:00:00
 #SBATCH --job-name=fp_qwen35_loop
-#SBATCH --chdir=/home/padia.so/Workspace/CS6120-Sycophancy-Detection
-#SBATCH --output=/home/padia.so/Workspace/CS6120-Sycophancy-Detection/logs/%x-%j.out
-#SBATCH --error=/home/padia.so/Workspace/CS6120-Sycophancy-Detection/logs/%x-%j.err
 
 set -euo pipefail
 
-ROOT="/home/padia.so/Workspace/CS6120-Sycophancy-Detection"
+ROOT="${ROOT_DIR:-${SLURM_SUBMIT_DIR:-$PWD}}"
 LOG_DIR="${ROOT}/logs"
 mkdir -p "${LOG_DIR}"
 cd "${ROOT}"
@@ -121,7 +118,12 @@ fi
 echo "Run incomplete."
 if [[ "${AUTO_RESUBMIT}" == "1" ]]; then
   echo "Re-submitting next chunk..."
-  sbatch --export=ALL,MODEL_NAME="${MODEL_NAME}",PROMPT_TYPE="${PROMPT_TYPE}",BATCH_SIZE="${BATCH_SIZE}",MAX_BATCHES_PER_JOB="${MAX_BATCHES_PER_JOB}",RUN_REPORT="${RUN_REPORT}",AUTO_RESUBMIT="${AUTO_RESUBMIT}",PROMPT_LIST="${PROMPT_LIST}",OUTPUT_DIR="${OUTPUT_DIR}" "${ROOT}/sbatch/false_presuppositions_qwen35_loop.sbatch"
+  sbatch \
+    --chdir="${ROOT}" \
+    --output="${ROOT}/logs/%x-%j.out" \
+    --error="${ROOT}/logs/%x-%j.err" \
+    --export=ALL,ROOT_DIR="${ROOT}",MODEL_NAME="${MODEL_NAME}",PROMPT_TYPE="${PROMPT_TYPE}",BATCH_SIZE="${BATCH_SIZE}",MAX_BATCHES_PER_JOB="${MAX_BATCHES_PER_JOB}",RUN_REPORT="${RUN_REPORT}",AUTO_RESUBMIT="${AUTO_RESUBMIT}",PROMPT_LIST="${PROMPT_LIST}",OUTPUT_DIR="${OUTPUT_DIR}" \
+    "${ROOT}/sbatch/false_presuppositions_qwen35_loop.sbatch"
 else
   echo "AUTO_RESUBMIT=0, stopping."
 fi
