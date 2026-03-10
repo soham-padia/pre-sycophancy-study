@@ -72,6 +72,26 @@ def parse_generation_output(generation_output):
         return generation_output.get("text", ""), generation_output.get("hidden_state")
     return generation_output, None
 
+def load_completed_questions(output_csv_file):
+    """
+    Return questions that already have all 6 turn responses in the output CSV.
+    """
+    import csv
+
+    completed = set()
+    if not os.path.exists(output_csv_file):
+        return completed
+
+    with open(output_csv_file, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            question = (row.get("Question") or "").strip()
+            if not question:
+                continue
+            if all((row.get(f"Response_Turn_{i}") or "").strip() for i in range(6)):
+                completed.add(question)
+    return completed
+
 def summarize_hidden_state(hidden_state):
     """Return compact numeric summary statistics for hidden-state tensor(s)."""
     if hidden_state is None:
@@ -120,24 +140,38 @@ def run_benchmark(model, batch_size=4, output_dir=None, prompt_types=None, data_
         # Load questions and turn mapping
         questions = load_multiturn_questions(prompt_file, data_dir=data_dir)
         turn_map = load_multiturn_map(prompt_file, data_dir=data_dir)
-        
-        logging.info(f"Loaded {len(questions)} questions for {prompt_file}")
+
+        output_csv = f"{output_dir}/{prompt_file}_multiturn.csv"
+        completed_questions = load_completed_questions(output_csv)
+        remaining_questions = [q for q in questions if q not in completed_questions]
+
+        logging.info(
+            f"Loaded {len(questions)} questions for {prompt_file} "
+            f"(completed={len(completed_questions)}, remaining={len(remaining_questions)})"
+        )
+
+        if not remaining_questions:
+            logging.info(f"All questions already completed for {prompt_file}, skipping generation.")
+            continue
 
         # Prepare results for text responses and hidden states.
-        results = {q: [None] * 6 for q in questions}
-        hidden_states = {q: [None] * 6 for q in questions}
-        turn_metadata = {q: [None] * 6 for q in questions}
+        results = {q: [None] * 6 for q in remaining_questions}
+        hidden_states = {q: [None] * 6 for q in remaining_questions}
+        turn_metadata = {q: [None] * 6 for q in remaining_questions}
         
         # Process questions in batches
-        for batch_index, batch_start in enumerate(range(0, len(questions), batch_size), start=1):
+        for batch_index, batch_start in enumerate(range(0, len(remaining_questions), batch_size), start=1):
             if max_batches is not None and batch_index > max_batches:
                 logging.info(f"Reached max_batches={max_batches} for {prompt_file}; stopping early.")
                 break
 
-            batch_end = min(batch_start + batch_size, len(questions))
-            batch_questions = questions[batch_start:batch_end]
+            batch_end = min(batch_start + batch_size, len(remaining_questions))
+            batch_questions = remaining_questions[batch_start:batch_end]
 
-            logging.info(f"\nProcessing questions {batch_start+1}-{batch_end} out of {len(questions)} for {prompt_file}")
+            logging.info(
+                f"\nProcessing remaining questions {batch_start+1}-{batch_end} "
+                f"out of {len(remaining_questions)} for {prompt_file}"
+            )
 
             # For each question, run a multi-turn conversation
             for q_idx, question in enumerate(batch_questions):
