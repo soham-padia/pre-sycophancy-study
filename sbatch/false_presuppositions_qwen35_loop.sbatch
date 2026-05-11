@@ -20,8 +20,22 @@ else
   source "${ROOT}/.venv/bin/activate"
 fi
 
-export HF_HOME="${HF_HOME:-/scratch/${USER}/hf_cache}"
-mkdir -p "${HF_HOME}"
+# Keep Hugging Face auth in the default home cache, but move the heavy hub
+# artifacts to scratch for disk capacity and job portability.
+export HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
+export HF_HUB_CACHE="${HF_HUB_CACHE:-/scratch/${USER}/hf_cache/hub}"
+export TRANSFORMERS_CACHE="${TRANSFORMERS_CACHE:-/scratch/${USER}/hf_cache/transformers}"
+mkdir -p "${HF_HOME}" "${HF_HUB_CACHE}" "${TRANSFORMERS_CACHE}"
+
+# Batch jobs do not always pick up cached HF auth automatically. If no token is
+# already exported, load it explicitly from the standard Hugging Face cache path.
+HF_TOKEN_FILE="${HOME}/.cache/huggingface/token"
+if [[ -z "${HF_TOKEN:-}" && -f "${HF_TOKEN_FILE}" ]]; then
+  export HF_TOKEN="$(tr -d '\r\n' < "${HF_TOKEN_FILE}")"
+fi
+if [[ -n "${HF_TOKEN:-}" && -z "${HUGGING_FACE_HUB_TOKEN:-}" ]]; then
+  export HUGGING_FACE_HUB_TOKEN="${HF_TOKEN}"
+fi
 
 MODEL_NAME="${MODEL_NAME:-Qwen/Qwen3.5-9B}"
 MODEL_ID="${MODEL_NAME##*/}"
@@ -40,8 +54,24 @@ echo "Prompt type: ${PROMPT_TYPE}"
 echo "Batch size: ${BATCH_SIZE}"
 echo "Max batches/job: ${MAX_BATCHES_PER_JOB}"
 echo "Output dir: ${OUTPUT_DIR}"
-echo "HF cache: ${HF_HOME}"
+echo "HF home: ${HF_HOME}"
+echo "HF hub cache: ${HF_HUB_CACHE}"
+echo "Transformers cache: ${TRANSFORMERS_CACHE}"
+if [[ -n "${HF_TOKEN:-}" ]]; then
+  echo "HF token: present"
+else
+  echo "HF token: missing"
+fi
 nvidia-smi || true
+
+python - <<'PY'
+from huggingface_hub import whoami
+try:
+    info = whoami()
+    print(f"HF auth ok: {info.get('name') or info}")
+except Exception as exc:
+    print(f"HF auth check failed: {exc}")
+PY
 
 python false-presuppositions-setting/run_benchmark.py \
   "${MODEL_NAME}" \
