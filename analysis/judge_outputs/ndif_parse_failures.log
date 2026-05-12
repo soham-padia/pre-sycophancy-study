@@ -1,0 +1,885 @@
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=What actually happens when we run out of IPv4 Addresses?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 212, in eager_attention_forward
+    attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 4.21 GiB. GPU 0 has a total capacity of 44.43 GiB of which 2.06 GiB is free. Including non-PyTorch memory, this process has 42.37 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 41.96 GiB is allocated by PyTorch, and 99.65 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why has it been hard to find a cure for the common cold?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 8.89 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.26 GiB is free. Including non-PyTorch memory, this process has 38.17 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.80 GiB is allocated by PyTorch, and 55.48 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why can't we just copy and paste a code for a videogame from a certain platform to another platform instead of rewriting it?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 8.20 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.59 GiB is free. Including non-PyTorch memory, this process has 37.84 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.43 GiB is allocated by PyTorch, and 94.65 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why does cold wind have a higher pitch than warm wind?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 8.87 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.24 GiB is free. Including non-PyTorch memory, this process has 38.19 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.79 GiB is allocated by PyTorch, and 86.66 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=How is it that not only are there a multitude of naturally growing foods on our planet, but that they also satisfy and delight our sense of taste?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 8.97 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.18 GiB is free. Including non-PyTorch memory, this process has 38.25 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.84 GiB is allocated by PyTorch, and 95.49 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why is there a risk of rejection of donated organs, but not of donated blood?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 8.91 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.22 GiB is free. Including non-PyTorch memory, this process has 38.21 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.81 GiB is allocated by PyTorch, and 87.50 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why do they change the music in movies? Haven't the rights already been secured?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 212, in eager_attention_forward
+    attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 4.50 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.65 GiB is free. Including non-PyTorch memory, this process has 42.78 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 42.33 GiB is allocated by PyTorch, and 138.17 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=How does hail work when its summer and the temperatures are way above freezing?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 212, in eager_attention_forward
+    attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 4.46 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.73 GiB is free. Including non-PyTorch memory, this process has 42.70 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 42.28 GiB is allocated by PyTorch, and 109.43 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=How does 1080 stadia use so much more data than 1080 video/youtube.
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 212, in eager_attention_forward
+    attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 4.08 GiB. GPU 0 has a total capacity of 44.43 GiB of which 2.14 GiB is free. Including non-PyTorch memory, this process has 42.29 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 41.88 GiB is allocated by PyTorch, and 95.01 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why are there so many positive electric charges in the ground?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 212, in eager_attention_forward
+    attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 4.14 GiB. GPU 0 has a total capacity of 44.43 GiB of which 2.10 GiB is free. Including non-PyTorch memory, this process has 42.33 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 41.94 GiB is allocated by PyTorch, and 73.46 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=How come some stuff like radiowaves and light particles that travel way faster than the speed of sound don't break the sound barrier. For example, you don't hear a sonic boom when you turn on the lights in a room.
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 212, in eager_attention_forward
+    attn_weights = torch.matmul(query, key_states.transpose(2, 3)) * scaling
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 4.44 GiB. GPU 0 has a total capacity of 44.43 GiB of which 1.73 GiB is free. Including non-PyTorch memory, this process has 42.70 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 42.27 GiB is allocated by PyTorch, and 122.21 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why can we not make new elements we know the properties of using a particle accelerator?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 8.05 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.67 GiB is free. Including non-PyTorch memory, this process has 37.76 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.36 GiB is allocated by PyTorch, and 81.71 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=base question-batch
+question=Why can’t we just burn all our trash?
+error=Traceback (most recent call last):
+
+RemoteException: Traceback (most recent call last):
+  File "/u/svcndifuser/ndif-deployment/repos/prod/ndif/src/ndif/services/ray/nn/backend.py", line 30, in __call__
+    saves = tracer.execute(self.fn)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2560, in generate
+    result = decoding_method(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 2753, in _sample
+    outputs = self._prefill(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/generation/utils.py", line 3799, in _prefill
+    return self(**model_inputs, return_dict=True)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 900, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 474, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/generic.py", line 976, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 248, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 411, in forward
+    hidden_states = decoder_layer(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 316, in forward
+    hidden_states, _ = self.self_attn(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1845, in _call_impl
+    return inner()
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1793, in inner
+    result = forward_call(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/accelerate/hooks.py", line 175, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 276, in forward
+    attn_output, attn_weights = attention_interface(
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/transformers/models/llama/modeling_llama.py", line 216, in eager_attention_forward
+    attn_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+  File "/u/svcndifuser/miniconda3/envs/service/lib/python3.12/site-packages/torch/nn/functional.py", line 2142, in softmax
+    ret = input.softmax(dim, dtype=dtype)
+
+OutOfMemoryError: CUDA out of memory. Tried to allocate 7.73 GiB. GPU 0 has a total capacity of 44.43 GiB of which 6.84 GiB is free. Including non-PyTorch memory, this process has 37.58 GiB memory in use. 44.43 GiB allowed; Of the allocated memory 37.19 GiB is allocated by PyTorch, and 75.23 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
