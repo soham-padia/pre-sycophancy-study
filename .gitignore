@@ -1,4 +1,5 @@
 # Ignore all model checkpoints inside debate-LM/analysis/model
 /analysis/model/
+/data/
 
 **/.DS_Store
