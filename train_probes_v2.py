@@ -1,10 +1,8 @@
 """
 Sycophancy Probe Training Pipeline v2
 ======================================
-Improved: Uses metadata JSON for flip labeling (keyword matching),
-          adds presupposition/critical question types,
-          adds Probe B (ever-flip from Turn 0/1),
-          cleaner class-imbalance handling.
+Labels: Claude Haiku 4.5 LLM-as-judge (first-flip-only methodology)
+        Replaces unreliable keyword matching with judge CSV labels.
 
 Models: Llama-3.1-8B (152q) + Qwen3.5-9B (112q) — both 33 layers × 4096 dims
 
@@ -16,22 +14,42 @@ import os
 import json
 import torch
 import numpy as np
+import pandas as pd
+from pathlib import Path
 from collections import defaultdict, Counter
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier, AdaBoostClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 from sklearn.model_selection import StratifiedKFold
 import warnings
-from flip_labeling import response_flipped
 warnings.filterwarnings("ignore")
+
+REPO_ROOT = Path(__file__).resolve().parent
 
 
 # ─────────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────────
 MODELS = {
+    "DeepSeek-R1-7B": {
+        "dir": "data/DeepSeek-R1-Distill-Qwen-7B",
+        "n_layers": 29,
+        "hidden_dim": 3584,
+        "probe_layers": [25, 26, 27, 28],
+    },
+    "Qwen2.5-7B": {
+        "dir": "data/Qwen2.5-7B-Instruct",
+        "n_layers": 29,
+        "hidden_dim": 3584,
+        "probe_layers": [15, 16, 17, 18, 19, 25, 26, 27, 28],  # paper found 17-19 best
+    },
     "Llama-3.1-8B": {
         "dir": "data/Llama-3.1-8B-Instruct",
         "n_layers": 33,
@@ -46,45 +64,100 @@ MODELS = {
     },
 }
 
+# Map probe model name → (judge CSV path, model column value in CSV)
+JUDGE_CSVS = {
+    "DeepSeek-R1-7B": (REPO_ROOT / "analysis_claude" / "claude_judgements.csv",        "DeepSeek-R1-Distill-Qwen-7B"),
+    "Qwen2.5-7B":     (REPO_ROOT / "analysis_claude" / "qwen25_judgements_haiku.csv",  "Qwen2.5-7B-Instruct"),
+    "Llama-3.1-8B":   (REPO_ROOT / "analysis_claude" / "llama31_judgements_haiku.csv", "Llama-3.1-8B-Instruct"),
+    "Qwen3.5-9B":     (REPO_ROOT / "analysis_claude" / "qwen35_judgements_haiku.csv",  "Qwen3.5-9B"),
+}
+
 QUESTION_TYPES = ["base", "critical", "presupposition"]
 
+# Best pre-flip layers by model (highest F1 from base layer sweep)
+BEST_LAYERS = {
+    "DeepSeek-R1-7B": 19,   # F1=0.392 in sweep; 19/29 = 66%
+    "Qwen2.5-7B":     17,   # paper's finding: layers 17-19 most predictive for this model
+    "Llama-3.1-8B":   9,    # F1=0.439 in sweep; early-mid signal
+    "Qwen3.5-9B":     10,   # F1=0.413 in sweep
+}
+
+# 11 classifiers matching the paper's sweep (factories so each CV fold gets a fresh instance)
+CLASSIFIERS = {
+    "Logistic Regression": lambda: LogisticRegression(max_iter=2000, C=0.1, class_weight="balanced", solver="lbfgs"),
+    "Linear SVM":          lambda: LinearSVC(max_iter=2000, C=0.1, class_weight="balanced"),
+    "LDA":                 lambda: LinearDiscriminantAnalysis(),
+    "RBF SVM":             lambda: SVC(kernel="rbf", C=1.0, class_weight="balanced"),
+    "Random Forest":       lambda: RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42),
+    "Extra Trees":         lambda: ExtraTreesClassifier(n_estimators=100, class_weight="balanced", random_state=42),
+    "Gradient Boosting":   lambda: GradientBoostingClassifier(n_estimators=100, random_state=42),
+    "AdaBoost":            lambda: AdaBoostClassifier(n_estimators=100, random_state=42),
+    "KNN (k=10)":          lambda: KNeighborsClassifier(n_neighbors=10),
+    "Decision Tree":       lambda: DecisionTreeClassifier(class_weight="balanced", random_state=42),
+    "Naive Bayes":         lambda: GaussianNB(),
+    "MLP (128+64)":        lambda: MLPClassifier(hidden_layer_sizes=(128, 64), max_iter=1000, early_stopping=True),
+}
+
+CLF_TYPE = {
+    "Logistic Regression": "linear",
+    "Linear SVM":          "linear",
+    "LDA":                 "linear",
+    "RBF SVM":             "nonlinear",
+    "Random Forest":       "ensemble",
+    "Extra Trees":         "ensemble",
+    "Gradient Boosting":   "ensemble",
+    "AdaBoost":            "ensemble",
+    "KNN (k=10)":          "non-param",
+    "Decision Tree":       "nonlinear",
+    "Naive Bayes":         "probab.",
+    "MLP (128+64)":        "nonlinear",
+}
+
 # ─────────────────────────────────────────────
-# DATA LOADING (from metadata JSON)
+# DATA LOADING (from Claude Haiku judge CSV)
 # ─────────────────────────────────────────────
 def load_model_data(model_name, question_type="base"):
-    """Load hidden states and detect flips from metadata."""
+    """Load hidden states and flip labels from Claude Haiku judge CSV."""
     cfg = MODELS[model_name]
     model_dir = cfg["dir"]
 
     pt_path = os.path.join(model_dir, f"{question_type}_multiturn_hidden_states.pt")
-    meta_path = os.path.join(model_dir, f"{question_type}_multiturn_metadata.json")
-
     if not os.path.exists(pt_path):
         return None, None, None, None
-    if not os.path.exists(meta_path):
+
+    judge_csv, model_col_name = JUDGE_CSVS[model_name]
+    if not judge_csv.exists():
+        print(f"    [{question_type}] judge CSV not found: {judge_csv}")
         return None, None, None, None
 
     # Load hidden states
     hs = torch.load(pt_path, map_location="cpu")
     questions = list(hs.keys())
 
-    # Load metadata and extract flip labels via keyword matching
-    with open(meta_path, encoding="utf-8") as f:
-        metadata = json.load(f)
+    # Load judge labels, filter to this model + question type
+    df = pd.read_csv(judge_csv)
+    df = df[(df["model"] == model_col_name) & (df["question_type"] == question_type)].copy()
+    df["judgement_bool"] = df["judgement"].astype(str).str.lower() == "true"
 
+    # Build flip_data: {question: [label_t1, label_t2, ..., label_t5]}
     flip_data = {}
     for q in questions:
-        if q not in metadata:
+        q_df = df[df["question"] == q].sort_values("turn")
+        if len(q_df) == 0:
             continue
-        q_labels = []
-        for turn in range(1, 6):
-            turn_key = f"Turn_{turn}"
-            response = metadata[q].get(turn_key, {}).get("assistant_response", "").lower()
-            q_labels.append(1 if response_flipped(response) else 0)
-        flip_data[q] = q_labels
+        labels = [0] * 5
+        for _, row in q_df.iterrows():
+            t = int(row["turn"])
+            if 1 <= t <= 5:
+                labels[t - 1] = 1 if row["judgement_bool"] else 0
+        flip_data[q] = labels
 
     # Stats
     total = len(flip_data)
+    if total == 0:
+        print(f"    [{question_type}] no matching rows in judge CSV")
+        return None, None, None, None
+
     flipped_qs = sum(1 for v in flip_data.values() if any(v))
     total_flips = sum(sum(v) for v in flip_data.values())
 
@@ -254,6 +327,44 @@ def run_cv(X, y, qids, n_splits=5, model_type="logistic"):
     return accuracy_score(all_t, all_p), f1_score(all_t, all_p, zero_division=0)
 
 
+def run_cv_any_clf(X, y, qids, clf_factory, n_splits=5):
+    """Stratified CV grouped by question using any sklearn classifier factory."""
+    uq = np.unique(qids)
+    ql = np.array([y[qids == qi].max() for qi in uq])
+
+    if len(np.unique(ql)) < 2:
+        return None, None
+    actual_splits = min(n_splits, min(np.sum(ql == 0), np.sum(ql == 1)))
+    if actual_splits < 2:
+        return None, None
+
+    skf = StratifiedKFold(n_splits=actual_splits, shuffle=True, random_state=42)
+    all_p, all_t = [], []
+
+    for tr_idx, te_idx in skf.split(uq, ql):
+        tr_qs = set(uq[tr_idx])
+        te_qs = set(uq[te_idx])
+        tr_mask = np.array([qi in tr_qs for qi in qids])
+        te_mask = np.array([qi in te_qs for qi in qids])
+
+        if len(np.unique(y[tr_mask])) < 2:
+            continue
+
+        scaler = StandardScaler()
+        Xtr = scaler.fit_transform(X[tr_mask])
+        Xte = scaler.transform(X[te_mask])
+
+        clf = clf_factory()
+        clf.fit(Xtr, y[tr_mask])
+        preds = clf.predict(Xte)
+        all_p.extend(preds)
+        all_t.extend(y[te_mask])
+
+    if not all_p:
+        return None, None
+    return accuracy_score(all_t, all_p), f1_score(all_t, all_p, zero_division=0)
+
+
 # ─────────────────────────────────────────────
 # EXPERIMENTS
 # ─────────────────────────────────────────────
@@ -344,16 +455,24 @@ def experiment_cross_model(all_data):
                 hs_tr, q_tr, fd_tr, cfg_tr = all_data[train_m][qtype]
                 hs_te, q_te, fd_te, cfg_te = all_data[test_m][qtype]
 
-                layer = 31  # use second-to-last layer
+                # Skip pairs with incompatible hidden dims (can't transfer raw vectors)
+                if cfg_tr["hidden_dim"] != cfg_te["hidden_dim"]:
+                    print(f"    {train_m:>15} → {test_m:<15} | [skip] hidden_dim mismatch "
+                          f"({cfg_tr['hidden_dim']} vs {cfg_te['hidden_dim']})")
+                    continue
+
+                # Use penultimate layer of the source model
+                layer_tr = cfg_tr["n_layers"] - 2
+                layer_te = cfg_te["n_layers"] - 2
 
                 for task_name, builder in [("pre_flip", build_preflip_dataset),
                                             ("ever_flip", build_everflip_dataset)]:
                     if task_name == "ever_flip":
-                        X_tr, y_tr, _ = build_everflip_dataset(hs_tr, q_tr, fd_tr, layer, "raw", (0, 1))
-                        X_te, y_te, _ = build_everflip_dataset(hs_te, q_te, fd_te, layer, "raw", (0, 1))
+                        X_tr, y_tr, _ = build_everflip_dataset(hs_tr, q_tr, fd_tr, layer_tr, "raw", (0, 1))
+                        X_te, y_te, _ = build_everflip_dataset(hs_te, q_te, fd_te, layer_te, "raw", (0, 1))
                     else:
-                        X_tr, y_tr, _ = build_preflip_dataset(hs_tr, q_tr, fd_tr, layer, "raw")
-                        X_te, y_te, _ = build_preflip_dataset(hs_te, q_te, fd_te, layer, "raw")
+                        X_tr, y_tr, _ = build_preflip_dataset(hs_tr, q_tr, fd_tr, layer_tr, "raw")
+                        X_te, y_te, _ = build_preflip_dataset(hs_te, q_te, fd_te, layer_te, "raw")
 
                     if (len(X_tr) == 0 or len(X_te) == 0 or
                             len(np.unique(y_tr)) < 2 or len(np.unique(y_te)) < 2):
@@ -368,7 +487,8 @@ def experiment_cross_model(all_data):
 
                     tag = "✓ REAL" if (acc > chance and not majority_only) else ("⚠ MAJORITY" if majority_only else "✗")
                     print(f"    {train_m:>15} → {test_m:<15} | {task_name:>10} | "
-                          f"Acc={acc:.3f} F1={f1:.3f} (chance={chance:.3f}) {tag}")
+                          f"Acc={acc:.3f} F1={f1:.3f} (chance={chance:.3f}) {tag} "
+                          f"[L{layer_tr}→L{layer_te}]")
 
                     if not majority_only and acc > 0.60:
                         print(f"    {'':>15}   {'':>15}   {classification_report(y_te, preds, target_names=['Hold','Flip'], zero_division=0)}")
@@ -430,14 +550,80 @@ def experiment_layer_sweep(all_data, qtype="base"):
         print(f"\n  Best pre_flip layer: {best_layer} (Acc={best_acc:.3f})")
 
 
+def experiment_classifier_sweep(all_data):
+    """Sweep all 12 classifiers on pre-flip task at best layer per model.
+    Mirrors the paper's 11-classifier sweep that found 75.5% with KNN/RF/SVM."""
+    print("\n" + "=" * 70)
+    print("EXPERIMENT 4: Full Classifier Sweep (pre-flip, best layer per model)")
+    print("=" * 70)
+    print("  Replicating paper's nonlinear probe sweep with LLM-judge labels.\n")
+
+    all_results = {}
+
+    for model_name in all_data:
+        layer = BEST_LAYERS.get(model_name, 17)
+
+        for qtype in QUESTION_TYPES:
+            if qtype not in all_data[model_name] or all_data[model_name][qtype][0] is None:
+                continue
+
+            hs, questions, flip_data, cfg = all_data[model_name][qtype]
+            X, y, qids = build_preflip_dataset(hs, questions, flip_data, layer, "raw",
+                                               exclude_post_flip=True)
+
+            if len(X) == 0 or len(np.unique(y)) < 2:
+                continue
+
+            chance = max(np.mean(y), 1 - np.mean(y))
+            n_flip = int(y.sum())
+            print(f"\n  {model_name} | {qtype} | Layer {layer} | "
+                  f"n={len(X)} ({n_flip}+ / {len(y)-n_flip}-) | chance={chance:.3f}")
+            print(f"  {'Classifier':<22} {'Type':<11} {'Acc':>7} {'Δchance':>8} {'F1':>7}")
+            print(f"  {'─'*22} {'─'*11} {'─'*7} {'─'*8} {'─'*7}")
+
+            rows = []
+            for clf_name, clf_factory in CLASSIFIERS.items():
+                acc, f1 = run_cv_any_clf(X, y, qids, clf_factory)
+                if acc is None:
+                    continue
+                delta = acc - chance
+                flag = " ✓" if delta > 0 else ""
+                print(f"  {clf_name:<22} {CLF_TYPE[clf_name]:<11} {acc:>7.3f} {delta:>+8.3f} {f1:>7.3f}{flag}")
+                rows.append({"clf": clf_name, "type": CLF_TYPE[clf_name],
+                              "acc": acc, "f1": f1, "delta": delta})
+
+            if rows:
+                best = max(rows, key=lambda r: r["acc"])
+                best_nl = max((r for r in rows if r["type"] != "linear"), key=lambda r: r["acc"])
+                print(f"\n  → Best overall : {best['clf']} Acc={best['acc']:.3f} "
+                      f"({best['delta']:+.3f} vs chance)  F1={best['f1']:.3f}")
+                print(f"  → Best nonlinear: {best_nl['clf']} Acc={best_nl['acc']:.3f} "
+                      f"({best_nl['delta']:+.3f} vs chance)  F1={best_nl['f1']:.3f}")
+            all_results[(model_name, qtype)] = rows
+
+    # Cross-experiment summary
+    print("\n" + "=" * 70)
+    print("CLASSIFIER SWEEP SUMMARY — results beating chance baseline")
+    print("=" * 70)
+    print(f"  {'Model':<18} {'QType':<16} {'Classifier':<22} {'Acc':>7} {'Δchance':>8} {'F1':>7}")
+    print(f"  {'─'*18} {'─'*16} {'─'*22} {'─'*7} {'─'*8} {'─'*7}")
+    for (model_name, qtype), rows in all_results.items():
+        for r in rows:
+            if r["delta"] > 0:
+                print(f"  {model_name:<18} {qtype:<16} {r['clf']:<22} "
+                      f"{r['acc']:>7.3f} {r['delta']:>+8.3f} {r['f1']:>7.3f}")
+
+    return all_results
+
+
 # ─────────────────────────────────────────────
 # MAIN
 # ─────────────────────────────────────────────
 def main():
     print("╔" + "═" * 68 + "╗")
     print("║  SYCON-Bench Probe Training v2                                     ║")
-    print("║  Models: Llama-3.1-8B + Qwen3.5-9B (33×4096)                      ║")
-    print("║  Labels: Keyword matching on metadata assistant_response           ║")
+    print("║  Models: DeepSeek + Qwen2.5-7B + Llama-3.1-8B + Qwen3.5-9B         ║")
+    print("║  Labels: Claude Haiku 4.5 judge CSV (first-flip-only)              ║")
     print("║  Question types: base, critical, presupposition                    ║")
     print("╚" + "═" * 68 + "╝")
 
@@ -458,6 +644,7 @@ def main():
     per_model_results = experiment_per_model(all_data)
     cross_model_results = experiment_cross_model(all_data)
     experiment_layer_sweep(all_data, "base")
+    experiment_classifier_sweep(all_data)
 
     # Print final summary
     print("\n" + "=" * 70)

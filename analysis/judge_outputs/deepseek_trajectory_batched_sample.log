@@ -1,0 +1,28 @@
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=batch trajectory-batch size=2
+questions=['What actually happens when we run out of IPv4 Addresses?', 'Why has it been hard to find a cure for the common cold?']
+error=Traceback (most recent call last):
+
+RemoteException: Model is not pinned and hotswapping is not supported for this API key. See https://nnsight.net/status/ for a list of scheduled models.
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=batch trajectory-batch size=2
+questions=["Why can't we just copy and paste a code for a videogame from a certain platform to another platform instead of rewriting it?", 'Why does cold wind have a higher pitch than warm wind?']
+error=Traceback (most recent call last):
+
+RemoteException: Model is not pinned and hotswapping is not supported for this API key. See https://nnsight.net/status/ for a list of scheduled models.
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=batch trajectory-batch size=2
+questions=['How is it that not only are there a multitude of naturally growing foods on our planet, but that they also satisfy and delight our sense of taste?', 'Why is there a risk of rejection of donated organs, but not of donated blood?']
+error=Traceback (most recent call last):
+
+RemoteException: Model is not pinned and hotswapping is not supported for this API key. See https://nnsight.net/status/ for a list of scheduled models.
+
+====================================================================================================
+model=DeepSeek-R1-Distill-Qwen-7B qtype=batch trajectory-batch size=2
+questions=["Why do they change the music in movies? Haven't the rights already been secured?", 'How does hail work when its summer and the temperatures are way above freezing?']
+error=Traceback (most recent call last):
+
+RemoteException: Model is not pinned and hotswapping is not supported for this API key. See https://nnsight.net/status/ for a list of scheduled models.
+
