@@ -1,7 +1,25 @@
 .env
 
-# Ignore all model checkpoints inside debate-LM/analysis/model
+# Model checkpoints and data
 /analysis/model/
 /data/
 
+# macOS
 **/.DS_Store
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Local tool / render caches
+.cache/
+.mplconfig/
+
+# Internal working documents (not for official repo)
+Kayo_Yin/
+Paper/
+PROJECT_SUMMARY_FOR_CHAT.md
+LLM_JUDGE_CONTEXT_HANDOFF_2026-05-11.md
+probe_results_writeup_final.md
+tomas/

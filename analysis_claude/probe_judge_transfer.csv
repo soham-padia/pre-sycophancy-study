@@ -1,0 +1,13 @@
+source,target,qtype,acc,f1,chance,delta
+DeepSeek-R1-7B,Qwen2.5-7B,base,0.4129,0.5845,0.5871,-0.1742
+DeepSeek-R1-7B,Qwen2.5-7B,critical,0.4615,0.6316,0.5385,-0.0769
+DeepSeek-R1-7B,Qwen2.5-7B,presupposition,0.4314,0.6027,0.5686,-0.1373
+Qwen2.5-7B,DeepSeek-R1-7B,base,0.8409,0.9136,0.8409,0.0
+Qwen2.5-7B,DeepSeek-R1-7B,critical,0.1667,0.0,0.8333,-0.6667
+Qwen2.5-7B,DeepSeek-R1-7B,presupposition,0.8631,0.9265,0.8631,0.0
+Llama-3.1-8B,Qwen3.5-9B,base,0.6696,0.8021,0.6696,0.0
+Llama-3.1-8B,Qwen3.5-9B,critical,0.7054,0.8272,0.7054,0.0
+Llama-3.1-8B,Qwen3.5-9B,presupposition,0.8036,0.8911,0.8036,0.0
+Qwen3.5-9B,Llama-3.1-8B,base,0.8553,0.922,0.8553,0.0
+Qwen3.5-9B,Llama-3.1-8B,critical,0.8224,0.9025,0.8224,0.0
+Qwen3.5-9B,Llama-3.1-8B,presupposition,0.7603,0.8638,0.7603,0.0

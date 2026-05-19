@@ -5,9 +5,6 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import numpy as np
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 OUT_PNG = REPO_ROOT / "analysis_claude" / "flip_turn_distribution.png"
 
@@ -88,52 +85,35 @@ for ax, qt, qt_label in zip(axes, QTYPES, QTYPE_LABELS):
                 if rate * 100 >= MIN_SHOW_PCT:
                     ax.text(t, i, f"{rate*100:.0f}%",
                             ha="center", va="center",
-                            fontsize=6.8, fontweight="bold", color="white", zorder=4)
+                            fontsize=7, fontweight="bold", color="white", zorder=4)
 
-        # Ever-flip annotation at right margin
-        ax.text(5.65, i, f"{ever*100:.0f}%",
-                ha="left", va="center", fontsize=9,
-                color=color, fontweight="bold")
-
-    # Column header for ever-flip column
-    ax.text(5.65, len(models) - 0.55, "ever\nflip",
-            ha="left", va="bottom", fontsize=7.5,
-            color="#666666", style="italic")
-
-    ax.set_xlim(0.4, 6.3)
+    ax.set_xlim(0.4, 5.6)
     ax.set_ylim(-0.7, len(models) - 0.3)
     ax.set_xticks(range(1, 6))
-    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=9)
-    ax.set_title(qt_label, fontsize=11, pad=9)
+    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=10)
+    ax.set_title(qt_label, fontsize=12, pad=9)
     ax.yaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
     ax.xaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
     ax.set_axisbelow(True)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
+# Model names on leftmost panel, color-coded to match their bubbles
 axes[0].set_yticks(range(len(models)))
-axes[0].set_yticklabels(models, fontsize=9.5)
-
-# ── Bubble-size legend ─────────────────────────────────────────────────────────
-legend_ax = axes[2]
-for pct, lbl in [(10, "10%"), (25, "25%"), (50, "50%")]:
-    legend_ax.scatter([], [], s=(pct / 100) * BUBBLE_SCALE,
-                      color="#888888", alpha=0.7, label=lbl,
-                      edgecolors="white", linewidths=0.8)
-legend_ax.legend(title="% questions\nfirst-flip here",
-                 title_fontsize=7.5, fontsize=8,
-                 loc="lower right", framealpha=0.85,
-                 handletextpad=0.4, labelspacing=0.6)
+axes[0].set_yticklabels(models, fontsize=10.5)
+for tick, model in zip(axes[0].get_yticklabels(), models):
+    tick.set_color(MODEL_COLORS[model])
+    tick.set_fontweight("bold")
 
 # ── Pressure-level note at bottom ──────────────────────────────────────────────
 pressure_str = "  •  ".join([f"T{i+1}: {p}" for i, p in enumerate(PRESSURE)])
-fig.text(0.5, -0.04, pressure_str, ha="center", fontsize=6.8, color="#555555",
+fig.text(0.5, -0.03, pressure_str, ha="center", fontsize=7.5, color="#555555",
          wrap=True)
 
 fig.suptitle(
     "First-Flip Turn Distribution by Model and Question Type\n"
-    "(Judge: Claude Haiku 4.5  ·  bubble area ∝ % of questions first flipping at that pressure turn)",
-    fontsize=11, y=1.03,
+    "(LLM-as-judge: Claude Haiku 4.5  ·  bubble area ∝ % of questions first-flipping at that pressure turn)",
+    fontsize=12, y=1.03,
 )
 
 plt.savefig(OUT_PNG, dpi=180, bbox_inches="tight")
