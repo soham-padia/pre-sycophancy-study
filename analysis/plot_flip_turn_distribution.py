@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 REPO_ROOT = Path(__file__).resolve().parents[1]
 OUT_PNG = REPO_ROOT / "analysis_claude" / "flip_turn_distribution.png"
 
@@ -64,8 +65,8 @@ models = list(JUDGE_CSVS.keys())
 dfs = {m: pd.read_csv(p) for m, (p, _) in JUDGE_CSVS.items()}
 
 # ── Figure ─────────────────────────────────────────────────────────────────────
-fig, axes = plt.subplots(1, 3, figsize=(15, 4.6), sharey=True)
-fig.subplots_adjust(wspace=0.06, right=0.88)
+fig, axes = plt.subplots(1, 3, figsize=(15, 5.5), sharey=True)
+fig.subplots_adjust(wspace=0.06, right=0.88, bottom=0.18)
 
 BUBBLE_SCALE = 2800   # area multiplier: rate=1.0 → s=2800 pts²
 MIN_SHOW_PCT = 4      # show label only for bubbles ≥ 4%
@@ -85,13 +86,13 @@ for ax, qt, qt_label in zip(axes, QTYPES, QTYPE_LABELS):
                 if rate * 100 >= MIN_SHOW_PCT:
                     ax.text(t, i, f"{rate*100:.0f}%",
                             ha="center", va="center",
-                            fontsize=7, fontweight="bold", color="white", zorder=4)
+                            fontsize=9, fontweight="bold", color="white", zorder=4)
 
     ax.set_xlim(0.4, 5.6)
     ax.set_ylim(-0.7, len(models) - 0.3)
     ax.set_xticks(range(1, 6))
-    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=10)
-    ax.set_title(qt_label, fontsize=12, pad=9)
+    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=12)
+    ax.set_title(qt_label, fontsize=14, pad=9)
     ax.yaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
     ax.xaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
     ax.set_axisbelow(True)
@@ -100,20 +101,36 @@ for ax, qt, qt_label in zip(axes, QTYPES, QTYPE_LABELS):
 
 # Model names on leftmost panel, color-coded to match their bubbles
 axes[0].set_yticks(range(len(models)))
-axes[0].set_yticklabels(models, fontsize=10.5)
+axes[0].set_yticklabels(models, fontsize=12)
 for tick, model in zip(axes[0].get_yticklabels(), models):
     tick.set_color(MODEL_COLORS[model])
     tick.set_fontweight("bold")
 
+# Right-margin ever-flip rate annotations on the rightmost panel
+for i, model in enumerate(models):
+    _, model_col = JUDGE_CSVS[model]
+    ever_vals = [first_flip_dist(dfs[model], model_col, qt)[1] for qt in QTYPES]
+    avg_ever = np.mean(ever_vals)
+    axes[-1].annotate(
+        f"{avg_ever*100:.0f}%",
+        xy=(5.6, i), xycoords="data",
+        xytext=(6, 0), textcoords="offset points",
+        ha="left", va="center",
+        fontsize=10.5, fontweight="bold",
+        color=MODEL_COLORS[model],
+        annotation_clip=False,
+    )
+
 # ── Pressure-level note at bottom ──────────────────────────────────────────────
-pressure_str = "  •  ".join([f"T{i+1}: {p}" for i, p in enumerate(PRESSURE)])
-fig.text(0.5, -0.03, pressure_str, ha="center", fontsize=7.5, color="#555555",
-         wrap=True)
+line1 = "  •  ".join([f"T{i+1}: {p}" for i, p in enumerate(PRESSURE[:3])])
+line2 = "  •  ".join([f"T{i+4}: {p}" for i, p in enumerate(PRESSURE[3:])])
+fig.text(0.5, 0.07, line1, ha="center", fontsize=10.5, color="#555555")
+fig.text(0.5, 0.02, line2, ha="center", fontsize=10.5, color="#555555")
 
 fig.suptitle(
     "First-Flip Turn Distribution by Model and Question Type\n"
     "(LLM-as-judge: Claude Haiku 4.5  ·  bubble area ∝ % of questions first-flipping at that pressure turn)",
-    fontsize=12, y=1.03,
+    fontsize=13, y=1.03,
 )
 
 plt.savefig(OUT_PNG, dpi=180, bbox_inches="tight")
