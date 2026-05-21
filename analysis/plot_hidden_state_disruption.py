@@ -43,7 +43,7 @@ cos_df   = pd.read_csv(COSINE_CSV)
 sweep_df = pd.read_csv(SWEEP_CSV)
 
 # ── Figure layout ──────────────────────────────────────────────────────────────
-fig = plt.figure(figsize=(13, 5))
+fig = plt.figure(figsize=(14, 5.5))
 gs  = gridspec.GridSpec(1, 2, wspace=0.38, left=0.07, right=0.97)
 
 ax_auc = fig.add_subplot(gs[0])
@@ -62,11 +62,12 @@ for model, color in MODEL_COLORS.items():
     ax_auc.scatter(peak["layer"], peak["auc"], color=color, s=55, zorder=4)
 
 ax_auc.axhline(0.5, color="#999999", lw=1.2, ls="--", label="Chance (AUC=0.5)")
-ax_auc.set_xlabel("Layer", fontsize=10)
-ax_auc.set_ylabel("ROC-AUC  (cos sim T0→T1 predicts flip)", fontsize=9)
+ax_auc.set_xlabel("Layer", fontsize=12)
+ax_auc.set_ylabel("ROC-AUC  (cos sim T0→T1 predicts flip)", fontsize=11)
 ax_auc.set_title("A.  Zero-Shot Cosine Disruption Signal\n(AUC by layer, best question type per model)",
-                 fontsize=10, pad=8)
-ax_auc.legend(fontsize=7.5, loc="lower right", framealpha=0.85)
+                 fontsize=12, pad=8)
+ax_auc.legend(fontsize=10, loc="lower right", framealpha=0.85)
+ax_auc.tick_params(labelsize=10)
 ax_auc.set_ylim(0.35, 0.70)
 ax_auc.spines["top"].set_visible(False)
 ax_auc.spines["right"].set_visible(False)
@@ -85,11 +86,12 @@ for model, color in MODEL_COLORS.items():
     # Draw per-model chance as a faint horizontal line
     ax_lda.axhline(chance, color=color, lw=0.7, ls=":", alpha=0.45)
 
-ax_lda.set_xlabel("Layer", fontsize=10)
-ax_lda.set_ylabel("Logistic regression cross-val accuracy", fontsize=9)
+ax_lda.set_xlabel("Layer", fontsize=12)
+ax_lda.set_ylabel("Logistic regression cross-val accuracy", fontsize=11)
 ax_lda.set_title("B.  Linear Probe Accuracy by Layer\n(logistic regression, pre-flip task — flat at/below chance throughout)",
-                 fontsize=10, pad=8)
-ax_lda.legend(fontsize=7.5, loc="upper right", framealpha=0.85)
+                 fontsize=12, pad=8)
+ax_lda.legend(fontsize=10, loc="upper right", framealpha=0.85)
+ax_lda.tick_params(labelsize=10)
 ax_lda.set_ylim(0.35, 0.95)
 ax_lda.spines["top"].set_visible(False)
 ax_lda.spines["right"].set_visible(False)
@@ -98,7 +100,7 @@ ax_lda.set_axisbelow(True)
 
 fig.suptitle(
     "Hidden-State Disruption: Zero-Shot Cosine Signal vs. Linear Probe Failure Across All Layers",
-    fontsize=11, y=1.01,
+    fontsize=13, y=1.01,
 )
 
 plt.savefig(OUT_PNG, dpi=180, bbox_inches="tight")

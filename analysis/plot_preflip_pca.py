@@ -138,20 +138,20 @@ def main():
             f"{model_name}  (layer {layer}, {qtype})\n"
             f"PC1={var[0]:.1%}, PC2={var[1]:.1%}  "
             f"n_flip={flip_mask.sum()}, n_hold={hold_mask.sum()}",
-            fontsize=8.5)
-        ax.set_xlabel("PC 1", fontsize=8)
-        ax.set_ylabel("PC 2", fontsize=8)
-        ax.tick_params(labelsize=7)
+            fontsize=10.5)
+        ax.set_xlabel("PC 1", fontsize=10)
+        ax.set_ylabel("PC 2", fontsize=10)
+        ax.tick_params(labelsize=9)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
         if idx == 0:
-            ax.legend(fontsize=7.5, loc="upper right", framealpha=0.85,
+            ax.legend(fontsize=9.5, loc="upper right", framealpha=0.85,
                       markerscale=1.5)
 
     fig.suptitle(
         "PCA Projection of Pre-Flip and Hold Hidden States\n"
         "(best probe layer per model, LLM-as-judge first-flip labels)",
-        fontsize=11, y=0.97)
+        fontsize=13, y=0.97)
 
     plt.savefig(OUT_PNG, dpi=180, bbox_inches="tight")
     print(f"Saved → {OUT_PNG}")
