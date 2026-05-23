@@ -97,9 +97,9 @@ def main():
     model_names = list(MODELS.keys())
     n = len(model_names)
 
-    fig = plt.figure(figsize=(13, 10))
-    gs = gridspec.GridSpec(2, 2, hspace=0.45, wspace=0.35,
-                           left=0.07, right=0.97, top=0.90, bottom=0.07)
+    fig = plt.figure(figsize=(3.3, 4.2))
+    gs = gridspec.GridSpec(2, 2, hspace=0.52, wspace=0.45,
+                           left=0.12, right=0.97, top=0.82, bottom=0.06)
 
     for idx, model_name in enumerate(model_names):
         cfg = MODELS[model_name]
@@ -128,32 +128,30 @@ def main():
         hold_mask = y == 0
 
         ax.scatter(X_2d[hold_mask, 0], X_2d[hold_mask, 1],
-                   c=COLORS["hold"], alpha=0.35, s=12, label="Hold",
+                   c=COLORS["hold"], alpha=0.35, s=4, label="Hold",
                    edgecolors="none", zorder=2)
         ax.scatter(X_2d[flip_mask, 0], X_2d[flip_mask, 1],
-                   c=COLORS["flip"], alpha=0.45, s=12, label="Pre-flip",
+                   c=COLORS["flip"], alpha=0.45, s=4, label="Pre-flip",
                    edgecolors="none", zorder=3)
 
         ax.set_title(
-            f"{model_name}  (layer {layer}, {qtype})\n"
-            f"PC1={var[0]:.1%}, PC2={var[1]:.1%}  "
-            f"n_flip={flip_mask.sum()}, n_hold={hold_mask.sum()}",
-            fontsize=10.5)
-        ax.set_xlabel("PC 1", fontsize=10)
-        ax.set_ylabel("PC 2", fontsize=10)
-        ax.tick_params(labelsize=9)
+            f"{model_name}\nlayer {layer}, {qtype[:5]}. "
+            f"(n={len(y)}, {flip_mask.sum()} flip)",
+            fontsize=6.5)
+        ax.set_xlabel("PC 1", fontsize=7)
+        ax.set_ylabel("PC 2", fontsize=7)
+        ax.tick_params(labelsize=6.5)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
         if idx == 0:
-            ax.legend(fontsize=9.5, loc="upper right", framealpha=0.85,
+            ax.legend(fontsize=7, loc="upper right", framealpha=0.85,
                       markerscale=1.5)
 
     fig.suptitle(
-        "PCA Projection of Pre-Flip and Hold Hidden States\n"
-        "(best probe layer per model, LLM-as-judge first-flip labels)",
-        fontsize=13, y=0.97)
+        "PCA: Pre-Flip vs. Hold Hidden States",
+        fontsize=9, y=0.97)
 
-    plt.savefig(OUT_PNG, dpi=180, bbox_inches="tight")
+    plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
     print(f"Saved → {OUT_PNG}")
 
 

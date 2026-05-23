@@ -221,9 +221,10 @@ def make_figure(df: pd.DataFrame):
     # Use only rows that are peak-AUC summaries (not per-layer detail)
     summary = df[df["peak_auc"].notna()].copy()
 
-    fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(3.3, 2.6), sharey=True)
+    fig.subplots_adjust(wspace=0.15, left=0.14, right=0.97, bottom=0.22, top=0.78)
     qtypes = ["base", "critical", "presupposition"]
-    qtype_titles = {"base": "Base", "critical": "Critical", "presupposition": "Presupposition"}
+    qtype_titles = {"base": "Base", "critical": "Critical", "presupposition": "Presup."}
 
     for ax, qtype in zip(axes, qtypes):
         sub = summary[summary["qtype"] == qtype]
@@ -232,29 +233,29 @@ def make_figure(df: pd.DataFrame):
             if mdf.empty:
                 continue
             ax.plot(mdf["k"], mdf["peak_auc"], marker="o", color=color,
-                    linewidth=2, markersize=6, label=model_name)
+                    linewidth=1.5, markersize=3.5, label=model_name)
 
-        ax.axhline(0.5, color="gray", linestyle="--", linewidth=1, alpha=0.7,
-                   label="Chance (0.5)")
-        ax.set_title(qtype_titles[qtype], fontsize=12, fontweight="bold")
-        ax.set_xlabel("Turn pair (T0 → Tk)", fontsize=10)
+        ax.axhline(0.5, color="gray", linestyle="--", linewidth=0.8, alpha=0.7,
+                   label="Chance")
+        ax.set_title(qtype_titles[qtype], fontsize=8, fontweight="bold", pad=3)
+        ax.set_xlabel("Pressure turn k", fontsize=7)
         ax.set_xticks(range(1, 6))
-        ax.set_xticklabels([f"T0→T{k}" for k in range(1, 6)], fontsize=8)
-        ax.set_ylim(0.45, 0.70)
+        ax.set_xticklabels([str(k) for k in range(1, 6)], fontsize=7)
+        ax.set_ylim(0.45, 0.72)
+        ax.tick_params(labelsize=7, pad=2)
         ax.grid(True, alpha=0.3)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
 
-    axes[0].set_ylabel("Peak AUC (across layers)", fontsize=10)
-    axes[0].legend(fontsize=8, loc="upper right")
+    axes[0].set_ylabel("Peak AUC (layers)", fontsize=7)
+    axes[0].legend(fontsize=6, loc="upper right", handlelength=1.2,
+                   borderpad=0.4, labelspacing=0.2)
 
     fig.suptitle(
-        "Zero-Shot Cosine Disruption: AUC of cos_sim(T0, Tk) Predicting Ever-Flip\n"
-        "Across All Pressure Turns (peak AUC per layer sweep)",
-        fontsize=11, y=1.02
+        "AUC of cos_sim(T0, Tk) predicting ever-flip\n(peak AUC across layers, k=1..5)",
+        fontsize=8, y=0.98
     )
-    plt.tight_layout()
-    fig.savefig(str(OUT_PNG), dpi=150, bbox_inches="tight")
+    fig.savefig(str(OUT_PNG), dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"Figure saved to {OUT_PNG}")
 

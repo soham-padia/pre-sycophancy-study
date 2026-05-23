@@ -34,6 +34,8 @@
 %Including images in your LaTeX document requires adding
 %additional package(s)
 \usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
 
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
@@ -54,14 +56,44 @@
 \AtBeginDocument{
 \let\@oldmaketitle\@maketitle
 \renewcommand{\@maketitle}{\@oldmaketitle
-  \vspace{-20pt}
-  \includegraphics[width=\linewidth]{figures/pca_3d.png}
-  \vspace{-20pt}
-  \captionof{figure}{
-    Hidden-state trajectories in 3D PCA space (T0-fitted, critical questions) across four open-weight LLMs under escalating social pressure. Background dots show the T0 population colored by eventual outcome (\textcolor[HTML]{90b8f8}{$\bullet$}~holds, \textcolor[HTML]{f4a0a0}{$\bullet$}~flips); colored markers trace one example question turn-by-turn, with \textbf{\large$\star$} marking the first capitulation turn. Drift is visible before any behavioral change occurs.
+  \vspace{-8pt}
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}[
+    box/.style={draw, rounded corners=4pt, align=center, minimum width=3cm,
+                minimum height=1.1cm, font=\small, fill=gray!7, thick},
+    arrow/.style={-{Stealth[length=6pt]}, thick},
+    note/.style={align=center, font=\small},
+    sig/.style={align=center, font=\small\itshape, color=blue!55!black}
+  ]
+  \node[box] (t0) at (0,0)    {T0\\\small Correct answer};
+  \node[box] (t1) at (4,0)    {T1\\\small ``Are you sure?''};
+  \node[box] (t2) at (8,0)    {T2--T4\\\small Escalating pressure};
+  \node[box] (tf) at (12,0)   {T3--T5\\\small Capitulation};
+
+  \draw[arrow] (t0) -- (t1);
+  \draw[arrow] (t1) -- (t2);
+  \draw[arrow] (t2) -- (tf);
+
+  \node[note] at (0,-1.5)  {Output:\\\small correct};
+  \node[note] at (4,-1.5)  {Output:\\\small still correct};
+  \node[note, font=\small\bfseries] at (8,-1.5)  {Hidden state\\\small begins drifting};
+  \node[note] at (12,-1.5) {Output:\\\small flips};
+
+  \draw[thick, dashed, -{Stealth[length=5pt]}, color=red!65!black]
+    (1.5,-2.6) .. controls (4,-3.2) and (8,-3.2) .. (10.5,-2.6);
+  \node[sig] at (6,-3.75)
+    {Pre-capitulation signal detected: $\cos(\mathbf{h}_{T0},\, \mathbf{h}_{T1})$ predicts eventual flip above chance --- before any output change};
+  \end{tikzpicture}
+  }
+  \vspace{2pt}
+  \captionof{figure}{%
+    Overview of our setting and central claim. A model answers correctly at T0, then receives
+    escalating social pressure. Before any behavioral capitulation occurs, the hidden state
+    begins drifting. We show that this pre-capitulation shift is detectable from a single
+    cosine similarity measurement, requiring no classifier training.%
   }
   \label{fig:teaser}
-  \vspace{8pt}
+  \vspace{6pt}
  }
 }
 \makeatother
@@ -69,14 +101,14 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Large language models abandon correct answers under social pressure, not because new evidence arrives, but because users persist. Prior work measures when this happens. We show what happens inside the model before it does. We construct a benchmark spanning five open-weight LLMs that applies monotonically escalating social pressure (each turn applies strictly stronger disagreement than the last, from mild doubt to confident contradiction), and extract layer-wise hidden states at every turn from four of them for probe analysis. Four findings emerge. First, cosine similarity between Turn 0 and Turn 1 hidden states predicts eventual flip timing across all four models without any classifier training. Second, the zero-shot cosine signal localizes to different layers per model, with peak AUC ranging from 0.596 to 0.636, while linear probes fail at every layer across all models. Third, the pre-flip signal is geometrically nonlinear: under keyword-based labels, nonlinear classifiers reach 75.5\% (+11.7 points above chance) while linear probes fall near chance. Fourth, L2 norm builds monotonically over 3--4 turns before capitulation: sycophancy is a gradual internal process, not a sudden output switch. These results reframe sycophancy from a behavioral event into a representational process detectable before incorrect outputs are produced, opening a new mission for NLP interpretability research.
+Large language models abandon correct answers under social pressure, not because new evidence arrives, but because users persist. Prior work measures when this happens. We show what happens inside the model before it does. We construct a benchmark spanning five open-weight LLMs that applies monotonically escalating social pressure (each turn applies strictly stronger disagreement than the last, from mild doubt to confident contradiction), and extract layer-wise hidden states at every turn from four of them for probe analysis. Four findings emerge. First, cosine similarity between Turn 0 and Turn 1 hidden states predicts eventual flip timing across all four models without any classifier training. Second, the zero-shot cosine signal localizes to different layers per model, with peak AUC ranging from 0.596 to 0.636. Third, the pre-flip signal is geometrically nonlinear: linear probes fail at every layer while nonlinear classifiers outperform them by 6.6 percentage points on average, though absolute prediction remains near chance under semantically stronger judge labels. Fourth, activation magnitude (L2 norm) rises steadily over the first 3--4 pressure turns in three of four models, with the flip group showing slightly higher magnitude than the hold group throughout (Appendix~\ref{appendix:l2norm}). These results reframe sycophancy from a behavioral event into a representational process detectable before incorrect outputs are produced, opening a new mission for NLP interpretability research.
 \end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
 
 Measuring how often a language model changes its answer under social pressure tells you that
-sycophancy exists \citep{sharma2023sycophancy, perez2022discovering}. It does not tell you \textit{when the model's representational state begins shifting toward capitulation}. We show
+sycophancy exists \citep{sharma2024towards, perez2022discovering}. It does not tell you \textit{when the model's representational state begins shifting toward capitulation}. We show
 that this decision is visible in hidden-state representations before it appears in any output.
 A single cosine similarity measurement at the first pressure turn, requiring no classifier
 training, predicts eventual capitulation timing.
@@ -88,7 +120,7 @@ of work asks whether representations shift \textit{before} a behavioral flip und
 pressure, or whether the geometry of that shift follows the linear-separability assumption
 that probing work on factual representations typically depends on \citep{alain2016understanding, burns2022discovering}.
 
-We study both questions directly. Across five open-weight models and 474 multi-turn conversations with monotonically escalating pressure, we extract layer-wise hidden states from four of them and train probes to predict flips before they occur. 
+We study both questions directly. Across five open-weight models and 474 multi-turn conversations with monotonically escalating pressure, we extract layer-wise hidden states from four of them and train probes to predict flips before they occur.
 
 
 We construct a monotonically escalating pressure benchmark adapted from SYCON-Bench
@@ -104,16 +136,17 @@ We evaluate five open-weight models for behavioral analysis: DeepSeek-R1-7B-Dist
 
 Four findings emerge:
 
-\begin{itemize}[noitemsep, topsep=2pt]
+\begin{itemize}[noitemsep, topsep=2pt, leftmargin=*]
 \item Turn 0→1 cosine similarity predicts eventual capitulation before any observable behavioral change.
 \item Representational drift magnitude and predictive structure dissociate across layers.
-\item Pre-flip signals are nonlinearly encoded: nonlinear classifiers outperform linear probes by 6.6 pp on average.
-\item L2 norm increases gradually over multiple turns before capitulation.
+\item Pre-flip signals are nonlinearly encoded: nonlinear classifiers outperform linear probes by 6.6 pp on average, though neither achieves above-chance absolute prediction under judge labels.
+\item Activation magnitude (L2 norm) rises over the first 3--4 pressure turns in most models, with the flip group showing higher activation magnitude than the hold group.
 \end{itemize}
 
 Together, these findings reframe sycophancy from a behavioral event into a representational
 process, one that begins before it is visible and can be detected before incorrect outputs
-are produced.
+are produced. Monitoring this internal process at inference time, rather than diagnosing
+outputs after the fact, is a tractable new direction for alignment research.
 
 % \subsection{Formal Definitions}
 % \label{subsec:formal-definitions}
@@ -381,7 +414,7 @@ strategies.
   \label{sec:labeling:keyword}
 
 Our first method identifies sycophantic capitulation
-through surface-level lexical cues \citep{sharma2023sycophancy}. A response is
+through surface-level lexical cues. A response is
 marked as flipped if it contains any of 19 direct
 concession phrases (e.g., ``you're right,'' ``I was
 wrong,'' ``I stand corrected'') or a co-occurrence of
@@ -398,7 +431,7 @@ position.
   \label{sec:labeling:judge}
 
 Our second method uses Claude Haiku 4.5 as an
-automated judge \citep{zheng2023judging}. For each (model, question, turn)
+automated judge \citep{10.5555/3666122.3668142}. For each (model, question, turn)
 triple, we provide the original question, the model's
 baseline response, and the response at the current
 pressure turn. The judge returns a binary verdict:
@@ -469,13 +502,13 @@ uniformly, consistent with later turns containing
 more elaborate concession language that surface
 patterns more readily detect.
   
-  \begin{figure}[t]
+  \begin{figure*}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/flip_turn_comparison.png}
     \caption{First-flip turn distribution by model and question type. Top row: keyword labels. Bottom row: LLM-as-judge (Claude Haiku 4.5). Bubble
   area is proportional to the percentage of questions first flipping at that pressure turn.}
     \label{fig:flip-turn-comparison}
-  \end{figure}
+  \end{figure*}
 
 
   \begin{table*}[t]
@@ -557,14 +590,14 @@ patterns more readily detect.
   explicit contradiction. The trigger for capitulation appears to be the existence of social
   disagreement, not its intensity.
 
-  \begin{figure}[t]
+  \begin{figure*}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/flip_turn_distribution.png}
     \caption{First-flip turn distribution by model and question type under LLM-as-judge labels
     (Claude Haiku 4.5). Bubble area is proportional to the percentage of questions first flipping
     at that pressure turn.}
     \label{fig:flip-turn-distribution}
-  \end{figure}
+  \end{figure*}
 
   \subsection{Early Hidden-State Disruption}
   \label{subsec:early-hidden-state-disruption}
@@ -577,7 +610,7 @@ patterns more readily detect.
   plots both results; full geometry analysis, the nine-classifier sweep, and
   cross-model transfer experiments appear in Section~\ref{sec:representation}.
 
-  \begin{figure}[t]
+  \begin{figure*}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/hidden_state_disruption.png}
     \caption{(A) ROC-AUC of cosine similarity between Turn~0 and Turn~1 hidden
@@ -587,7 +620,7 @@ patterns more readily detect.
   per model. Linear probes remain at or below chance at every layer, not only at
   the best layer; the failure is architecture-wide.}
     \label{fig:hidden-state-disruption}
-  \end{figure}
+  \end{figure*}
 
 \section{Representation-Level Precursors}
   \label{sec:representation}
@@ -868,13 +901,17 @@ Appendix~\ref{appendix:linear}.
 
   \paragraph{Label noise.}
   Inter-judge agreement between Claude Haiku~4.5 and Claude Opus~4.7 is
-  $\kappa = 0.60$ overall, comparable to inter-annotator agreement reported
-  for similar subjective preference labeling tasks \citep{ouyang2022training}.
-  Agreement rises to $\kappa = 0.77$ when both judges are high-confidence
+  $\kappa = 0.60$ overall. Human-to-human agreement on preference evaluation
+  tasks of comparable difficulty reaches only ${\sim}80\%$ raw agreement
+  \citep{10.5555/3666122.3668142}, placing our inter-judge $\kappa$ within the
+  expected range for this class of annotation \citep{ouyang2022training}.
+  Agreement rises to $\kappa = 0.77$ on high-confidence judgments
   (Appendix~\ref{appendix:labeling:reliability}), indicating that noise
-  concentrates in genuinely ambiguous cases rather than being systematic.
-  Manual arbitration on 120 disagreement cases favors Haiku as the more
-  accurate judge.
+  concentrates in genuinely ambiguous cases rather than reflecting systematic
+  bias. Manual arbitration on 120 disagreement cases independently confirms
+  Haiku as the more accurate judge. Taken together, these results indicate
+  that label noise does not systematically skew our probe experiments or
+  behavioral conclusions.
 
   \paragraph{Benchmark artificiality.}
   The five-turn pressure schedule is fixed and monotone. Real conversations
@@ -931,7 +968,7 @@ and evaluation code.
  \section{Judge Reliability}
   \label{appendix:labeling:reliability}
 
-  We assess the reliability of Claude Haiku~4.5 as an automated judge through
+  We assess the reliability of Claude Haiku~4.5 as an automated judge \citep{10.5555/3666122.3668142} through
   two complementary analyses: a systematic inter-judge agreement study against
   Claude Opus~4.7 across all labelled examples, and a manual human arbitration
   study on the 120 hardest disagreement cases.
@@ -991,13 +1028,14 @@ and evaluation code.
   \begin{table}[h]
   \centering
   \small
-  \caption{Per-model $\kappa$ (Haiku vs.\ Opus, per-turn). Opus labels
+  \caption{Per-model $\kappa$ (Haiku vs.\ Opus, per-turn); $\Delta$flip\,=\,Opus flip\% $-$ Haiku flip\%. Opus labels
     Qwen3.5-9B as sycophantic 16\,pp more often than Haiku, the largest
     discrepancy across models.}
   \label{tab:kappa-model}
+  \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lccc}
   \toprule
-  \textbf{Model} & \textbf{N} & \textbf{$\kappa$} & \textbf{Opus$-$Haiku flip\%} \\
+  \textbf{Model} & \textbf{N} & \textbf{$\kappa$} & \textbf{$\Delta$flip\%} \\
   \midrule
   Gemma-2-9B          & 2,640 & 0.534 & $+$6.3 \\
   Qwen2.5-7B-I & 2,320 & 0.446 & $-$0.8 \\
@@ -1013,12 +1051,13 @@ and evaluation code.
     When the judges disagree, Opus calls sycophancy where Haiku does not
     at nearly 2$\times$ the rate of the reverse.}
   \label{tab:agreement-breakdown}
+  \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lcc}
   \toprule
   \textbf{Outcome} & \textbf{N} & \textbf{\%} \\
   \midrule
-  Both: flip        & 2,065 & 31.1 \\
-  Both: hold        & 3,284 & 49.5 \\
+  Both: flip           & 2,065 & 31.1 \\
+  Both: hold           & 3,284 & 49.5 \\
   Haiku flip, Opus hold  &   435 &  6.6 \\
   Haiku hold, Opus flip  &   856 & 12.9 \\
   \addlinespace
@@ -1162,4 +1201,57 @@ linear separation but recoverable nonlinear structure.
     the maximum, of the signal's predictive reach.}
     \label{fig:multiturn_auc}
   \end{figure}
+
+\section{Hidden-State Trajectory Visualizations}
+\label{appendix:pca-trajectories}
+
+Figure~\ref{fig:pca-trajectories} shows hidden-state trajectories in 3D PCA space
+for one example question per model (critical question type), with the PCA axes fitted
+to the T0 population. Background points are colored by eventual outcome; colored
+markers trace the per-turn hidden state, with $\bigstar$ marking the first
+capitulation turn. Directional drift away from the T0 cluster is visible before
+any behavioral change occurs, consistent with the cosine disruption signal reported
+in Section~\ref{sec:cosine}.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/pca_3d.png}
+  \caption{Hidden-state trajectories in 3D PCA space (T0-fitted, critical questions)
+  across four open-weight LLMs under escalating social pressure.
+  Background dots show the T0 population colored by eventual outcome
+  (\textcolor[HTML]{90b8f8}{$\bullet$}~holds, \textcolor[HTML]{f4a0a0}{$\bullet$}~flips);
+  colored markers trace one example question turn-by-turn, with $\bigstar$ marking
+  the first capitulation turn. Drift is visible before any behavioral change occurs.}
+  \label{fig:pca-trajectories}
+\end{figure*}
+
+\section{Activation Magnitude over Pressure Turns}
+\label{appendix:l2norm}
+
+Figure~\ref{fig:l2norm} plots the mean L2 norm of the last-token hidden state
+(averaged across all transformer layers) at each pressure turn T0--T5, split
+by ever-flip (will eventually capitulate) and hold (never capitulates) groups
+using LLM-as-judge labels. Post-flip turns are censored for flip questions,
+consistent with the first-flip methodology used throughout.
+
+Three of four models show a clear increase in activation magnitude from T0
+through T3--T4 under escalating pressure. The flip group maintains slightly
+higher mean L2 norm than the hold group across most turns for DeepSeek-R1-7B,
+Qwen2.5-7B, and Llama-3.1-8B. The two trajectories track closely, however,
+indicating that L2 norm reflects the model's engagement with escalating pressure
+context generally rather than being specific to the pre-capitulation state.
+Qwen3.5-9B is an exception: both groups show decreasing activation magnitude
+across turns, consistent with that model's distinct representational response
+to pressure observed elsewhere in our analysis.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/l2_norm_trend.png}
+  \caption{Mean L2 norm of the last-token hidden state (averaged across all
+  layers) at each pressure turn. Solid lines: ever-flip group; dashed lines:
+  hold group. Shaded bands show $\pm$1 standard error. Post-flip turns are
+  censored for flip questions.}
+  \label{fig:l2norm}
+\end{figure}
+
 \end{document}

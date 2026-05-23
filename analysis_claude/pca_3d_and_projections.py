@@ -173,12 +173,12 @@ model_data = {k: load_model_3d(k) for k in MODEL_KEYS}
 # FIGURE 1 — 3D scatter
 # ══════════════════════════════════════════════════════════════════════════
 
-fig3d = plt.figure(figsize=(20, 6))
-fig3d.subplots_adjust(left=0.01, right=0.99, top=0.88, bottom=0.12, wspace=0.0)
+fig3d = plt.figure(figsize=(6.5, 6.2))
+fig3d.subplots_adjust(left=0.02, right=0.98, top=0.90, bottom=0.11, wspace=0.05, hspace=0.15)
 
 for col, key in enumerate(MODEL_KEYS):
     d   = model_data[key]
-    ax  = fig3d.add_subplot(1, 4, col + 1, projection="3d")
+    ax  = fig3d.add_subplot(2, 2, col + 1, projection="3d")
 
     pts = d["pts_t0"]
 
@@ -197,11 +197,18 @@ for col, key in enumerate(MODEL_KEYS):
     mask_hold = ~d["eventual"]
     mask_flip =  d["eventual"]
 
+    # Subsample background to reduce visual clutter (50% of each group)
+    rng = np.random.default_rng(42)
+    idx_hold = rng.choice(mask_hold.sum(), size=max(1, mask_hold.sum() // 2), replace=False)
+    idx_flip = rng.choice(mask_flip.sum(), size=max(1, mask_flip.sum() // 2), replace=False)
+    pts_hold = pts[mask_hold][idx_hold]
+    pts_flip = pts[mask_flip][idx_flip]
+
     # Background — T0 population, colored by eventual outcome
-    ax.scatter(pts[mask_hold, 0], pts[mask_hold, 1], pts[mask_hold, 2],
-               s=14, color=HOLD_C, alpha=0.50, linewidths=0, depthshade=True)
-    ax.scatter(pts[mask_flip,  0], pts[mask_flip,  1], pts[mask_flip,  2],
-               s=14, color=FLIP_C, alpha=0.50, linewidths=0, depthshade=True)
+    ax.scatter(pts_hold[:, 0], pts_hold[:, 1], pts_hold[:, 2],
+               s=7, color=HOLD_C, alpha=0.35, linewidths=0, depthshade=True)
+    ax.scatter(pts_flip[:, 0], pts_flip[:, 1], pts_flip[:, 2],
+               s=7, color=FLIP_C, alpha=0.35, linewidths=0, depthshade=True)
 
     # Trajectory line T0–T5 (all non-None points)
     traj_valid = [(t, p) for t, p in enumerate(d["traj"]) if p is not None]
@@ -225,12 +232,12 @@ for col, key in enumerate(MODEL_KEYS):
     ax.set_xlim(*lims[0]); ax.set_ylim(*lims[1]); ax.set_zlim(*lims[2])
 
     v = d["pct_var"]
-    ax.set_xlabel(f"PC1 ({v[0]:.0f}%)", fontsize=8, labelpad=1)
-    ax.set_ylabel(f"PC2 ({v[1]:.0f}%)", fontsize=8, labelpad=1)
-    ax.set_zlabel(f"PC3 ({v[2]:.0f}%)", fontsize=8, labelpad=1)
-    ax.tick_params(labelsize=6.5)
-    ax.set_title(d["label"], fontsize=11, fontweight="bold",
-                 color=d["color"], pad=8)
+    ax.set_xlabel(f"PC1 ({v[0]:.0f}%)", fontsize=9, labelpad=1)
+    ax.set_ylabel(f"PC2 ({v[1]:.0f}%)", fontsize=9, labelpad=1)
+    ax.set_zlabel(f"PC3 ({v[2]:.0f}%)", fontsize=9, labelpad=1)
+    ax.tick_params(labelsize=8)
+    ax.set_title(d["label"], fontsize=10.5, fontweight="bold",
+                 color=d["color"], pad=6)
     ax.view_init(elev=22, azim=225)
     ax.set_box_aspect([1, 1, 0.75])
 
@@ -247,16 +254,16 @@ legend_handles = (
               label=TURN_LABELS[t] + (" ← flip" if t == 3 else ""))
        for t in range(6)]
 )
-fig3d.legend(handles=legend_handles, loc="lower center", ncol=8,
-             fontsize=8, frameon=True, bbox_to_anchor=(0.5, 0.0),
+fig3d.legend(handles=legend_handles, loc="lower center", ncol=4,
+             fontsize=8.5, frameon=True, bbox_to_anchor=(0.5, 0.0),
              edgecolor="#bbb", framealpha=0.92)
 
 fig3d.suptitle(
     "Hidden-State Trajectory in 3D PCA Space  "
     "(critical questions · T0-fitted PCA · ★ = first flip turn)",
-    fontsize=11, y=0.97,
+    fontsize=10.5, y=0.97,
 )
-plt.savefig(OUT_3D, dpi=160, bbox_inches="tight")
+plt.savefig(OUT_3D, dpi=300, bbox_inches="tight")
 print(f"Saved → {OUT_3D}")
 plt.close(fig3d)
 
