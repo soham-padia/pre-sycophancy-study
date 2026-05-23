@@ -17,9 +17,27 @@ __pycache__/
 .mplconfig/
 
 # Internal working documents (not for official repo)
-Kayo_Yin/
 Paper/
 PROJECT_SUMMARY_FOR_CHAT.md
 LLM_JUDGE_CONTEXT_HANDOFF_2026-05-11.md
 probe_results_writeup_final.md
-tomas/
+
+# Paper working copies (Overleaf syncs / draft iterations)
+current_paper_may_21/
+PAPER_MAY_21/
+documents/
+
+# Python virtual environment
+.venv/
+
+# Scratch / intermediate outputs
+ex.csv
+consistency_anova_results.txt
+anova_syco_analysis.py
+output/
+
+# Internal annotator-comparison plots (not used in paper)
+analysis/plot_tomas_vs_soham.py
+analysis/plot_flip_turn_distribution_combined.py
+analysis_claude/flip_turn_tomas_vs_soham.png
+analysis_claude/flip_turn_distribution_combined.png

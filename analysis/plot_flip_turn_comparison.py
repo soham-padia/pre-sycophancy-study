@@ -135,14 +135,14 @@ def draw_panel(ax, dist_fn, qtype, models, title=None):
                 if rate * 100 >= MIN_SHOW_PCT:
                     ax.text(t, i, f"{rate*100:.0f}%",
                             ha="center", va="center",
-                            fontsize=8.5, fontweight="bold", color="white", zorder=4)
+                            fontsize=7, fontweight="bold", color="white", zorder=4)
 
     ax.set_xlim(0.4, 5.6)
     ax.set_ylim(-0.7, len(models) - 0.3)
     ax.set_xticks(range(1, 6))
-    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=11)
+    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=9)
     if title:
-        ax.set_title(title, fontsize=13, pad=7)
+        ax.set_title(title, fontsize=10, pad=7)
     ax.yaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
     ax.xaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
     ax.set_axisbelow(True)
@@ -152,8 +152,8 @@ def draw_panel(ax, dist_fn, qtype, models, title=None):
 
 # ── Figure: 2 rows × 3 columns ────────────────────────────────────────────────
 
-fig, axes = plt.subplots(2, 3, figsize=(16, 10))
-fig.subplots_adjust(wspace=0.06, hspace=0.38)
+fig, axes = plt.subplots(2, 3, figsize=(6.5, 4.5))
+fig.subplots_adjust(wspace=0.06, hspace=0.42)
 
 ROW_LABELS = ["Keyword\nLabels", "LLM-as-Judge\n(Claude Haiku 4.5)"]
 dist_fns   = [keyword_first_flip_dist, judge_first_flip_dist]
@@ -166,11 +166,11 @@ for row, (dist_fn, row_label) in enumerate(zip(dist_fns, ROW_LABELS)):
 
         ax.set_yticks(range(len(MODELS)))
         if col == 0:
-            ticklabels = ax.set_yticklabels(MODELS, fontsize=11)
+            ticklabels = ax.set_yticklabels(MODELS, fontsize=9)
             for label, model in zip(ticklabels, MODELS):
                 label.set_color(MODEL_COLORS[model])
                 label.set_fontweight("bold")
-            ax.set_ylabel(row_label, fontsize=12, fontweight="bold",
+            ax.set_ylabel(row_label, fontsize=9, fontweight="bold",
                           labelpad=10, rotation=90, va="center")
         else:
             ax.tick_params(labelleft=False)
@@ -186,7 +186,7 @@ for row, dist_fn in enumerate(dist_fns):
             xy=(5.6, i), xycoords="data",
             xytext=(6, 0), textcoords="offset points",
             ha="left", va="center",
-            fontsize=10.5, fontweight="bold",
+            fontsize=9, fontweight="bold",
             color=MODEL_COLORS[model],
             annotation_clip=False,
         )
@@ -195,19 +195,19 @@ for row, dist_fn in enumerate(dist_fns):
 fig.text(
     0.5, -0.005,
     "T1: \"Are you sure?\"  •  T2: \"I think you're mistaken\"  •  T3: \"Pretty sure that's wrong\"",
-    ha="center", fontsize=10.5, color="#555555",
+    ha="center", fontsize=9, color="#555555",
 )
 fig.text(
     0.5, -0.03,
     "T4: \"I checked a textbook\"  •  T5: \"I'm confident you're wrong\"",
-    ha="center", fontsize=10.5, color="#555555",
+    ha="center", fontsize=9, color="#555555",
 )
 
 fig.suptitle(
     "First-Flip Turn Distribution: Keyword Labels vs LLM-as-Judge\n"
     "(bubble area ∝ % of questions first-flipping at that pressure turn)",
-    fontsize=13, y=1.01,
+    fontsize=10, y=1.01,
 )
 
-plt.savefig(OUT_PNG, dpi=180, bbox_inches="tight")
+plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
 print(f"Saved → {OUT_PNG}")

@@ -1,170 +1,131 @@
-<p align="center">
-  <img src="assets/img/image.png" alt="Agora-Logo" style="width: 50%; display: block; margin: auto;">
-</p>
+# Before the Model Caves: Detecting Pre-Capitulation States in Multi-Turn Sycophancy
 
-<p align="center">
-  <a href="https://arxiv.org/pdf/2505.23840"><img src="https://img.shields.io/badge/arXiv-2412.03679-b31b1b.svg" alt="arXiv"></a>
-  <a href="https://github.com/JiseungHong/SYCON-Bench/blob/master/LICENSE"><img src="https://img.shields.io/github/license/JiseungHong/SYCON-Bench.svg" alt="License"></a>
-</p>
+> Submitted to EMNLP 2026 — Track: Interpretability and Analysis of Models for NLP
 
-# SYCON-Bench: Measuring Sycophancy of Language Models in Multi-turn Dialogues
+---
 
-SYCON-Bench is a novel benchmark for evaluating sycophantic behavior in multi-turn, free-form conversational settings. This benchmark measures how quickly a model conforms to the user (*Turn of Flip*) and how frequently it shifts its stance under sustained user pressure (*Number of Flip*).
-
-## Overview
-
-Large Language Models (LLMs) are expected to provide helpful and harmless responses, yet they often exhibit *sycophancy*—conforming to user beliefs regardless of factual accuracy or ethical soundness. Prior research on sycophancy has primarily focused on single-turn factual correctness, overlooking the dynamics of real-world interactions.
-
-SYCON-Bench addresses this gap by:
-1. Evaluating models in multi-turn, free-form conversational settings
-2. Measuring sycophancy across three real-world scenarios
-3. Providing metrics to quantify sycophantic behavior
-
-## Benchmark Structure
-
-SYCON-Bench consists of three distinct settings:
-
-| Debate | Challenging Unethical Queries | Identifying False Presupposition |
-|--------|-------------------------------|----------------------------------|
-| Subjective & Explicit | Subjective & Implicit | Objective & Implicit |
-
-### 1. Debate Setting
-
-Tests how models maintain or change their stance on controversial topics when faced with user disagreement.
-
-- **Data**: 100 controversial debate topics with predefined stances
-- **Metrics**: Turn of Flip (ToF), Number of Flips (NoF)
-- **Prompting Strategies**: Individual Thinker, Andrew (i.e., third-person pronouns), Non-Sycophantic, Andrew+Non-Sycophantic
-
-### 2. Ethical Setting
-
-Evaluates how models respond to questions containing harmful stereotypes when users increasingly pressure them to conform.
-
-- **Data**: 200 Ethical questions derived from StereoSet
-- **Metrics**: Turn of Flip (ToF)
-- **Evaluation**: Measures how quickly models adopt harmful stereotypes
-- **Prompting Strategies**: Individual Thinker, Andrew (i.e., third-person pronouns), Non-Sycophantic, Andrew+Non-Sycophantic
-
-### 3. False Presuppositions Setting
-
-Tests how models handle questions with false presuppositions and whether they maintain factual accuracy under user pressure.
-
-- **Data**: 200 Questions containing false presuppositions
-- **Metrics**: Turn of Flip (ToF)
-- **Evaluation**: Measures how models respond to factually incorrect assumptions
-- **Prompting Strategies**: Individual Thinker, Andrew (i.e., third-person pronouns), Non-Sycophantic, Andrew+Non-Sycophantic
-
-## Getting Started
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/username/SYCON-Bench.git
-cd SYCON-Bench
-
-# Install dependencies for each setting
-cd debate-setting
-pip install -r requirements.txt
-cd ../ethical-setting
-pip install -r requirements.txt
-cd ../false-presuppositions-setting
-pip install -r requirements.txt
-```
-
-### Running the Benchmark
-
-Each setting has a unified interface for running the benchmark:
-
-#### Debate Setting
-
-```bash
-cd debate-setting
-
-# For open-source models
-python run_benchmark.py "google/gemma-3-12b-it"
-
-# For closed-source models (API-based)
-python run_benchmark.py "openai/gpt-4o" --api_key YOUR_API_KEY
-```
-
-#### Ethical Setting
-
-```bash
-cd ethical-setting
-
-# For open-source models
-python run_benchmark.py "google/gemma-3-12b-it"
-
-# For closed-source models (API-based)
-python run_benchmark.py "openai/gpt-4o" --api_key YOUR_API_KEY
-```
-
-#### False Presuppositions Setting
-
-```bash
-cd false-presuppositions-setting
-
-# For open-source models
-python run_benchmark.py "google/gemma-3-12b-it"
-
-# For closed-source models (API-based)
-python run_benchmark.py "openai/gpt-4o" --api_key YOUR_API_KEY
-```
-
-### Command Line Arguments
-
-Each `run_benchmark.py` script supports the following arguments:
-
-- `model_name`: Name or identifier of the model to evaluate
-- `--api_key`: API key for closed-source models
-- `--base_url`: Custom base URL for API (optional)
-- `--batch_size`: Number of questions to process in each batch (default: 4)
-- `--output_dir`: Custom output directory (default: "output/{model_id}")
-- `--prompt_type`: Specific prompt type to use (default: "all")
-- `--verbose`: Enable verbose logging
+Large language models abandon correct answers under social pressure, not because new evidence arrives, but because users persist. This work shows what happens *inside the model before it does*. We construct a benchmark spanning five open-weight LLMs with monotonically escalating social pressure, extract layer-wise hidden states at every turn, and train probes to detect capitulation before it appears in outputs.
 
 ## Key Findings
 
-Our analysis of 17 LLMs across the three settings revealed:
+1. **Early cosine disruption predicts eventual flips** — cosine similarity between Turn 0 and Turn 1 hidden states predicts whether a model will eventually capitulate, across all four probed models, without any classifier training (peak AUC 0.596–0.636).
 
-1. **Alignment tuning amplifies sycophancy**: Models fine-tuned with RLHF or other alignment techniques show increased sycophantic behavior.
+2. **The signal is model-specific** — predictive layers differ substantially across architectures; cross-model probe transfer fails for all within-family pairs.
 
-2. **Model scaling reduces sycophancy**: Larger models generally demonstrate greater resistance to user pressure.
+3. **Pre-flip geometry is nonlinear** — linear probes fail at every layer while nonlinear classifiers outperform them by 6.6 pp on average, with Fisher ratios near zero confirming the signal is not hyperplanar.
 
-3. **Reasoning optimization helps**: Models optimized for reasoning abilities show improved resistance to sycophancy.
+4. **L2 norm rises monotonically** — activation magnitude builds over 3–4 pressure turns before capitulation in three of four models.
 
-4. **Third-person perspective reduces sycophancy**: Adopting a third-person perspective (SPT) reduces sycophancy by up to 63.8% in the debate setting.
+### Hidden-State Trajectories (3D PCA)
+
+Directional drift away from the T0 cluster is visible before any behavioral change occurs:
+
+![Hidden-State Trajectories](analysis_claude/pca_3d.png)
+
+### Zero-Shot Cosine Disruption Signal
+
+AUC by layer for the best question type per model (A), and linear probe accuracy vs. majority-class chance (B):
+
+![Cosine Disruption and Linear Probe Failure](analysis_claude/hidden_state_disruption.png)
+
+### Pre-Flip Geometry (PCA Projection)
+
+Pre-flip (red) and hold (blue) states intermix throughout the two leading principal components, confirming the absence of linear separability:
+
+![Pre-Flip PCA](analysis_claude/preflip_pca.png)
+
+### First-Flip Turn Distribution
+
+Flip timing by model and question type under LLM-as-judge labels:
+
+![Flip Turn Distribution](analysis_claude/flip_turn_distribution.png)
+
+---
+
+## Repository Structure
+
+```
+.
+├── analysis/                  # Analysis and plotting scripts
+│   ├── cosine_disruption.py   # Zero-shot cosine AUC sweep
+│   ├── preflip_geometry.py    # Fisher ratio + LDA + classifier sweep
+│   ├── multiturn_auc_robustness.py  # Signal persistence across turns (Appendix D)
+│   ├── plot_hidden_state_disruption.py
+│   ├── plot_preflip_pca.py
+│   ├── plot_flip_turn_distribution.py
+│   ├── plot_l2_norm_trend.py
+│   └── ...
+├── analysis_claude/           # Figures and CSVs from analysis runs
+├── data/                      # Hidden states per model (gitignored — large)
+│   ├── DeepSeek-R1-Distill-Qwen-7B/
+│   ├── Llama-3.1-8B-Instruct/
+│   ├── Qwen2.5-7B-Instruct/
+│   └── Qwen3.5-9B/
+├── debate_setting/            # Debate benchmark (original SYCON-Bench setting)
+├── ethical-setting/           # Ethical benchmark setting
+├── false-presuppositions-setting/  # False presuppositions benchmark setting
+├── sbatch/                    # SLURM job scripts for HPC runs
+├── flip_labeling.py           # Keyword-based flip detection
+├── train_probes_v2.py         # Probe training (linear + nonlinear classifiers)
+├── probe_model_comparison.py  # Cross-model probe evaluation
+├── probe_judge_comparison.py  # Keyword vs. LLM-as-judge label comparison
+└── requirements.txt
+```
+
+## Models Evaluated
+
+| Model | Layers | Hidden Dim | Used For |
+|-------|--------|------------|----------|
+| DeepSeek-R1-7B-Distill | 29 | 3584 | Behavior + probing |
+| Qwen2.5-7B-Instruct | 29 | 3584 | Behavior + probing |
+| Llama-3.1-8B-Instruct | 33 | 4096 | Behavior + probing |
+| Qwen3.5-9B | 33 | 4096 | Behavior + probing |
+| Gemma-2-9B-it | 42 | 3584 | Behavioral analysis only |
+
+## Setup
+
+```bash
+git clone <repo-url>
+cd CS6120-Sycophancy-Detection
+pip install -r requirements.txt
+```
+
+Requires access to NDIF for distributed hidden-state extraction via [NNsight](https://nnsight.net/).
+
+## Running Experiments
+
+### Generate multi-turn conversations
+
+```bash
+python analysis/generate_multiturn_dataset.py
+```
+
+### Run LLM-as-judge labeling
+
+```bash
+python analysis/judge_flip_claude.py
+```
+
+### Train probes
+
+```bash
+python train_probes_v2.py
+```
+
+### Reproduce analysis figures
+
+```bash
+python analysis/plot_hidden_state_disruption.py
+python analysis/plot_preflip_pca.py
+python analysis/plot_flip_turn_distribution.py
+python analysis/plot_l2_norm_trend.py
+python analysis/multiturn_auc_robustness.py
+```
+
+## Benchmark Settings
+
+This repo extends [SYCON-Bench](https://github.com/JiseungHong/SYCON-Bench) with monotonically escalating pressure (each turn applies strictly stronger disagreement) and true multi-turn dialogue (full conversation history at every step). The three question categories — base, critical, and presupposition — test distinct resistance mechanisms.
 
 ## Citation
 
-If you use SYCON-Bench in your research, please cite our paper:
-
-```
-@misc{hong2025measuringsycophancylanguagemodels,
-      title={Measuring Sycophancy of Language Models in Multi-turn Dialogues}, 
-      author={Jiseung Hong and Grace Byun and Seungone Kim and Kai Shu},
-      year={2025},
-      eprint={2505.23840},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2505.23840}, 
-}
-```
-
-
-
-## Model Compatibility Matrix
-
-| Model Family | Quantization | Chat Template | Dependencies |
-|--------------|--------------|---------------|--------------|
-| Llama        | 4-bit        | llama-2       | transformers, bitsandbytes |
-| Qwen         | 8-bit        | chatml        | transformers, accelerate   |
-| Gemma        | 16-bit       | gemma         | transformers               |
-| ...          | ...          | ...           | ...                        |
-
-
-
-## License
-
-Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
+Citation will be added upon publication.
