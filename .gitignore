@@ -41,3 +41,12 @@ analysis/plot_tomas_vs_soham.py
 analysis/plot_flip_turn_distribution_combined.py
 analysis_claude/flip_turn_tomas_vs_soham.png
 analysis_claude/flip_turn_distribution_combined.png
+
+# Submission archives and working folders
+blog/
+Kayo_Yin/
+tomas/
+submission_code/
+submission_code.zip
+submission_data.zip
+"analysis_claude 2/"
