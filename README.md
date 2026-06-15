@@ -86,11 +86,11 @@ Flip timing by model and question type under LLM-as-judge labels:
 
 ```bash
 git clone <repo-url>
-cd CS6120-Sycophancy-Detection
+cd SYCON-Bench
 pip install -r requirements.txt
 ```
 
-Requires access to NDIF for distributed hidden-state extraction via [NNsight](https://nnsight.net/).
+Hidden-state extraction requires a GPU with sufficient VRAM (≥16 GB recommended). Experiments were run on Tesla V100-SXM2-32GB via SLURM; the `sbatch/` scripts can be adapted to other clusters.
 
 ## Running Experiments
 
