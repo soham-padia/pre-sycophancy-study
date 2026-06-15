@@ -26,6 +26,13 @@ MODEL_COLORS = {
     "Llama-3.1-8B":   "#6ACC65",
     "Qwen3.5-9B":     "#C4AD66",
 }
+
+SHORT_NAMES = {
+    "DeepSeek-R1-7B": "DS",
+    "Qwen2.5-7B":     "Q2.5",
+    "Llama-3.1-8B":   "L3.1",
+    "Qwen3.5-9B":     "Q3.5",
+}
 MODEL_ORDER = ["Gemma-2-9B", "DeepSeek-R1-7B", "Llama-3.1-8B", "Qwen3.5-9B", "Qwen2.5-7B"]
 
 # Best qtype per model (highest peak AUC from the analysis)
@@ -43,8 +50,8 @@ cos_df   = pd.read_csv(COSINE_CSV)
 sweep_df = pd.read_csv(SWEEP_CSV)
 
 # ── Figure layout ──────────────────────────────────────────────────────────────
-fig = plt.figure(figsize=(6.5, 3.6))
-gs  = gridspec.GridSpec(1, 2, wspace=0.42, left=0.09, right=0.97, top=0.76, bottom=0.15)
+fig = plt.figure(figsize=(4.2, 5.8))
+gs  = gridspec.GridSpec(2, 1, hspace=0.52, left=0.13, right=0.63, top=0.86, bottom=0.08)
 
 ax_auc = fig.add_subplot(gs[0])
 ax_lda = fig.add_subplot(gs[1])
@@ -63,9 +70,8 @@ for model, color in MODEL_COLORS.items():
 
 ax_auc.axhline(0.5, color="#999999", lw=1.2, ls="--", label="Chance (AUC=0.5)")
 ax_auc.set_xlabel("Layer", fontsize=9)
-ax_auc.set_ylabel("ROC-AUC  (cos sim T0→T1 predicts flip)", fontsize=8.5)
+ax_auc.set_ylabel("ROC-AUC", fontsize=9)
 ax_auc.set_title("A.  Zero-Shot Cosine Disruption AUC", fontsize=9, pad=5)
-ax_auc.legend(fontsize=8, loc="lower right", framealpha=0.85)
 ax_auc.tick_params(labelsize=8.5)
 ax_auc.set_ylim(0.35, 0.70)
 ax_auc.spines["top"].set_visible(False)
@@ -86,9 +92,8 @@ for model, color in MODEL_COLORS.items():
     ax_lda.axhline(chance, color=color, lw=0.7, ls=":", alpha=0.45)
 
 ax_lda.set_xlabel("Layer", fontsize=9)
-ax_lda.set_ylabel("Logistic regression cross-val accuracy", fontsize=8.5)
+ax_lda.set_ylabel("Accuracy", fontsize=9)
 ax_lda.set_title("B.  Linear Probe Accuracy by Layer", fontsize=9, pad=5)
-ax_lda.legend(fontsize=8, loc="upper right", framealpha=0.85)
 ax_lda.tick_params(labelsize=8.5)
 ax_lda.set_ylim(0.35, 0.95)
 ax_lda.spines["top"].set_visible(False)
@@ -97,9 +102,16 @@ ax_lda.yaxis.grid(True, linestyle="--", alpha=0.3, zorder=0)
 ax_lda.set_axisbelow(True)
 
 fig.suptitle(
-    "Hidden-State Disruption: Zero-Shot Cosine Signal vs. Linear Probe Failure",
-    fontsize=10, y=0.995,
+    "Hidden-State Disruption:\nCosine Signal vs. Linear Probe Failure",
+    fontsize=9, y=0.995,
 )
+
+# Single shared legend to the right of both panels
+handles, labels = ax_auc.get_legend_handles_labels()
+fig.legend(handles, labels,
+           fontsize=8, loc="center left",
+           bbox_to_anchor=(0.65, 0.5),
+           framealpha=0.85, borderaxespad=0)
 
 plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
 print(f"Saved → {OUT_PNG}")

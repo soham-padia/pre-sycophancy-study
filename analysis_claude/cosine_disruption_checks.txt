@@ -1,0 +1,150 @@
+COSINE DISRUPTION ROBUSTNESS CHECKS
+======================================================================
+
+Check 1: T0→T1 AUC excluding T1-first-flip questions
+Check 2: Bootstrap 95% CIs at peak layer
+Check 3: T0 baseline correctness (completeness proxy)
+
+
+──────────────────────────────────────────────────────────────────────
+MODEL: DeepSeek-R1-7B
+──────────────────────────────────────────────────────────────────────
+
+  base  |  176 questions  (148 ever-flip, 50 flip-at-T1, 126 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.508  [0.403, 0.621]      10
+  Excl. T1-flip questions          0.505  [0.395, 0.626]      10
+  CI strictly above chance (0.5):  original=MARGINAL, excl=MARGINAL
+  T0 response present: 176/176 (100.0%)
+
+  critical  |  168 questions  (140 ever-flip, 45 flip-at-T1, 123 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.617  [0.502, 0.729]      21
+  Excl. T1-flip questions          0.606  [0.474, 0.733]      19
+  CI strictly above chance (0.5):  original=YES, excl=MARGINAL
+  T0 response present: 168/168 (100.0%)
+
+  presupposition  |  168 questions  (145 ever-flip, 50 flip-at-T1, 118 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.500  [0.500, 0.500]       0
+  Excl. T1-flip questions          0.508  [0.373, 0.638]      28
+  CI strictly above chance (0.5):  original=NO, excl=MARGINAL
+  T0 response present: 168/168 (100.0%)
+
+──────────────────────────────────────────────────────────────────────
+MODEL: Qwen2.5-7B
+──────────────────────────────────────────────────────────────────────
+
+  base  |  155 questions  (64 ever-flip, 3 flip-at-T1, 152 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.630  [0.539, 0.712]      26
+  Excl. T1-flip questions          0.646  [0.559, 0.737]      27
+  CI strictly above chance (0.5):  original=YES, excl=YES
+  T0 response present: 156/156 (100.0%)
+
+  critical  |  156 questions  (72 ever-flip, 2 flip-at-T1, 154 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.531  [0.440, 0.626]      18
+  Excl. T1-flip questions          0.539  [0.443, 0.631]      18
+  CI strictly above chance (0.5):  original=MARGINAL, excl=MARGINAL
+  T0 response present: 157/157 (100.0%)
+
+  presupposition  |  153 questions  (66 ever-flip, 1 flip-at-T1, 152 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.583  [0.487, 0.673]      19
+  Excl. T1-flip questions          0.582  [0.488, 0.672]      19
+  CI strictly above chance (0.5):  original=MARGINAL, excl=MARGINAL
+  T0 response present: 153/153 (100.0%)
+
+──────────────────────────────────────────────────────────────────────
+MODEL: Llama-3.1-8B
+──────────────────────────────────────────────────────────────────────
+
+  base  |  152 questions  (130 ever-flip, 36 flip-at-T1, 116 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.630  [0.511, 0.750]       1
+  Excl. T1-flip questions          0.629  [0.499, 0.750]       1
+  CI strictly above chance (0.5):  original=YES, excl=MARGINAL
+  T0 response present: 152/152 (100.0%)
+
+  critical  |  152 questions  (125 ever-flip, 24 flip-at-T1, 128 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.636  [0.503, 0.750]      32
+  Excl. T1-flip questions          0.642  [0.515, 0.761]      32
+  CI strictly above chance (0.5):  original=YES, excl=YES
+  T0 response present: 152/152 (100.0%)
+
+  presupposition  |  146 questions  (111 ever-flip, 16 flip-at-T1, 130 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.517  [0.413, 0.620]       1
+  Excl. T1-flip questions          0.535  [0.429, 0.642]      31
+  CI strictly above chance (0.5):  original=MARGINAL, excl=MARGINAL
+  T0 response present: 147/147 (100.0%)
+
+──────────────────────────────────────────────────────────────────────
+MODEL: Qwen3.5-9B
+──────────────────────────────────────────────────────────────────────
+
+  base  |  112 questions  (75 ever-flip, 0 flip-at-T1, 112 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.500  [0.500, 0.500]       0
+  Excl. T1-flip questions          0.500  [0.500, 0.500]       0
+  CI strictly above chance (0.5):  original=NO, excl=NO
+  T0 response present: 112/112 (100.0%)
+
+  critical  |  112 questions  (79 ever-flip, 0 flip-at-T1, 112 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.560  [0.441, 0.677]      24
+  Excl. T1-flip questions          0.560  [0.441, 0.677]      24
+  CI strictly above chance (0.5):  original=MARGINAL, excl=MARGINAL
+  T0 response present: 112/112 (100.0%)
+
+  presupposition  |  112 questions  (90 ever-flip, 2 flip-at-T1, 110 retained after exclusion)
+                                     AUC           95% CI   Layer
+                                 ───────  ───────────────  ──────
+  All questions (original)         0.596  [0.466, 0.726]       4
+  Excl. T1-flip questions          0.601  [0.467, 0.737]       4
+  CI strictly above chance (0.5):  original=MARGINAL, excl=MARGINAL
+  T0 response present: 112/112 (100.0%)
+
+
+======================================================================
+SUMMARY — Peak AUC with 95% bootstrap CI
+======================================================================
+  Model            Q-type           Original AUC           95% CI    Excl T1-flip           95% CI
+  ──────────────── ────────────── ──────────────  ───────────────  ──────────────  ───────────────
+  DeepSeek-R1-7B   base                    0.508  [0.403, 0.621]           0.505  [0.395, 0.626]
+  DeepSeek-R1-7B   critical                0.617  [0.502, 0.729]           0.606  [0.474, 0.733]
+  DeepSeek-R1-7B   presupposition          0.500  [0.500, 0.500]           0.508  [0.373, 0.638]
+  Qwen2.5-7B       base                    0.630  [0.539, 0.712]           0.646  [0.559, 0.737]
+  Qwen2.5-7B       critical                0.531  [0.440, 0.626]           0.539  [0.443, 0.631]
+  Qwen2.5-7B       presupposition          0.583  [0.487, 0.673]           0.582  [0.488, 0.672]
+  Llama-3.1-8B     base                    0.630  [0.511, 0.750]           0.629  [0.499, 0.750]
+  Llama-3.1-8B     critical                0.636  [0.503, 0.750]           0.642  [0.515, 0.761]
+  Llama-3.1-8B     presupposition          0.517  [0.413, 0.620]           0.535  [0.429, 0.642]
+  Qwen3.5-9B       base                    0.500  [0.500, 0.500]           0.500  [0.500, 0.500]
+  Qwen3.5-9B       critical                0.560  [0.441, 0.677]           0.560  [0.441, 0.677]
+  Qwen3.5-9B       presupposition          0.596  [0.466, 0.726]           0.601  [0.467, 0.737]
+
+NOTE — Baseline (T0) correctness:
+  The judge CSV covers only turns 1-5; no per-instance T0 correctness
+  label is available. T0 completeness (Response_Turn_0 non-empty) is
+  near 100% for all models and question types above.  Correctness at T0
+  is assumed from SYCON-Bench benchmark design: questions have a single
+  defensible correct answer and are evaluated precisely because models
+  are expected to answer correctly before pressure is applied.
+  A minority of T0 responses may already be incorrect; these would
+  appear as "anti-sycophantic corrections" under pressure and inflate
+  flip counts slightly. Explicit T0 verification is left for future work.
+

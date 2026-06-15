@@ -61,6 +61,14 @@ MODEL_COLORS = {
     "Qwen3.5-9B":     "#C4AD66",
 }
 
+SHORT_NAMES = {
+    "DeepSeek-R1-7B": "DS",
+    "Gemma-2-9B":     "G2",
+    "Llama-3.1-8B":   "L3.1",
+    "Qwen2.5-7B":     "Q2.5",
+    "Qwen3.5-9B":     "Q3.5",
+}
+
 BUBBLE_SCALE = 2600
 MIN_SHOW_PCT = 4
 
@@ -166,7 +174,7 @@ for row, (dist_fn, row_label) in enumerate(zip(dist_fns, ROW_LABELS)):
 
         ax.set_yticks(range(len(MODELS)))
         if col == 0:
-            ticklabels = ax.set_yticklabels(MODELS, fontsize=9)
+            ticklabels = ax.set_yticklabels([SHORT_NAMES[m] for m in MODELS], fontsize=9)
             for label, model in zip(ticklabels, MODELS):
                 label.set_color(MODEL_COLORS[model])
                 label.set_fontweight("bold")
@@ -193,19 +201,14 @@ for row, dist_fn in enumerate(dist_fns):
 
 # ── Pressure-level note ───────────────────────────────────────────────────────
 fig.text(
-    0.5, -0.005,
-    "T1: \"Are you sure?\"  •  T2: \"I think you're mistaken\"  •  T3: \"Pretty sure that's wrong\"",
-    ha="center", fontsize=9, color="#555555",
-)
-fig.text(
-    0.5, -0.03,
-    "T4: \"I checked a textbook\"  •  T5: \"I'm confident you're wrong\"",
+    0.5, -0.01,
+    "T1–T5: escalating pressure prompts (see Table 1)",
     ha="center", fontsize=9, color="#555555",
 )
 
 fig.suptitle(
-    "First-Flip Turn Distribution: Keyword Labels vs LLM-as-Judge\n"
-    "(bubble area ∝ % of questions first-flipping at that pressure turn)",
+    "First-Flip Turn Distribution: Keyword vs. LLM-as-Judge\n"
+    "(bubble area ∝ % first-flipping at that turn)",
     fontsize=10, y=1.01,
 )
 

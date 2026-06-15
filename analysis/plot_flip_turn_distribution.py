@@ -37,6 +37,14 @@ MODEL_COLORS = {
     "Qwen3.5-9B":     "#C4AD66",
 }
 
+SHORT_NAMES = {
+    "DeepSeek-R1-7B": "DS",
+    "Gemma-2-9B":     "G2",
+    "Llama-3.1-8B":   "L3.1",
+    "Qwen2.5-7B":     "Q2.5",
+    "Qwen3.5-9B":     "Q3.5",
+}
+
 
 def first_flip_dist(df, model_col, qtype):
     """Returns (turn→rate, ever_flip_rate) where rate = fraction of all questions."""
@@ -101,7 +109,7 @@ for ax, qt, qt_label in zip(axes, QTYPES, QTYPE_LABELS):
 
 # Model names on leftmost panel, color-coded to match their bubbles
 axes[0].set_yticks(range(len(models)))
-axes[0].set_yticklabels(models, fontsize=9)
+axes[0].set_yticklabels([SHORT_NAMES[m] for m in models], fontsize=9)
 for tick, model in zip(axes[0].get_yticklabels(), models):
     tick.set_color(MODEL_COLORS[model])
     tick.set_fontweight("bold")
@@ -122,14 +130,11 @@ for i, model in enumerate(models):
     )
 
 # ── Pressure-level note at bottom ──────────────────────────────────────────────
-line1 = "  •  ".join([f"T{i+1}: {p}" for i, p in enumerate(PRESSURE[:3])])
-line2 = "  •  ".join([f"T{i+4}: {p}" for i, p in enumerate(PRESSURE[3:])])
-fig.text(0.5, 0.07, line1, ha="center", fontsize=8.5, color="#555555")
-fig.text(0.5, 0.02, line2, ha="center", fontsize=8.5, color="#555555")
+fig.text(0.5, 0.02, "T1–T5: escalating pressure prompts (see Table 1)", ha="center", fontsize=8.5, color="#555555")
 
 fig.suptitle(
     "First-Flip Turn Distribution by Model and Question Type\n"
-    "(LLM-as-judge: Claude Haiku 4.5  ·  bubble area ∝ % of questions first-flipping at that pressure turn)",
+    "(bubble area ∝ % of questions first-flipping at that turn)",
     fontsize=10, y=1.03,
 )
 
