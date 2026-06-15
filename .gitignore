@@ -42,6 +42,9 @@ analysis/plot_flip_turn_distribution_combined.py
 analysis_claude/flip_turn_tomas_vs_soham.png
 analysis_claude/flip_turn_distribution_combined.png
 
+# Claude Code project files
+.claude/
+
 # Submission archives and working folders
 blog/
 Kayo_Yin/
