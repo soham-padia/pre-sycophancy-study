@@ -14,7 +14,7 @@ import argparse
 import sys
 from pathlib import Path
 
-HF_REPO = "TODO/pre-sycophancy-study-data"   # ← set this before sharing
+HF_REPO = "sohampadianeu/pre-sycophancy-study-data"   # ← set this before sharing
 
 MODELS = [
     "DeepSeek-R1-Distill-Qwen-7B",
