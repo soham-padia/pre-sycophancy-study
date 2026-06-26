@@ -16,15 +16,10 @@ __pycache__/
 .cache/
 .mplconfig/
 
-# Internal working documents (not for official repo)
-Paper/
-PROJECT_SUMMARY_FOR_CHAT.md
-LLM_JUDGE_CONTEXT_HANDOFF_2026-05-11.md
-probe_results_writeup_final.md
-
 # Paper working copies (Overleaf syncs / draft iterations)
 current_paper_may_21/
 PAPER_MAY_21/
+Paper/
 documents/
 
 # Python virtual environment
@@ -36,20 +31,12 @@ consistency_anova_results.txt
 anova_syco_analysis.py
 output/
 
-# Internal annotator-comparison plots (not used in paper)
-analysis/plot_tomas_vs_soham.py
-analysis/plot_flip_turn_distribution_combined.py
-analysis_claude/flip_turn_tomas_vs_soham.png
-analysis_claude/flip_turn_distribution_combined.png
-
 # Claude Code project files
 .claude/
 
-# Submission archives and working folders
-blog/
-Kayo_Yin/
-tomas/
-submission_code/
-submission_code.zip
-submission_data.zip
-"analysis_claude 2/"
+# Unused/intermediate analysis scripts and plots
+analysis/plot_flip_turn_distribution_combined.py
+analysis_claude/flip_turn_distribution_combined.png
+
+# Local working folder (scratch files, not for repo)
+_local/
