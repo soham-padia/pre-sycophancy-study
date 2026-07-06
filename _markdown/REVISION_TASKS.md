@@ -152,7 +152,7 @@ pip install -r requirements.txt
 - `data/` — multiturn CSV files (~50MB per model, 5 models)
 - `data/*/` — hidden state `.pt` files (~1–4GB per model per question type)
 
-**Ask Soham for the Google Drive link** for `data/`. Download and place it at repo root so paths resolve correctly.
+Run `python download_data.py` (full ~22 GB) or `python download_data.py --csv-only` (~50 MB, behavioral data only). Downloads from HuggingFace (`sohampadianeu/pre-sycophancy-study-data`) into `data/` at repo root.
 
 ### Do NOT download / run locally
 - Model weights (7–9B params each, need 16GB+ VRAM) — all extraction already done
