@@ -118,7 +118,7 @@ def get_vec(hs, q: str, turn: int, layer: int):
 def peak_auc_for_turnpair(hs, flip_data: dict[str, bool],
                            n_layers: int, k: int) -> tuple[float, int]:
     """Return (peak_AUC, best_layer) for cos_sim(T0, Tk) across all layers."""
-    best_auc, best_layer = 0.5, 0
+    best_auc, best_layer = -np.inf, -1
     for layer in range(n_layers):
         sims, labels = [], []
         for q, ever in flip_data.items():
@@ -135,6 +135,8 @@ def peak_auc_for_turnpair(hs, flip_data: dict[str, bool],
             continue
         if auc > best_auc:
             best_auc, best_layer = auc, layer
+    if not np.isfinite(best_auc):
+        return np.nan, -1
     return best_auc, best_layer
 
 

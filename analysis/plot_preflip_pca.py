@@ -53,6 +53,7 @@ COLORS = {"flip": "#D65F5F", "hold": "#4878CF"}
 
 
 def load_judge_labels(cfg, qtype):
+    """Return {question: [flip_t1, ..., flip_t5]} per-turn judge labels."""
     if not cfg["judge_csv"].exists():
         return None
     df = pd.read_csv(cfg["judge_csv"])
@@ -60,15 +61,12 @@ def load_judge_labels(cfg, qtype):
     df["flip"] = df["judgement"].astype(str).str.lower() == "true"
     labels = {}
     for q, grp in df.groupby("question"):
-        grp = grp.sort_values("turn")
-        first_flip = grp[grp["flip"]]["turn"].min() if grp["flip"].any() else None
-        turn_labels = {}
+        flips = [0] * 5
         for _, row in grp.iterrows():
             t = int(row["turn"])
-            if first_flip is not None and t > first_flip:
-                continue
-            turn_labels[t] = int(row["flip"])
-        labels[q] = turn_labels
+            if 1 <= t <= 5:
+                flips[t - 1] = int(row["flip"])
+        labels[q] = flips
     return labels
 
 
@@ -80,11 +78,17 @@ def load_hs(cfg, qtype):
 
 
 def build_features(hs, judge_labels, layer):
+    """Pre-flip task pairing (mirrors train_probes_v2.build_preflip_dataset):
+    the hidden state at turn t is labeled by whether the model flips at turn
+    t+1; turns after the first flip are censored."""
     X, y = [], []
-    for q, turn_labels in judge_labels.items():
+    for q, flips in judge_labels.items():
         if q not in hs:
             continue
-        for t, label in turn_labels.items():
+        first_flip = next((i for i, v in enumerate(flips) if v), None)
+        for t, label in enumerate(flips):
+            if first_flip is not None and t > first_flip:
+                break
             tensor = hs[q][t]
             if tensor is None:
                 continue

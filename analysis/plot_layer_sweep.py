@@ -59,15 +59,18 @@ MODEL_COLORS = {
     "Qwen3.5-9B":     "#C4AD66",
 }
 
+# Matches the cosine-analysis (Panel A) best condition per model so the two
+# panels of the paper figure describe the same data.
 BEST_QTYPE = {
     "DeepSeek-R1-7B": "critical",
-    "Qwen2.5-7B":     "presupposition",
-    "Llama-3.1-8B":   "presupposition",
+    "Qwen2.5-7B":     "base",
+    "Llama-3.1-8B":   "critical",
     "Qwen3.5-9B":     "presupposition",
 }
 
 
 def load_judge_labels(cfg, qtype):
+    """Return {question: [flip_t1, ..., flip_t5]} per-turn judge labels."""
     if not cfg["judge_csv"].exists():
         return None
     df = pd.read_csv(cfg["judge_csv"])
@@ -75,15 +78,12 @@ def load_judge_labels(cfg, qtype):
     df["flip"] = df["judgement"].astype(str).str.lower() == "true"
     labels = {}
     for q, grp in df.groupby("question"):
-        grp = grp.sort_values("turn")
-        first_flip = grp[grp["flip"]]["turn"].min() if grp["flip"].any() else None
-        turn_labels = {}
+        flips = [0] * 5
         for _, row in grp.iterrows():
             t = int(row["turn"])
-            if first_flip is not None and t > first_flip:
-                continue
-            turn_labels[t] = int(row["flip"])
-        labels[q] = turn_labels
+            if 1 <= t <= 5:
+                flips[t - 1] = int(row["flip"])
+        labels[q] = flips
     return labels
 
 
@@ -95,11 +95,17 @@ def load_hs(cfg, qtype):
 
 
 def build_features(hs, judge_labels, layer):
+    """Pre-flip task pairing (mirrors train_probes_v2.build_preflip_dataset):
+    the hidden state at turn t is labeled by whether the model flips at turn
+    t+1; turns after the first flip are censored."""
     X, y, qids = [], [], []
-    for qi, (q, turn_labels) in enumerate(judge_labels.items()):
+    for qi, (q, flips) in enumerate(judge_labels.items()):
         if q not in hs:
             continue
-        for t, label in turn_labels.items():
+        first_flip = next((i for i, v in enumerate(flips) if v), None)
+        for t, label in enumerate(flips):
+            if first_flip is not None and t > first_flip:
+                break
             tensor = hs[q][t]
             if tensor is None:
                 continue
@@ -152,9 +158,9 @@ def main():
             print(f"  {model_name}: missing data, skipping")
             continue
 
-        # chance for this dataset
-        all_y = [label for tl in judge_labels.values() for label in tl.values()]
-        chance = max(np.mean(all_y), 1 - np.mean(all_y))
+        # chance for this dataset (censored pre-flip sample distribution)
+        _, y0, _ = build_features(hs, judge_labels, 0)
+        chance = max(np.mean(y0), 1 - np.mean(y0))
 
         print(f"  {model_name} | {qtype} | {cfg['n_layers']} layers | chance={chance:.3f}")
         for layer in range(cfg["n_layers"]):
