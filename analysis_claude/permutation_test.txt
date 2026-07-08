@@ -1,0 +1,22 @@
+SWEEP-CORRECTED PERMUTATION TEST
+Null: max-over-layers AUC with shuffled ever-flip labels (10,000 permutations)
+p = P(shuffled peak >= observed peak)
+==============================================================================
+  Model            Cond.          Obs peak Layer Null median Null 95th        p
+  ----------------------------------------------------------------------------
+  DeepSeek-R1-7B   base              0.508    10       0.578     0.653   0.9606
+  DeepSeek-R1-7B   critical          0.617    21       0.579     0.653   0.1899
+  DeepSeek-R1-7B   presupposition    0.500     0       0.579     0.662   1.0000
+  Qwen2.5-7B       base              0.630    26       0.565     0.623   0.0346
+  Qwen2.5-7B       critical          0.531    18       0.563     0.622   0.8340
+  Qwen2.5-7B       presupposition    0.583    19       0.567     0.626   0.3233
+  Llama-3.1-8B     base              0.630     1       0.599     0.676   0.2432
+  Llama-3.1-8B     critical          0.636    32       0.590     0.662   0.1477
+  Llama-3.1-8B     presupposition    0.517     1       0.580     0.646   0.9651
+  Qwen3.5-9B       base              0.500     0       0.562     0.640   1.0000
+  Qwen3.5-9B       critical          0.560    24       0.568     0.648   0.5788
+  Qwen3.5-9B       presupposition    0.596     4       0.582     0.672   0.3977
+
+Interpretation: the null median shows how high a peak AUC the layer
+sweep alone produces under label-shuffled data. Cells with p < 0.05
+have peaks that the sweep cannot explain.

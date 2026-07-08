@@ -1,7 +1,7 @@
 # Paper Status — EACL revision (deadline: August 2026)
 
 Tracks the professor's revision letter (2026-05-25) item by item.
-Last updated: 2026-07-08. Paper lives in Overleaf; latest local tex work was
+Last updated: 2026-07-08 (evening). Paper lives in Overleaf; latest local tex work was
 synced from `_local/main.tex` (gitignored).
 
 ## Done ✅
@@ -27,9 +27,9 @@ synced from `_local/main.tex` (gitignored).
 
 ## Remaining ❌
 
-1. **Permutation test with layer-sweep correction** — shuffle labels, repeat the
-   full layer sweep, compare observed peak to shuffled-peak distribution.
-   Pure analysis of existing data (~30 min CPU). Professor pressed hardest here.
+1. ~~Permutation test with layer-sweep correction~~ — DONE 2026-07-08
+   (`analysis/permutation_test.py`): only Qwen2.5 base survives (p=0.035);
+   Fisher-combined p=0.047. §6.1 + Limitations updated.
 2. ~~Binomial CIs for flip rates in Table 2~~ — DONE 2026-07-08
    (`analysis/flip_rate_cis.py`; Table 2 in Overleaf updated with ±95% CI).
 3. ~~Figure 2 redesign~~ — Tomas's PR #1 on `paper-jul-6` (stacked bars,

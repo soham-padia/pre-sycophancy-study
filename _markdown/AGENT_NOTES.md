@@ -73,3 +73,26 @@ Template:
   hover at 0.50 and are seed-sensitive; caption should match the text's framing
   (Qwen2.5 clearly above; Llama marginal; DeepSeek/Qwen3.5 straddle).
 - Handoff: permutation test with layer-sweep correction is the last stats item.
+
+## 2026-07-08 (fact-check + permutation) — Soham + Claude (branch: main)
+- Permutation test done (`analysis/permutation_test.py`, 10k shuffles, full layer
+  sweep per shuffle): null median peaks 0.56–0.60; ONLY Qwen2.5 base survives
+  (p=0.035); Fisher-combined across best conditions p=0.047 (condition selection
+  uncorrected). §6.1 + Limitations updated — peaks are now framed as descriptive.
+- Full fact-check of paper claims vs data. VERIFIED: avg first-flip turns, 76%
+  T4 Qwen2.5, all peak AUC/layer cells, T1-exclusion deltas, bootstrap CIs,
+  flip-rate ranges + keyword-judge gaps, all §6.3 classifier claims (2.5pp,
+  80.0/77.5, 78.3/75.9, 6.6pp avg, 13.3/8.8pp), multiturn DS 0.725 + Q2.5
+  stability, trajectory example question, Fisher range, 11,450 judge calls.
+- ERRORS FOUND AND FIXED in tex:
+  1. §4.5 "judge concentrates flips at T1 across all models" — false (Q2.5 3%,
+     Q3.5 1%); keyword actually fires EARLIER than judge; paragraph rewritten.
+  2. §4.5 Qwen3.5 keyword>judge exception — only base/critical; presup is the
+     reverse; caveat added.
+  3. §3.5 imbalance "75–85%" and §3.6 chance "68–91%" — actual 66–91%; fixed.
+  4. Appendix multiturn: exception is LLAMA (not Qwen3.5); Q3.5 peaks at T0→T3.
+  5. Appendix L2: "flip group slightly higher" — false (lower for DS/Q2.5);
+     rewritten to match l2_norm_trend.csv.
+- FOR TOMAS'S PR: Panel C caption ("3/4 reach 0.5") is seed-sensitive and
+  contradicts paper text; appendix Fig2 caption "keyword labels undercount
+  flips" is false for Qwen3.5 base/critical (overcounts by 21–22pp).
