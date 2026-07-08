@@ -30,7 +30,8 @@ synced from `_local/main.tex` (gitignored).
 1. **Permutation test with layer-sweep correction** — shuffle labels, repeat the
    full layer sweep, compare observed peak to shuffled-peak distribution.
    Pure analysis of existing data (~30 min CPU). Professor pressed hardest here.
-2. **Binomial CIs for flip rates in Table 2** — quick.
+2. ~~Binomial CIs for flip rates in Table 2~~ — DONE 2026-07-08
+   (`analysis/flip_rate_cis.py`; Table 2 in Overleaf updated with ±95% CI).
 3. **Figure 2 redesign** — judge-labels-only stacked bars in main text; move
    keyword-vs-judge bubble comparison to appendix. (Track 3)
 4. **Figure 3 → 4-panel evidence figure** — A: AUC with CI bands; B: after

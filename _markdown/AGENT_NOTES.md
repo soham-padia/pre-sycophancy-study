@@ -45,3 +45,14 @@ Template:
   - Two bib entries pending in Overleaf (see `PAPER_STATUS.md`).
   - Anyone writing new probe analyses: use the pre-flip pairing from
     `train_probes_v2.py::build_preflip_dataset` — see ONBOARDING "off-by-one trap".
+
+## 2026-07-08 — Soham + Claude (branch: main)
+- What changed: Table 2 flip-rate 95% binomial CIs generated
+  (`analysis/flip_rate_cis.py` → `analysis_claude/flip_rate_cis.{csv,tex}`);
+  Overleaf Table 2 rows + caption updated with ± values. Point estimates
+  verified identical to the published table before adding CIs.
+- Files touched: analysis/flip_rate_cis.py, analysis_claude/flip_rate_cis.*,
+  Overleaf main.tex (Table 2)
+- Blocked on / needs review: nothing
+- Handoff notes: permutation test (PAPER_STATUS item 1) still the top remaining
+  stats item; figure redesigns (items 3-4) unassigned in-flight for Track 3.
