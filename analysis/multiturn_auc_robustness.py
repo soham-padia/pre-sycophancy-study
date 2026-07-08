@@ -140,6 +140,33 @@ def peak_auc_for_turnpair(hs, flip_data: dict[str, bool],
     return best_auc, best_layer
 
 
+def bootstrap_ci_at_layer(hs, flip_data: dict[str, bool], layer: int, k: int,
+                          n_boot: int = 1000, seed: int = 42) -> tuple[float, float]:
+    """95% bootstrap CI for the AUC of cos_sim(T0, Tk) at a fixed layer."""
+    sims, labels = [], []
+    for q, ever in flip_data.items():
+        v0 = get_vec(hs, q, 0, layer)
+        vk = get_vec(hs, q, k, layer)
+        if v0 is not None and vk is not None:
+            sims.append(cos_sim(v0, vk))
+            labels.append(int(ever))
+    sims = np.array(sims); labels = np.array(labels)
+    n = len(sims)
+    if n < 10 or len(set(labels)) < 2:
+        return np.nan, np.nan
+    rng = np.random.default_rng(seed)
+    boots = []
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, size=n)
+        yb = labels[idx]
+        if yb.min() == yb.max():
+            continue
+        boots.append(roc_auc_score(yb, -sims[idx]))
+    if len(boots) < 10:
+        return np.nan, np.nan
+    return float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
+
+
 def all_layers_auc(hs, flip_data: dict[str, bool],
                    n_layers: int, k: int) -> list[tuple[int, float]]:
     """Return [(layer, AUC), ...] for cos_sim(T0, Tk) at every layer."""
@@ -192,9 +219,13 @@ def run() -> tuple[list[dict], str]:
                     hs, flip_data, cfg["n_layers"], k
                 )
                 aucs.append(peak_auc)
+                ci_lo, ci_hi = (np.nan, np.nan)
+                if best_layer >= 0:
+                    ci_lo, ci_hi = bootstrap_ci_at_layer(hs, flip_data, best_layer, k)
                 rows.append({
                     "model": model_name, "qtype": qtype, "k": k,
                     "peak_auc": peak_auc, "best_layer": best_layer,
+                    "ci_lo": ci_lo, "ci_hi": ci_hi,
                     "n": len(flip_data),
                     "n_flip": sum(flip_data.values()),
                 })
@@ -236,6 +267,13 @@ def make_figure(df: pd.DataFrame):
                 continue
             ax.plot(mdf["k"], mdf["peak_auc"], marker="o", color=color,
                     linewidth=1.5, markersize=3.5, label=model_name)
+            if "ci_lo" in mdf.columns and mdf["ci_lo"].notna().any():
+                yerr = np.array([
+                    (mdf["peak_auc"] - mdf["ci_lo"]).clip(lower=0),
+                    (mdf["ci_hi"] - mdf["peak_auc"]).clip(lower=0),
+                ])
+                ax.errorbar(mdf["k"], mdf["peak_auc"], yerr=yerr, fmt="none",
+                            ecolor=color, elinewidth=0.7, capsize=1.5, alpha=0.55)
 
         ax.axhline(0.5, color="gray", linestyle="--", linewidth=0.8, alpha=0.7,
                    label="Chance")
@@ -243,7 +281,7 @@ def make_figure(df: pd.DataFrame):
         ax.set_xlabel("Pressure turn k", fontsize=7)
         ax.set_xticks(range(1, 6))
         ax.set_xticklabels([str(k) for k in range(1, 6)], fontsize=7)
-        ax.set_ylim(0.45, 0.72)
+        ax.set_ylim(0.38, 0.84)
         ax.tick_params(labelsize=7, pad=2)
         ax.grid(True, alpha=0.3)
         ax.spines["top"].set_visible(False)

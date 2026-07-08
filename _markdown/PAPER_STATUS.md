@@ -1,7 +1,7 @@
 # Paper Status — EACL revision (deadline: August 2026)
 
 Tracks the professor's revision letter (2026-05-25) item by item.
-Last updated: 2026-06-30. Paper lives in Overleaf; latest local tex work was
+Last updated: 2026-07-08. Paper lives in Overleaf; latest local tex work was
 synced from `_local/main.tex` (gitignored).
 
 ## Done ✅
@@ -32,12 +32,11 @@ synced from `_local/main.tex` (gitignored).
    Pure analysis of existing data (~30 min CPU). Professor pressed hardest here.
 2. ~~Binomial CIs for flip rates in Table 2~~ — DONE 2026-07-08
    (`analysis/flip_rate_cis.py`; Table 2 in Overleaf updated with ±95% CI).
-3. **Figure 2 redesign** — judge-labels-only stacked bars in main text; move
-   keyword-vs-judge bubble comparison to appendix. (Track 3)
-4. **Figure 3 → 4-panel evidence figure** — A: AUC with CI bands; B: after
-   T1-exclusion; C: best layer per model; D: drift magnitude vs predictive AUC
-   dissociation. All data exists in `cosine_disruption.csv` +
-   `cosine_disruption_checks.csv`. (Track 3)
+3. ~~Figure 2 redesign~~ — Tomas's PR #1 on `paper-jul-6` (stacked bars,
+   keyword comparison to appendix). Pending review fixes before merge.
+4. ~~Figure 3 → 4-panel evidence figure~~ — Tomas's PR #1. Pending review fixes:
+   Panel C caption contradicts the paper's own CI values; generating scripts not
+   committed; old Panel B (probe-by-layer) evidence needs a home in appendix:linear.
 5. **One intro sentence**: why multi-turn pressure differs from single-turn
    preference conflict (her "four questions" — three are answered).
 
