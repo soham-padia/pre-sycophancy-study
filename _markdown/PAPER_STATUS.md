@@ -37,8 +37,8 @@ synced from `_local/main.tex` (gitignored).
 4. ~~Figure 3 → 4-panel evidence figure~~ — Tomas's PR #1. Pending review fixes:
    Panel C caption contradicts the paper's own CI values; generating scripts not
    committed; old Panel B (probe-by-layer) evidence needs a home in appendix:linear.
-5. **One intro sentence**: why multi-turn pressure differs from single-turn
-   preference conflict (her "four questions" — three are answered).
+5. ~~One intro sentence~~ — DONE 2026-07-08 (paper-jul-6 aaf5e8b): multi-turn
+   pressure accumulates in context, giving the internal state a trajectory.
 
 ## Bib entries to add in Overleaf `custom.bib`
 
