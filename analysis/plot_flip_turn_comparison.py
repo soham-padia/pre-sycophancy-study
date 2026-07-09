@@ -109,9 +109,9 @@ def draw(ax, dist_fn, cond, title=None, ylabel=None):
 
 
 def main():
-    fig, axes = plt.subplots(2, 3, figsize=(9.5, 5.2), sharey=True)
+    fig, axes = plt.subplots(2, 3, figsize=(9.5, 5.5), sharey=True)
     fig.subplots_adjust(wspace=0.08, hspace=0.30, left=0.07, right=0.99,
-                        top=0.88, bottom=0.07)
+                        top=0.82, bottom=0.07)
 
     for col, (cond, cl) in enumerate(zip(CONDITIONS, COND_LABELS)):
         draw(axes[0][col], keyword_first_flip_dist, cond, title=cl,
