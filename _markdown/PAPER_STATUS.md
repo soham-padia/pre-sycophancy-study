@@ -32,11 +32,11 @@ synced from `_local/main.tex` (gitignored).
    Fisher-combined p=0.047. §6.1 + Limitations updated.
 2. ~~Binomial CIs for flip rates in Table 2~~ — DONE 2026-07-08
    (`analysis/flip_rate_cis.py`; Table 2 in Overleaf updated with ±95% CI).
-3. ~~Figure 2 redesign~~ — Tomas's PR #1 on `paper-jul-6` (stacked bars,
-   keyword comparison to appendix). Pending review fixes before merge.
-4. ~~Figure 3 → 4-panel evidence figure~~ — Tomas's PR #1. Pending review fixes:
-   Panel C caption contradicts the paper's own CI values; generating scripts not
-   committed; old Panel B (probe-by-layer) evidence needs a home in appendix:linear.
+3. ~~Figure 2 redesign~~ — DONE, merged in paper-jul-6 a4457ce (stacked bars
+   regenerated from committed scripts).
+4. ~~Figure 3 → 4-panel evidence figure~~ — DONE, merged in paper-jul-6 a4457ce
+   with Panel C aligned to permutation result; layer_sweep.png added to
+   appendix:linear; all figures reproducible from analysis repo scripts.
 5. ~~One intro sentence~~ — DONE 2026-07-08 (paper-jul-6 aaf5e8b): multi-turn
    pressure accumulates in context, giving the internal state a trajectory.
 

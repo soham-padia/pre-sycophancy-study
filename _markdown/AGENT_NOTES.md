@@ -96,3 +96,18 @@ Template:
 - FOR TOMAS'S PR: Panel C caption ("3/4 reach 0.5") is seed-sensitive and
   contradicts paper text; appendix Fig2 caption "keyword labels undercount
   flips" is false for Qwen3.5 base/critical (overcounts by 21–22pp).
+
+## 2026-07-08 (PR merge) — Soham + Claude (branch: main)
+- Did Tomas's PR fixes ourselves and merged paper-jul-6 PR #1 (merge commit
+  a4457ce): resolved 3 tex conflicts (kept corrected §4.5 text + his appendix
+  ref; his 4-panel caption with Panel C aligned to the permutation result; my
+  LDA-CI wording + his appendix ref), fixed the appendix comparison caption
+  (Qwen3.5 overcounts under keyword), added layer_sweep.png to the linear-probes
+  appendix, and replaced all four figure PNGs with versions regenerated from
+  committed scripts (analysis repo 96355ad):
+  plot_hidden_state_disruption.py is now the 4-panel evidence figure;
+  plot_flip_turn_{distribution,comparison}.py are stacked bars;
+  cosine_auc_ci_bands.py gained excl_t1 + mean_drift columns.
+- Remaining before sending the draft to the professor: Overleaf pull + compile
+  check (Table 4 width, new figure* placements), abstract judgment call
+  (mention permutation result?), then email the draft.
