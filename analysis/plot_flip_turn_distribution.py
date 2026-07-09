@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Bubble grid: first-flip turn distribution by model and question type."""
+"""Stacked-bar first-flip turn distribution (LLM-as-judge labels, main figure).
+
+One panel per prompt condition; x-axis = models; bar height = ever-flip rate,
+segmented by the pressure turn (T1..T5) at which questions first flip.
+"""
 from pathlib import Path
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 OUT_PNG = REPO_ROOT / "analysis_claude" / "flip_turn_distribution.png"
 
@@ -17,25 +22,8 @@ JUDGE_CSVS = {
     "Qwen3.5-9B":      (REPO_ROOT / "analysis_claude" / "qwen35_judgements_haiku.csv",  "Qwen3.5-9B"),
 }
 
-QTYPES       = ["base", "critical", "presupposition"]
-QTYPE_LABELS = ["Base", "Critical", "Presupposition"]
-
-# Short pressure-level labels for x-axis
-PRESSURE = [
-    '"Are you sure?"',
-    '"You might be mistaken"',
-    '"Pretty sure that\'s wrong"',
-    '"I checked a textbook"',
-    '"I\'m confident you\'re wrong"',
-]
-
-MODEL_COLORS = {
-    "DeepSeek-R1-7B": "#4878CF",
-    "Gemma-2-9B":     "#D65F5F",
-    "Llama-3.1-8B":   "#6ACC65",
-    "Qwen2.5-7B":     "#B47CC7",
-    "Qwen3.5-9B":     "#C4AD66",
-}
+CONDITIONS  = ["base", "critical", "presupposition"]
+COND_LABELS = ["Base", "Critical", "Presupposition"]
 
 SHORT_NAMES = {
     "DeepSeek-R1-7B": "DS",
@@ -45,98 +33,69 @@ SHORT_NAMES = {
     "Qwen3.5-9B":     "Q3.5",
 }
 
+# Sequential turn colors: mild doubt (light) -> strong contradiction (dark)
+TURN_COLORS = ["#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"]
 
-def first_flip_dist(df, model_col, qtype):
-    """Returns (turn→rate, ever_flip_rate) where rate = fraction of all questions."""
-    sub = df[(df["model"] == model_col) & (df["question_type"] == qtype)].copy()
+
+def first_flip_dist(df, model_col, cond):
+    """{turn: fraction of ALL questions first-flipping at that turn}."""
+    sub = df[(df["model"] == model_col) & (df["question_type"] == cond)].copy()
     sub["flip"] = sub["judgement"].astype(str).str.lower() == "true"
-    questions = sub["question"].unique()
-    if len(questions) == 0:
-        return {}, 0.0
-
-    first_flips = {}
-    for q in questions:
-        q_df = sub[sub["question"] == q].sort_values("turn")
-        flipped = q_df[q_df["flip"]]["turn"]
-        first_flips[q] = int(flipped.min()) if len(flipped) > 0 else None
-
-    total = len(first_flips)
-    dist = {}
-    for t in range(1, 6):
-        dist[t] = sum(1 for v in first_flips.values() if v == t) / total
-    ever = sum(1 for v in first_flips.values() if v is not None) / total
-    return dist, ever
+    total, dist = 0, {t: 0 for t in range(1, 6)}
+    for q, g in sub.groupby("question"):
+        total += 1
+        fl = g[g["flip"]]["turn"]
+        if len(fl):
+            dist[int(fl.min())] += 1
+    if total == 0:
+        return {t: 0.0 for t in range(1, 6)}
+    return {t: v / total for t, v in dist.items()}
 
 
-# ── Load all data ──────────────────────────────────────────────────────────────
-models = list(JUDGE_CSVS.keys())
-dfs = {m: pd.read_csv(p) for m, (p, _) in JUDGE_CSVS.items()}
-
-# ── Figure ─────────────────────────────────────────────────────────────────────
-fig, axes = plt.subplots(1, 3, figsize=(6.5, 3.0), sharey=True)
-fig.subplots_adjust(wspace=0.06, right=0.88, bottom=0.18)
-
-BUBBLE_SCALE = 2800   # area multiplier: rate=1.0 → s=2800 pts²
-MIN_SHOW_PCT = 4      # show label only for bubbles ≥ 4%
-
-for ax, qt, qt_label in zip(axes, QTYPES, QTYPE_LABELS):
+def draw(ax, dists, models, title, show_ylabel):
+    x = np.arange(len(models))
     for i, model in enumerate(models):
-        _, model_col = JUDGE_CSVS[model]
-        color = MODEL_COLORS[model]
-        dist, ever = first_flip_dist(dfs[model], model_col, qt)
-
+        bottom = 0.0
         for t in range(1, 6):
-            rate = dist.get(t, 0)
-            if rate > 0.005:
-                ax.scatter(t, i, s=max(rate * BUBBLE_SCALE, 20),
-                           color=color, alpha=0.82, zorder=3,
-                           edgecolors="white", linewidths=0.9)
-                if rate * 100 >= MIN_SHOW_PCT:
-                    ax.text(t, i, f"{rate*100:.0f}%",
-                            ha="center", va="center",
-                            fontsize=7, fontweight="bold", color="white", zorder=4)
-
-    ax.set_xlim(0.4, 5.6)
-    ax.set_ylim(-0.7, len(models) - 0.3)
-    ax.set_xticks(range(1, 6))
-    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=9)
-    ax.set_title(qt_label, fontsize=10, pad=6)
-    ax.yaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
-    ax.xaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
-    ax.set_axisbelow(True)
+            h = dists[model][t] * 100
+            ax.bar(i, h, bottom=bottom, width=0.65, color=TURN_COLORS[t - 1],
+                   edgecolor="white", linewidth=0.5,
+                   label=f"T{t}" if i == 0 else None)
+            bottom += h
+        ax.text(i, bottom + 1.5, f"{bottom:.0f}%", ha="center", va="bottom",
+                fontsize=8, fontweight="bold")
+    ax.set_xticks(x)
+    ax.set_xticklabels([SHORT_NAMES[m] for m in models], fontsize=9)
+    ax.set_title(title, fontsize=10, pad=6)
+    ax.set_ylim(0, 108)
+    if show_ylabel:
+        ax.set_ylabel("Ever-flip rate (%)", fontsize=9)
+    ax.tick_params(labelsize=8.5)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.3)
+    ax.set_axisbelow(True)
 
-# Model names on leftmost panel, color-coded to match their bubbles
-axes[0].set_yticks(range(len(models)))
-axes[0].set_yticklabels([SHORT_NAMES[m] for m in models], fontsize=9)
-for tick, model in zip(axes[0].get_yticklabels(), models):
-    tick.set_color(MODEL_COLORS[model])
-    tick.set_fontweight("bold")
 
-# Right-margin ever-flip rate annotations on the rightmost panel
-for i, model in enumerate(models):
-    _, model_col = JUDGE_CSVS[model]
-    ever_vals = [first_flip_dist(dfs[model], model_col, qt)[1] for qt in QTYPES]
-    avg_ever = np.mean(ever_vals)
-    axes[-1].annotate(
-        f"{avg_ever*100:.0f}%",
-        xy=(5.6, i), xycoords="data",
-        xytext=(6, 0), textcoords="offset points",
-        ha="left", va="center",
-        fontsize=9, fontweight="bold",
-        color=MODEL_COLORS[model],
-        annotation_clip=False,
-    )
+def main():
+    models = list(JUDGE_CSVS.keys())
+    dfs = {m: pd.read_csv(p) for m, (p, _) in JUDGE_CSVS.items()}
 
-# ── Pressure-level note at bottom ──────────────────────────────────────────────
-fig.text(0.5, 0.02, "T1–T5: escalating pressure prompts (see Table 1)", ha="center", fontsize=8.5, color="#555555")
+    fig, axes = plt.subplots(1, 3, figsize=(9.5, 3.1), sharey=True)
+    fig.subplots_adjust(wspace=0.08, left=0.06, right=0.99, top=0.74, bottom=0.12)
 
-fig.suptitle(
-    "First-Flip Turn Distribution by Model and Question Type\n"
-    "(bubble area ∝ % of questions first-flipping at that turn)",
-    fontsize=10, y=1.03,
-)
+    for ax, cond, cl in zip(axes, CONDITIONS, COND_LABELS):
+        dists = {m: first_flip_dist(dfs[m], JUDGE_CSVS[m][1], cond) for m in models}
+        draw(ax, dists, models, cl, show_ylabel=(cond == "base"))
 
-plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
-print(f"Saved → {OUT_PNG}")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, fontsize=8, ncol=5, loc="upper center",
+               bbox_to_anchor=(0.5, 1.02), title="First-flip turn",
+               title_fontsize=8, framealpha=0.9, columnspacing=1.0)
+
+    plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
+    print(f"Saved -> {OUT_PNG}")
+
+
+if __name__ == "__main__":
+    main()

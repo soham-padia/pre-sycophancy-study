@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-"""Side-by-side bubble grid: keyword labels (top) vs LLM-as-judge labels (bottom).
+"""Stacked-bar keyword-vs-judge first-flip comparison (appendix figure).
 
-Rows: labeling method (keyword / judge)
-Columns: question type (base / critical / presupposition)
-Y-axis: models
-X-axis: pressure turn (T1–T5)
-Bubble: % of questions first-flipping at that turn
-Right annotation: ever-flip %
+Rows: labeling method (keyword / LLM-as-judge); columns: prompt condition.
+Bar height = ever-flip rate, segmented by first-flip turn (T1..T5).
 """
 from pathlib import Path
 import sys
@@ -22,17 +18,8 @@ from flip_labeling import response_flipped
 
 OUT_PNG = REPO_ROOT / "analysis_claude" / "flip_turn_comparison.png"
 
-# ── Data sources ───────────────────────────────────────────────────────────────
+MODELS = ["DeepSeek-R1-7B", "Gemma-2-9B", "Llama-3.1-8B", "Qwen2.5-7B", "Qwen3.5-9B"]
 
-MODELS = [
-    "DeepSeek-R1-7B",
-    "Gemma-2-9B",
-    "Llama-3.1-8B",
-    "Qwen2.5-7B",
-    "Qwen3.5-9B",
-]
-
-# Multiturn CSVs for keyword labels
 KEYWORD_DIRS = {
     "DeepSeek-R1-7B": REPO_ROOT / "data" / "DeepSeek-R1-Distill-Qwen-7B",
     "Gemma-2-9B":     REPO_ROOT / "data" / "Gemma-2-9B",
@@ -41,7 +28,6 @@ KEYWORD_DIRS = {
     "Qwen3.5-9B":     REPO_ROOT / "data" / "Qwen3.5-9B",
 }
 
-# Judge CSVs for LLM-as-judge labels
 JUDGE_CSVS = {
     "DeepSeek-R1-7B": (REPO_ROOT / "analysis_claude" / "claude_judgements.csv",        "DeepSeek-R1-Distill-Qwen-7B"),
     "Gemma-2-9B":     (REPO_ROOT / "analysis_claude" / "gemma_judgements_haiku.csv",   "Gemma-2-9B"),
@@ -50,16 +36,8 @@ JUDGE_CSVS = {
     "Qwen3.5-9B":     (REPO_ROOT / "analysis_claude" / "qwen35_judgements_haiku.csv",  "Qwen3.5-9B"),
 }
 
-QTYPES       = ["base", "critical", "presupposition"]
-QTYPE_LABELS = ["Base", "Critical", "Presupposition"]
-
-MODEL_COLORS = {
-    "DeepSeek-R1-7B": "#4878CF",
-    "Gemma-2-9B":     "#D65F5F",
-    "Llama-3.1-8B":   "#6ACC65",
-    "Qwen2.5-7B":     "#B47CC7",
-    "Qwen3.5-9B":     "#C4AD66",
-}
+CONDITIONS  = ["base", "critical", "presupposition"]
+COND_LABELS = ["Base", "Critical", "Presupposition"]
 
 SHORT_NAMES = {
     "DeepSeek-R1-7B": "DS",
@@ -69,148 +47,86 @@ SHORT_NAMES = {
     "Qwen3.5-9B":     "Q3.5",
 }
 
-BUBBLE_SCALE = 2600
-MIN_SHOW_PCT = 4
+TURN_COLORS = ["#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"]
 
 
-# ── Keyword: first-flip distribution from multiturn CSVs ──────────────────────
-
-def keyword_first_flip_dist(model: str, qtype: str):
-    csv_path = KEYWORD_DIRS[model] / f"{qtype}_multiturn.csv"
+def keyword_first_flip_dist(model, cond):
+    csv_path = KEYWORD_DIRS[model] / f"{cond}_multiturn.csv"
     if not csv_path.exists():
-        return {t: 0.0 for t in range(1, 6)}, 0.0
-
+        return {t: 0.0 for t in range(1, 6)}
     df = pd.read_csv(csv_path)
-    turn_cols = [f"Response_Turn_{t}" for t in range(1, 6)]
-    # Keep only columns that exist
-    turn_cols = [c for c in turn_cols if c in df.columns]
-
-    first_flips = []
+    turn_cols = [c for c in (f"Response_Turn_{t}" for t in range(1, 6)) if c in df.columns]
+    dist = {t: 0 for t in range(1, 6)}
     for _, row in df.iterrows():
-        first = None
         for idx, col in enumerate(turn_cols, start=1):
-            text = str(row.get(col, ""))
-            if response_flipped(text):
-                first = idx
+            if response_flipped(str(row.get(col, ""))):
+                dist[idx] += 1
                 break
-        first_flips.append(first)
-
-    total = len(first_flips)
-    dist = {t: sum(1 for v in first_flips if v == t) / total for t in range(1, 6)}
-    ever = sum(1 for v in first_flips if v is not None) / total
-    return dist, ever
+    return {t: v / len(df) for t, v in dist.items()}
 
 
-# ── Judge: first-flip distribution from judge CSVs ────────────────────────────
-
-def judge_first_flip_dist(model: str, qtype: str):
+def judge_first_flip_dist(model, cond):
     csv_path, model_col = JUDGE_CSVS[model]
-    if not csv_path.exists():
-        return {t: 0.0 for t in range(1, 6)}, 0.0
-
     df = pd.read_csv(csv_path)
-    sub = df[(df["model"] == model_col) & (df["question_type"] == qtype)].copy()
+    sub = df[(df["model"] == model_col) & (df["question_type"] == cond)].copy()
     sub["flip"] = sub["judgement"].astype(str).str.lower() == "true"
-
-    questions = sub["question"].unique()
-    first_flips = []
-    for q in questions:
-        q_df = sub[sub["question"] == q].sort_values("turn")
-        flipped = q_df[q_df["flip"]]["turn"]
-        first_flips.append(int(flipped.min()) if len(flipped) > 0 else None)
-
-    total = len(first_flips)
+    total, dist = 0, {t: 0 for t in range(1, 6)}
+    for q, g in sub.groupby("question"):
+        total += 1
+        fl = g[g["flip"]]["turn"]
+        if len(fl):
+            dist[int(fl.min())] += 1
     if total == 0:
-        return {t: 0.0 for t in range(1, 6)}, 0.0
-    dist = {t: sum(1 for v in first_flips if v == t) / total for t in range(1, 6)}
-    ever = sum(1 for v in first_flips if v is not None) / total
-    return dist, ever
+        return {t: 0.0 for t in range(1, 6)}
+    return {t: v / total for t, v in dist.items()}
 
 
-# ── Draw one panel ─────────────────────────────────────────────────────────────
-
-def draw_panel(ax, dist_fn, qtype, models, title=None):
-    for i, model in enumerate(models):
-        color = MODEL_COLORS[model]
-        dist, ever = dist_fn(model, qtype)
-
+def draw(ax, dist_fn, cond, title=None, ylabel=None):
+    x = np.arange(len(MODELS))
+    for i, model in enumerate(MODELS):
+        dist = dist_fn(model, cond)
+        bottom = 0.0
         for t in range(1, 6):
-            rate = dist.get(t, 0)
-            if rate > 0.005:
-                ax.scatter(t, i, s=max(rate * BUBBLE_SCALE, 18),
-                           color=color, alpha=0.82, zorder=3,
-                           edgecolors="white", linewidths=0.9)
-                if rate * 100 >= MIN_SHOW_PCT:
-                    ax.text(t, i, f"{rate*100:.0f}%",
-                            ha="center", va="center",
-                            fontsize=7, fontweight="bold", color="white", zorder=4)
-
-    ax.set_xlim(0.4, 5.6)
-    ax.set_ylim(-0.7, len(models) - 0.3)
-    ax.set_xticks(range(1, 6))
-    ax.set_xticklabels([f"T{t}" for t in range(1, 6)], fontsize=9)
+            h = dist[t] * 100
+            ax.bar(i, h, bottom=bottom, width=0.65, color=TURN_COLORS[t - 1],
+                   edgecolor="white", linewidth=0.5,
+                   label=f"T{t}" if i == 0 else None)
+            bottom += h
+        ax.text(i, bottom + 1.5, f"{bottom:.0f}%", ha="center", va="bottom",
+                fontsize=7.5, fontweight="bold")
+    ax.set_xticks(x)
+    ax.set_xticklabels([SHORT_NAMES[m] for m in MODELS], fontsize=8.5)
     if title:
-        ax.set_title(title, fontsize=10, pad=7)
-    ax.yaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
-    ax.xaxis.grid(True, linestyle="--", alpha=0.35, zorder=0)
-    ax.set_axisbelow(True)
+        ax.set_title(title, fontsize=10, pad=6)
+    if ylabel:
+        ax.set_ylabel(ylabel, fontsize=9, fontweight="bold")
+    ax.set_ylim(0, 110)
+    ax.tick_params(labelsize=8)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.3)
+    ax.set_axisbelow(True)
 
 
-# ── Figure: 2 rows × 3 columns ────────────────────────────────────────────────
+def main():
+    fig, axes = plt.subplots(2, 3, figsize=(9.5, 5.2), sharey=True)
+    fig.subplots_adjust(wspace=0.08, hspace=0.30, left=0.07, right=0.99,
+                        top=0.88, bottom=0.07)
 
-fig, axes = plt.subplots(2, 3, figsize=(6.5, 4.5))
-fig.subplots_adjust(wspace=0.06, hspace=0.42)
+    for col, (cond, cl) in enumerate(zip(CONDITIONS, COND_LABELS)):
+        draw(axes[0][col], keyword_first_flip_dist, cond, title=cl,
+             ylabel="Keyword\never-flip (%)" if col == 0 else None)
+        draw(axes[1][col], judge_first_flip_dist, cond,
+             ylabel="LLM-as-judge\never-flip (%)" if col == 0 else None)
 
-ROW_LABELS = ["Keyword\nLabels", "LLM-as-Judge\n(Claude Haiku 4.5)"]
-dist_fns   = [keyword_first_flip_dist, judge_first_flip_dist]
+    handles, labels = axes[0][0].get_legend_handles_labels()
+    fig.legend(handles, labels, fontsize=8, ncol=5, loc="upper center",
+               bbox_to_anchor=(0.5, 0.99), title="First-flip turn",
+               title_fontsize=8, framealpha=0.9, columnspacing=1.0)
 
-for row, (dist_fn, row_label) in enumerate(zip(dist_fns, ROW_LABELS)):
-    for col, (qt, qt_label) in enumerate(zip(QTYPES, QTYPE_LABELS)):
-        ax = axes[row][col]
-        title = qt_label if row == 0 else None
-        draw_panel(ax, dist_fn, qt, MODELS, title=title)
+    plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
+    print(f"Saved -> {OUT_PNG}")
 
-        ax.set_yticks(range(len(MODELS)))
-        if col == 0:
-            ticklabels = ax.set_yticklabels([SHORT_NAMES[m] for m in MODELS], fontsize=9)
-            for label, model in zip(ticklabels, MODELS):
-                label.set_color(MODEL_COLORS[model])
-                label.set_fontweight("bold")
-            ax.set_ylabel(row_label, fontsize=9, fontweight="bold",
-                          labelpad=10, rotation=90, va="center")
-        else:
-            ax.tick_params(labelleft=False)
 
-# ── Right-margin ever-flip annotations on rightmost column ───────────────────
-for row, dist_fn in enumerate(dist_fns):
-    ax = axes[row][2]
-    for i, model in enumerate(MODELS):
-        ever_vals = [dist_fn(model, qt)[1] for qt in QTYPES]
-        avg_ever = sum(ever_vals) / len(ever_vals)
-        ax.annotate(
-            f"{avg_ever*100:.0f}%",
-            xy=(5.6, i), xycoords="data",
-            xytext=(6, 0), textcoords="offset points",
-            ha="left", va="center",
-            fontsize=9, fontweight="bold",
-            color=MODEL_COLORS[model],
-            annotation_clip=False,
-        )
-
-# ── Pressure-level note ───────────────────────────────────────────────────────
-fig.text(
-    0.5, -0.01,
-    "T1–T5: escalating pressure prompts (see Table 1)",
-    ha="center", fontsize=9, color="#555555",
-)
-
-fig.suptitle(
-    "First-Flip Turn Distribution: Keyword vs. LLM-as-Judge\n"
-    "(bubble area ∝ % first-flipping at that turn)",
-    fontsize=10, y=1.01,
-)
-
-plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
-print(f"Saved → {OUT_PNG}")
+if __name__ == "__main__":
+    main()

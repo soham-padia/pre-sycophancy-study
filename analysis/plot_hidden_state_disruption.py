@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
-"""Two-panel figure for Early Hidden-State Disruption section.
+"""Four-panel central evidence figure for the cosine disruption signal.
 
-Panel A: AUC by layer (cosine similarity zero-shot predictor) — one line per model,
-         best question type selected per model.
-Panel B: Logistic regression accuracy by layer — one line per model, showing that
-         linear probes remain at or below chance across ALL layers (not just best).
+Panel A: T0->T1 cosine AUC by layer with 95% bootstrap CI bands
+         (best prompt condition per model).
+Panel B: the same after excluding questions whose first flip occurs at T1
+         (pre-behavioral robustness check).
+Panel C: peak AUC per model with 95% bootstrap CIs (from
+         cosine_disruption_checks.py, 2000 resamples, seeded).
+Panel D: per-layer representational drift (1 - mean cosine) vs. predictive
+         AUC, showing the dissociation between movement and predictiveness.
+
+Data sources (all committed; regenerate with):
+    python analysis/cosine_auc_ci_bands.py      -> cosine_auc_ci_bands.csv
+    python analysis/cosine_disruption_checks.py -> cosine_disruption_checks.csv
 """
 from pathlib import Path
 import pandas as pd
@@ -12,13 +20,12 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-OUT_PNG = REPO_ROOT / "analysis_claude" / "hidden_state_disruption.png"
+OUT_PNG   = REPO_ROOT / "analysis_claude" / "hidden_state_disruption.png"
 
-COSINE_CSV  = REPO_ROOT / "analysis_claude" / "cosine_disruption.csv"
-SWEEP_CSV   = REPO_ROOT / "analysis_claude" / "layer_sweep_accuracy.csv"
+BANDS_CSV  = REPO_ROOT / "analysis_claude" / "cosine_auc_ci_bands.csv"
+CHECKS_CSV = REPO_ROOT / "analysis_claude" / "cosine_disruption_checks.csv"
 
 MODEL_COLORS = {
     "DeepSeek-R1-7B": "#4878CF",
@@ -27,91 +34,91 @@ MODEL_COLORS = {
     "Qwen3.5-9B":     "#C4AD66",
 }
 
-SHORT_NAMES = {
-    "DeepSeek-R1-7B": "DS",
-    "Qwen2.5-7B":     "Q2.5",
-    "Llama-3.1-8B":   "L3.1",
-    "Qwen3.5-9B":     "Q3.5",
-}
-MODEL_ORDER = ["Gemma-2-9B", "DeepSeek-R1-7B", "Llama-3.1-8B", "Qwen3.5-9B", "Qwen2.5-7B"]
-
-# Best qtype per model (highest peak AUC from the analysis)
+# Best condition per model (matches the cosine analysis / paper Sec. 6.1)
 BEST_QTYPE = {
-    "DeepSeek-R1-7B": "critical",      # AUC=0.617 at layer 21
-    "Qwen2.5-7B":     "base",          # AUC=0.630 at layer 26
-    "Llama-3.1-8B":   "critical",      # AUC=0.636 at layer 32
-    "Qwen3.5-9B":     "presupposition",# AUC=0.596 at layer 4
+    "DeepSeek-R1-7B": "critical",
+    "Qwen2.5-7B":     "base",
+    "Llama-3.1-8B":   "critical",
+    "Qwen3.5-9B":     "presupposition",
 }
 
 QTYPE_LABELS = {"base": "Base", "critical": "Critical", "presupposition": "Presup."}
+SHORT = {"DeepSeek-R1-7B": "DS", "Qwen2.5-7B": "Q2.5",
+         "Llama-3.1-8B": "L3.1", "Qwen3.5-9B": "Q3.5"}
 
-# ── Load data ──────────────────────────────────────────────────────────────────
-cos_df   = pd.read_csv(COSINE_CSV)
-sweep_df = pd.read_csv(SWEEP_CSV)
+bands  = pd.read_csv(BANDS_CSV)
+checks = pd.read_csv(CHECKS_CSV)
 
-# ── Figure layout ──────────────────────────────────────────────────────────────
-fig = plt.figure(figsize=(4.2, 5.8))
-gs  = gridspec.GridSpec(2, 1, hspace=0.52, left=0.13, right=0.63, top=0.86, bottom=0.08)
+fig, axes = plt.subplots(1, 4, figsize=(13.0, 3.1))
+fig.subplots_adjust(left=0.05, right=0.99, top=0.82, bottom=0.16, wspace=0.30)
+ax_a, ax_b, ax_c, ax_d = axes
 
-ax_auc = fig.add_subplot(gs[0])
-ax_lda = fig.add_subplot(gs[1])
+# ── Panels A and B: AUC by layer with CI bands ────────────────────────────────
+for ax, variant, title in ((ax_a, "all", "A.  Zero-shot cosine AUC by layer"),
+                           (ax_b, "excl_t1", "B.  Excluding T1-flip conversations")):
+    for model, color in MODEL_COLORS.items():
+        sub = bands[(bands["model"] == model) & (bands["variant"] == variant)].sort_values("layer")
+        if sub.empty:
+            continue
+        label = f"{model} ({QTYPE_LABELS[BEST_QTYPE[model]]})" if variant == "all" else None
+        ax.plot(sub["layer"], sub["auc"], color=color, lw=1.6, label=label)
+        ax.fill_between(sub["layer"], sub["lo"], sub["hi"], color=color, alpha=0.13, lw=0)
+        peak = sub.loc[sub["auc"].idxmax()]
+        ax.scatter(peak["layer"], peak["auc"], color=color, s=38, zorder=4)
+    ax.axhline(0.5, color="#999999", lw=1.0, ls="--")
+    ax.set_xlabel("Layer", fontsize=9)
+    ax.set_ylabel("ROC-AUC", fontsize=9)
+    ax.set_title(title, fontsize=9, pad=5)
+    ax.set_ylim(0.30, 0.80)
+    ax.tick_params(labelsize=8)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.3)
+    ax.set_axisbelow(True)
 
-# ── Panel A: AUC by layer ─────────────────────────────────────────────────────
+# ── Panel C: peak AUC per model with 95% CIs (checks CSV, best condition) ─────
+xs, labels_c = [], []
+for i, (model, qt) in enumerate(BEST_QTYPE.items()):
+    row = checks[(checks["model"] == model) & (checks["qtype"] == qt)].iloc[0]
+    color = MODEL_COLORS[model]
+    ax_c.errorbar(i, row["auc_original"],
+                  yerr=[[row["auc_original"] - row["ci_orig_lo"]],
+                        [row["ci_orig_hi"] - row["auc_original"]]],
+                  fmt="o", color=color, markersize=6, capsize=4, lw=1.4)
+    xs.append(i)
+    labels_c.append(f"{SHORT[model]}\n({QTYPE_LABELS[qt]})")
+ax_c.axhline(0.5, color="#999999", lw=1.0, ls="--")
+ax_c.set_xticks(xs)
+ax_c.set_xticklabels(labels_c, fontsize=8)
+ax_c.set_ylabel("Peak ROC-AUC", fontsize=9)
+ax_c.set_title("C.  Peak AUC with 95% CI", fontsize=9, pad=5)
+ax_c.set_ylim(0.40, 0.80)
+ax_c.set_xlim(-0.6, len(xs) - 0.4)
+ax_c.tick_params(labelsize=8)
+ax_c.spines["top"].set_visible(False)
+ax_c.spines["right"].set_visible(False)
+ax_c.yaxis.grid(True, linestyle="--", alpha=0.3)
+ax_c.set_axisbelow(True)
+
+# ── Panel D: drift magnitude vs predictive AUC (per layer) ────────────────────
 for model, color in MODEL_COLORS.items():
-    qt = BEST_QTYPE[model]
-    sub = cos_df[(cos_df["model"] == model) & (cos_df["qtype"] == qt)].sort_values("layer")
-    if sub.empty:
-        continue
-    ax_auc.plot(sub["layer"], sub["auc"], color=color, lw=1.8,
-                label=f"{model} ({QTYPE_LABELS[qt]})")
-    # Mark peak
-    peak = sub.loc[sub["auc"].idxmax()]
-    ax_auc.scatter(peak["layer"], peak["auc"], color=color, s=55, zorder=4)
+    sub = bands[(bands["model"] == model) & (bands["variant"] == "all")]
+    ax_d.scatter(sub["mean_drift"], sub["auc"], color=color, s=14, alpha=0.65,
+                 edgecolors="none")
+ax_d.axhline(0.5, color="#999999", lw=1.0, ls="--")
+ax_d.set_xlabel(r"Drift magnitude  $1-\overline{\cos}(\mathbf{h}_{T0},\mathbf{h}_{T1})$", fontsize=9)
+ax_d.set_ylabel("ROC-AUC", fontsize=9)
+ax_d.set_title("D.  Drift vs. predictiveness", fontsize=9, pad=5)
+ax_d.set_ylim(0.30, 0.80)
+ax_d.tick_params(labelsize=8)
+ax_d.spines["top"].set_visible(False)
+ax_d.spines["right"].set_visible(False)
+ax_d.yaxis.grid(True, linestyle="--", alpha=0.3)
+ax_d.set_axisbelow(True)
 
-ax_auc.axhline(0.5, color="#999999", lw=1.2, ls="--", label="Chance (AUC=0.5)")
-ax_auc.set_xlabel("Layer", fontsize=9)
-ax_auc.set_ylabel("ROC-AUC", fontsize=9)
-ax_auc.set_title("A.  Zero-Shot Cosine Disruption AUC", fontsize=9, pad=5)
-ax_auc.tick_params(labelsize=8.5)
-ax_auc.set_ylim(0.35, 0.70)
-ax_auc.spines["top"].set_visible(False)
-ax_auc.spines["right"].set_visible(False)
-ax_auc.yaxis.grid(True, linestyle="--", alpha=0.3, zorder=0)
-ax_auc.set_axisbelow(True)
-
-# ── Panel B: Logistic regression accuracy by layer ────────────────────────────
-for model, color in MODEL_COLORS.items():
-    sub = sweep_df[sweep_df["model"] == model].sort_values("layer")
-    if sub.empty:
-        continue
-    qt = BEST_QTYPE[model]
-    chance = sub["chance"].iloc[0]
-    ax_lda.plot(sub["layer"], sub["acc"], color=color, lw=1.8,
-                label=f"{model} ({QTYPE_LABELS[qt]})")
-    # Draw per-model chance as a faint horizontal line
-    ax_lda.axhline(chance, color=color, lw=0.7, ls=":", alpha=0.45)
-
-ax_lda.set_xlabel("Layer", fontsize=9)
-ax_lda.set_ylabel("Accuracy", fontsize=9)
-ax_lda.set_title("B.  Linear Probe Accuracy by Layer", fontsize=9, pad=5)
-ax_lda.tick_params(labelsize=8.5)
-ax_lda.set_ylim(0.35, 0.95)
-ax_lda.spines["top"].set_visible(False)
-ax_lda.spines["right"].set_visible(False)
-ax_lda.yaxis.grid(True, linestyle="--", alpha=0.3, zorder=0)
-ax_lda.set_axisbelow(True)
-
-fig.suptitle(
-    "Hidden-State Disruption:\nCosine Signal vs. Linear Probe Failure",
-    fontsize=9, y=0.995,
-)
-
-# Single shared legend to the right of both panels
-handles, labels = ax_auc.get_legend_handles_labels()
-fig.legend(handles, labels,
-           fontsize=8, loc="center left",
-           bbox_to_anchor=(0.65, 0.5),
-           framealpha=0.85, borderaxespad=0)
+handles, labels = ax_a.get_legend_handles_labels()
+fig.legend(handles, labels, fontsize=8, ncol=4, loc="upper center",
+           bbox_to_anchor=(0.5, 1.00), framealpha=0.9, borderaxespad=0.2)
 
 plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
-print(f"Saved → {OUT_PNG}")
+print(f"Saved -> {OUT_PNG}")
