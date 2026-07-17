@@ -126,3 +126,20 @@ Template:
   hardcoded Table 2 ref, wrong CI-width explanation, and deduplicated the
   authority-cue Discussion paragraph (post-merge commit a96c745).
 - Paper repo main: a96c745. Overleaf needs a pull + compile check.
+
+## 2026-07-16 (later) — Soham + Claude (branch: main)
+- Human-in-Language reframing pass applied to paper-jul-6 (990c885), per
+  Asteria's feedback for the EACL 2027 special theme: intro opens with real
+  user interaction; theme lock-ins at abstract/intro/conclusion ends;
+  related work trimmed + human-pressure citations (FlipFlop, Truth Decay,
+  Asch 1956); labeling framed as user-sees vs user-takes-away; user-cost
+  sentence in Discussion; pressure schedule framed as social acts
+  "abstracted from" (not replicating) human escalation.
+- IMPORTANT deviations from Asteria's suggestions (flagged to her):
+  contribution says we EXTEND SYCON-Bench (Hong et al. 2025), not introduce
+  it; her "existing metrics fail" closing softened; "cumulative pressure"
+  replaced with "social acts" per our own findings.
+- Minor: teaser T2 example + whitespace + bold caption; multiturn appendix
+  figure fonts bumped to print size (analysis repo updated).
+- Timeline per EACL 2027 CFP: ARR deadline Aug 3, 2026; ALL authors must
+  register as reviewers by Aug 5; commitment Oct 11.

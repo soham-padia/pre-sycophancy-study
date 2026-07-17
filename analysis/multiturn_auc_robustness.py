@@ -254,7 +254,7 @@ def make_figure(df: pd.DataFrame):
     # Use only rows that are peak-AUC summaries (not per-layer detail)
     summary = df[df["peak_auc"].notna()].copy()
 
-    fig, axes = plt.subplots(1, 3, figsize=(3.3, 2.6), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(6.3, 2.8), sharey=True)
     fig.subplots_adjust(wspace=0.15, left=0.14, right=0.97, bottom=0.22, top=0.78)
     qtypes = ["base", "critical", "presupposition"]
     qtype_titles = {"base": "Base", "critical": "Critical", "presupposition": "Presup."}
@@ -277,23 +277,23 @@ def make_figure(df: pd.DataFrame):
 
         ax.axhline(0.5, color="gray", linestyle="--", linewidth=0.8, alpha=0.7,
                    label="Chance")
-        ax.set_title(qtype_titles[qtype], fontsize=8, fontweight="bold", pad=3)
-        ax.set_xlabel("Pressure turn k", fontsize=7)
+        ax.set_title(qtype_titles[qtype], fontsize=11, fontweight="bold", pad=4)
+        ax.set_xlabel("Pressure turn k", fontsize=10)
         ax.set_xticks(range(1, 6))
-        ax.set_xticklabels([str(k) for k in range(1, 6)], fontsize=7)
+        ax.set_xticklabels([str(k) for k in range(1, 6)], fontsize=9)
         ax.set_ylim(0.38, 0.84)
-        ax.tick_params(labelsize=7, pad=2)
+        ax.tick_params(labelsize=9, pad=2)
         ax.grid(True, alpha=0.3)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
 
-    axes[0].set_ylabel("Peak AUC (layers)", fontsize=7)
-    axes[0].legend(fontsize=6, loc="upper right", handlelength=1.2,
+    axes[0].set_ylabel("Peak AUC (layers)", fontsize=10)
+    axes[0].legend(fontsize=8.5, loc="upper right", handlelength=1.2,
                    borderpad=0.4, labelspacing=0.2)
 
     fig.suptitle(
         "AUC of cos_sim(T0, Tk) predicting ever-flip\n(peak AUC across layers, k=1..5)",
-        fontsize=8, y=0.98
+        fontsize=11, y=0.99
     )
     fig.savefig(str(OUT_PNG), dpi=300, bbox_inches="tight")
     plt.close(fig)
