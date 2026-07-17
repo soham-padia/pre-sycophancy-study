@@ -111,3 +111,18 @@ Template:
 - Remaining before sending the draft to the professor: Overleaf pull + compile
   check (Table 4 width, new figure* placements), abstract judgment call
   (mention permutation result?), then email the draft.
+
+## 2026-07-16 — Soham + Claude (branch: main)
+- Reviewed + merged paper-jul-6 PR #2 (Tomas's figure polish: teaser redesign,
+  Fig 2 font sizes, Fig 3 cut to 2 panels with the drift dissociation moved to
+  a new appendix). Design and data checked out; permutation sentence survives
+  in the new caption.
+- Tomas again did not commit figure scripts — regenerated all three PNGs from
+  committed scripts instead (analysis repo: plot_hidden_state_disruption.py is
+  now the 2-panel version, new plot_drift_vs_auc.py, plot_flip_turn_
+  distribution.py at print-size fonts with segment labels).
+- Also reviewed 3c4a10c "Utkarsh changes done" (pushed via Soham's account,
+  hadn't been checked): fixed abstract subject-verb agreement, missing space +
+  hardcoded Table 2 ref, wrong CI-width explanation, and deduplicated the
+  authority-cue Discussion paragraph (post-merge commit a96c745).
+- Paper repo main: a96c745. Overleaf needs a pull + compile check.
