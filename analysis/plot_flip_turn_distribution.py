@@ -3,6 +3,7 @@
 
 One panel per prompt condition; x-axis = models; bar height = ever-flip rate,
 segmented by the pressure turn (T1..T5) at which questions first flip.
+Built at \\textwidth (~6.3in) so fonts render at print size without scaling.
 """
 from pathlib import Path
 import pandas as pd
@@ -35,6 +36,7 @@ SHORT_NAMES = {
 
 # Sequential turn colors: mild doubt (light) -> strong contradiction (dark)
 TURN_COLORS = ["#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"]
+MIN_LABEL_PCT = 8   # label segments at least this tall
 
 
 def first_flip_dist(df, model_col, cond):
@@ -58,19 +60,22 @@ def draw(ax, dists, models, title, show_ylabel):
         bottom = 0.0
         for t in range(1, 6):
             h = dists[model][t] * 100
-            ax.bar(i, h, bottom=bottom, width=0.65, color=TURN_COLORS[t - 1],
-                   edgecolor="white", linewidth=0.5,
+            ax.bar(i, h, bottom=bottom, width=0.68, color=TURN_COLORS[t - 1],
+                   edgecolor="white", linewidth=0.6,
                    label=f"T{t}" if i == 0 else None)
+            if h >= MIN_LABEL_PCT:
+                ax.text(i, bottom + h / 2, f"{h:.0f}", ha="center", va="center",
+                        fontsize=9, color="black" if t <= 3 else "white")
             bottom += h
-        ax.text(i, bottom + 1.5, f"{bottom:.0f}%", ha="center", va="bottom",
-                fontsize=8, fontweight="bold")
+        ax.text(i, bottom + 2, f"{bottom:.0f}%", ha="center", va="bottom",
+                fontsize=10.5, fontweight="bold")
     ax.set_xticks(x)
-    ax.set_xticklabels([SHORT_NAMES[m] for m in models], fontsize=9)
-    ax.set_title(title, fontsize=10, pad=6)
-    ax.set_ylim(0, 108)
+    ax.set_xticklabels([SHORT_NAMES[m] for m in models], fontsize=11)
+    ax.set_title(title, fontsize=12, pad=6)
+    ax.set_ylim(0, 112)
     if show_ylabel:
-        ax.set_ylabel("Ever-flip rate (%)", fontsize=9)
-    ax.tick_params(labelsize=8.5)
+        ax.set_ylabel("Ever-flip rate (%)", fontsize=11)
+    ax.tick_params(labelsize=10)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.yaxis.grid(True, linestyle="--", alpha=0.3)
@@ -81,17 +86,18 @@ def main():
     models = list(JUDGE_CSVS.keys())
     dfs = {m: pd.read_csv(p) for m, (p, _) in JUDGE_CSVS.items()}
 
-    fig, axes = plt.subplots(1, 3, figsize=(9.5, 3.1), sharey=True)
-    fig.subplots_adjust(wspace=0.08, left=0.06, right=0.99, top=0.74, bottom=0.12)
+    # Built at \textwidth so page scale is 1.0 and all text >= ~10pt in print
+    fig, axes = plt.subplots(1, 3, figsize=(6.3, 3.2), sharey=True)
+    fig.subplots_adjust(wspace=0.10, left=0.09, right=0.995, top=0.70, bottom=0.10)
 
     for ax, cond, cl in zip(axes, CONDITIONS, COND_LABELS):
         dists = {m: first_flip_dist(dfs[m], JUDGE_CSVS[m][1], cond) for m in models}
         draw(ax, dists, models, cl, show_ylabel=(cond == "base"))
 
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, fontsize=8, ncol=5, loc="upper center",
+    fig.legend(handles, labels, fontsize=10, ncol=5, loc="upper center",
                bbox_to_anchor=(0.5, 1.02), title="First-flip turn",
-               title_fontsize=8, framealpha=0.9, columnspacing=1.0)
+               title_fontsize=10, framealpha=0.9, columnspacing=1.0)
 
     plt.savefig(OUT_PNG, dpi=300, bbox_inches="tight")
     print(f"Saved -> {OUT_PNG}")
