@@ -166,3 +166,22 @@ Template:
   keys have now regressed twice. Do not use "introduce/replicates" wording.
 - Still true post-cuts: permutation test, T1-exclusion, all CI tables,
   workspace paragraph, baseline-position para survive. Overleaf needs pull.
+
+## 2026-07-27 (TA feedback round) — Soham + Claude (branch: main)
+- Asteria's review (of a stale pre-13841a5 compile) flagged: "?" citations
+  (already fixed on main — Overleaf must pull before recompiling), sentence-
+  level bloat, and Human-in-Language framing missing from Secs 3-6 (largely
+  because Utkarsh's length cuts removed the July 16 threading).
+- Applied in cd7bd96 (net -7 lines): her example cuts (restating sentence in
+  Related Work; findings detail out of Related Work para 3 and out of §3.1;
+  Table 2 walkthrough -> three takeaways) + compact theme threading (human
+  dialogue not single-turn; schedule mirrors human social acts; conditions as
+  cautious-user instructions; labeling as two human views of a conversation;
+  §6 traces invisible in the language a user reads).
+- Also this session (3a3f0d7, ae49fd9): all em dashes removed per Soham;
+  §7.1 merged into Discussion and halved; abstract-body alignment fixed
+  ("abandon correct positions" -> "initial positions" — the professor's
+  banned claim had crept back; transfer failure restored to abstract);
+  trajectory table -> appendix; conclusion 24->15 lines.
+- REMINDER: compile from Overleaf ONLY after pulling main. Two of the TA's
+  three complaints were artifacts of reviewing a stale PDF.
