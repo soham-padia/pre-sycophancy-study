@@ -143,3 +143,26 @@ Template:
   figure fonts bumped to print size (analysis repo updated).
 - Timeline per EACL 2027 CFP: ARR deadline Aug 3, 2026; ALL authors must
   register as reviewers by Aug 5; commitment Oct 11.
+
+## 2026-07-27 — Soham + Claude (branch: main)
+- Reviewed Utkarsh's length-reduction PR #3 (82383fd, merged Jul 20) + the
+  Jul 27 Overleaf sync (e2e258d). The cuts are largely good (abstract
+  condensation is solid, dialogue framing survives in compressed form),
+  BUT they reintroduced three previously-fixed problems, all now re-fixed
+  in 13841a5:
+  1. Contribution 1 regressed to "We introduce ... benchmark that
+     replicates how users..." — the misattribution AND overclaim we
+     deliberately avoided. Restored: extend SYCON-Bench (cite), "closer to".
+  2. Broken citation keys (hong-etal-2025-measuring,
+     perez-etal-2023-discovering) returned — would render as "?".
+  3. FlipFlop/TruthDecay/Asch citations were cut entirely; worse, the new
+     intro claimed users escalate across turns citing perez/sharma (which
+     don't show that). Swapped cites; restored one grounding clause in
+     Related Work.
+  Also: tab:trajectory was orphaned (float with no \ref) — re-referenced;
+  teaser em-dash restored.
+- LESSON for whoever edits next: before cutting or rewriting, grep
+  AGENT_NOTES for "deviations" — the SYCON attribution and the citation
+  keys have now regressed twice. Do not use "introduce/replicates" wording.
+- Still true post-cuts: permutation test, T1-exclusion, all CI tables,
+  workspace paragraph, baseline-position para survive. Overleaf needs pull.
