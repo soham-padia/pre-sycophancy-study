@@ -62,8 +62,9 @@ synced from `_local/main.tex` (gitignored).
 
 ## Submission checklist (learned the hard way)
 
-- [ ] Fresh single-commit snapshot for the anonymous link (old history contains names)
-- [ ] `_markdown/` excluded from the snapshot
-- [ ] grep the snapshot for author names, `sohampadia`, `northeastern`, local paths
-- [ ] No identifying filenames in figures/plots
+- [x] Fresh single-commit snapshot: https://github.com/soham-padia/pre-capitulation-study (2026-07-27)
+- [x] `_markdown/` excluded from the snapshot (plus PAPER_MAY_21, notebooks, judge logs, other settings)
+- [x] Scrubbed via `_local/scrub_scan.py`; only third-party CREPE content remains (benign)
+- [x] No identifying filenames; single commit authored Anonymous
+- [ ] New anonymous.4open.science link created (user, browser) + footnote updated in tex/Overleaf
 - [ ] Figures in Overleaf `new_figures/` match latest regenerated versions

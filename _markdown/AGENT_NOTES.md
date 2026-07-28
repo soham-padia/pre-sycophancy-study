@@ -185,3 +185,27 @@ Template:
   trajectory table -> appendix; conclusion 24->15 lines.
 - REMINDER: compile from Overleaf ONLY after pulling main. Two of the TA's
   three complaints were artifacts of reviewing a stale PDF.
+
+## 2026-07-27 (anonymization) — Soham + Claude (branch: main)
+- Built the fresh anonymized repo: https://github.com/soham-padia/pre-capitulation-study
+  (public, no description/topics, ONE commit authored "Anonymous <anon@example.com>").
+- Full audit first: the old anon repo STILL contained the desk-reject files
+  (PAPER_MAY_21/ tex with all 5 authors+emails, flip_turn_tomas_vs_soham.png,
+  ~375 identifying refs in 12 files). Fresh export excluded: _markdown/,
+  PAPER_MAY_21/, debate_setting/, ethical-setting/, analysis/judge_outputs/,
+  notebooks (tomasdavola paths in outputs), .github/, assets/, legacy fps
+  outputs (kept only Qwen2.5-0.5B question-pool CSVs). Sanitized: sbatch
+  (padia.so paths -> $SLURM_SUBMIT_DIR), download_data.py (HF id ->
+  ANONYMIZED placeholder), judge_disagreement_assessment.txt (Soham ->
+  Judge-Haiku, 239x), fresh README + .gitignore. ADDED: behavioral CSVs
+  (~126MB, data/<Model>/*_multiturn.csv + metadata) so reviewers can verify
+  all behavioral results; hidden states = "released upon acceptance".
+- Scrub scanner at _local/scrub_scan.py (reusable). Only remaining hits are
+  third-party CREPE content (geographic "northeastern", "Tomas Baez" etc.) —
+  adjudicated benign.
+- Verified from a fresh clone: git author anonymous, scan clean,
+  flip_rate_cis.py + plot_flip_turn_distribution.py reproduce Table 2 exactly.
+- REMAINING (user, in browser): create new anonymous.4open.science link for
+  the new repo (expiration 2027-12-31, add name/institution keywords), then
+  update the paper footnote URL in acl_latex.tex + Overleaf. DO NOT push any
+  commit to pre-capitulation-study with a real git identity.
