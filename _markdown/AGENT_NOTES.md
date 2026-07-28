@@ -209,3 +209,18 @@ Template:
   the new repo (expiration 2027-12-31, add name/institution keywords), then
   update the paper footnote URL in acl_latex.tex + Overleaf. DO NOT push any
   commit to pre-capitulation-study with a real git identity.
+
+## 2026-07-28 — Soham + Claude (branch: main)
+- Post-anonymization audit round: two institutional URLs found in upstream
+  SYCON code (cmu.litellm.ai in evaluate_oscillate.py; an Azure endpoint in
+  evaluate_ToF.py + data/pushback_generator.py), plus NDIF prose mentions
+  (weak Northeastern signal; NNsight the library is fine).
+- DECISION: handled via 4open redaction keywords (ndif, cmu, gpt-35-1106)
+  added to the pre-capitulation-study-C568 anonymization — view-layer fix,
+  pinned commit untouched. A source-level fix (env-var swaps, verified,
+  4 files) was prepared but deliberately NOT pushed; it lives in
+  /tmp/anon-fix and should be applied if the anon repo is ever re-pushed
+  (amend + force-push as Anonymous ONLY, then update the pinned commit
+  hash in 4open settings).
+- Reminder: keywords list now = names + northeastern/khoury/CS6120 +
+  malihe/asteria + ndif/cmu/gpt-35-1106.
