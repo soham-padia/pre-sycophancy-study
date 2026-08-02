@@ -285,3 +285,28 @@ Template:
   p8 (Limitations p9, refs p10) — verified by local latexmk compile, no
   undefined refs, remaining overfulls are 2 pre-existing appendix ones.
 - Overleaf pull now = f8229ea + a7105dc + 2b43858 + 482b13d.
+
+## 2026-08-02 (night) — Soham + Claude (branch: main)
+- Malihe's 17-point review triaged (she reviewed the pre-tonight Overleaf
+  version; her pt 7 misdescribes the multiturn appendix as censored — it
+  isn't, and the real issue, post-flip contamination, was already caveated
+  by the falsifier round).
+- 14 of 17 points addressed in text (paper-jul-6 c70cf6b): abstract carries
+  permutation clause; oracle framing of presup prompt; Gemma exclusion
+  explained; Fisher independence + best-of-conditions DoF caveats;
+  accuracy-delta coarseness in §6.3; deployment language hardened;
+  T0-correctness judge guard clarified (verified against
+  judge_flip_claude.py — the judge DOES see pressure prompts, and its
+  instructions exclude corrections); Limitations gains: context-length
+  confound, neutral-control missing experiment (claim rescoped to
+  prediction not causation), exploratory-secondary-analyses + scope
+  paragraph, pressure-blind-judge check; Appendix B distinguishes Δ=0
+  collapse from active misclassification.
+- 3 points need experiments (author-response / revision material):
+  T0-correct fraction + restricted rerun (pt 1), neutral-pressure control
+  arm (pt 2), pressure-blind judge (pt 13).
+- Content still exactly 8 pages after offsetting compression (verified:
+  Limitations opens p9, refs p10, no undefined refs).
+- Title suggestion from Malihe ("Before the Flip: Hidden-State Precursors
+  of Sycophancy") NOT applied — user's call.
+- Overleaf pull now = f8229ea..c70cf6b (5 commits).
