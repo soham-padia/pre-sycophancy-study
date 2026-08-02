@@ -258,3 +258,30 @@ Template:
   4 judge cells silently 1 question short vs keyword cells (parse failures).
 - Overleaf must pull BOTH f8229ea..2b43858 (footnote + scoping + verification
   fixes) before tonight's ARR submission.
+
+## 2026-08-02 (evening) — Soham + Claude (branch: main)
+- Asteria's Aug-1 Overleaf comments addressed (paper-jul-6 482b13d). KEY
+  FINDING: she was right about line 412 — verified from the SYCON-Bench
+  EMNLP Findings PDF + JiseungHong/SYCON-Bench code: the FP setting generates
+  per-question GPT-4o pushbacks with escalating strategies (T2 uncertainty,
+  T3 reassertion, T4 anecdote, T5 direct challenge); ONLY the debate setting
+  repeats one identical prompt, and even it keeps full chat history
+  (models.py generate_responses appends assistant+user each turn). So BOTH
+  "applies the same pressure prompt repeatedly" AND Departure 2's
+  "concatenates all pressure prompts into a single input" were false.
+  Rewritten: our contrast = fixed verbatim schedule (turn-aligned state
+  comparison) + turn-level hidden-state access; "true multi-turn" dropped
+  everywhere.
+- Other comments: turn defined (teaser + §3); static-exchanges claim cited
+  (hong/laban); ustaomeroglu2026effective (arXiv 2605.09294) cited as
+  concurrent macrostate work per her Scholar-check ask (vennemeyer2026
+  already cited); "deliberate" wordiness cut; Fig 3 caption leads with bold
+  takeaway; Table 3 CI brackets scriptsize→footnotesize + tabcolsep 3pt
+  (ARR font-size concern, overfull fixed); scale-generalization "why should
+  it hold" answered (sharma2024towards); scripted-vs-generated pressure
+  rationale added to Benchmark artificiality.
+- Length: additions overflowed page 8; compressed prose across
+  intro/methods/results/discussion/conclusion until content ends EXACTLY on
+  p8 (Limitations p9, refs p10) — verified by local latexmk compile, no
+  undefined refs, remaining overfulls are 2 pre-existing appendix ones.
+- Overleaf pull now = f8229ea + a7105dc + 2b43858 + 482b13d.
