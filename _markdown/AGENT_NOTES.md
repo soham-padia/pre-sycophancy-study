@@ -310,3 +310,24 @@ Template:
 - Title suggestion from Malihe ("Before the Flip: Hidden-State Precursors
   of Sycophancy") NOT applied — user's call.
 - Overleaf pull now = f8229ea..c70cf6b (5 commits).
+
+## 2026-08-02 (late night) — Soham + Claude (branch: main)
+- Utkarsh's parallel revision pass merged selectively (paper-jul-6 b7e9eb9).
+  His base was 482b13d (lacked c70cf6b), so his edits overlapped Malihe's
+  points independently. ACCEPTED: abstract "signal is fragile" clause +
+  "consistent with" closing (de-em-dashed); flip-timing compression (bought
+  the page budget); Discussion "measurement result, not a monitoring method"
+  rewrite; conclusion permutation clause; stat-uncertainty "read as
+  optimistic" + cross-model pool caveat; context-length ending; Ethics AI
+  disclosure + licenses (DeepSeek corrected to MIT); tab:compute ref fix.
+  REJECTED: real-name author block (anonymity = prior desk-reject failure
+  mode; also puts Utkarsh first with equal-contribution dagger — TEAM
+  DECISION, flag to Soham); "modest but consistent" regression; keyword
+  paragraph without the "preliminary experiments" provenance guard;
+  decompressed passages (page fit); garbled judge-bias sentence; unicode
+  arrows (compile risk).
+- Verified after merge: content exactly 8 pages, Limitations p9, refs p10,
+  no undefined refs.
+- Overleaf pull now = f8229ea..b7e9eb9 (7 commits). IMPORTANT: Overleaf may
+  contain Utkarsh's version — pulling git over it will conflict; resolve by
+  taking the git version (it already contains his accepted changes).
