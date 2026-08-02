@@ -224,3 +224,37 @@ Template:
   hash in 4open settings).
 - Reminder: keywords list now = names + northeastern/khoury/CS6120 +
   malihe/asteria + ndif/cmu/gpt-35-1106.
+
+## 2026-08-02 — Soham + Claude (branch: main)
+- TA abstract comment resolved: "anti-sycophancy system prompts" claim scoped
+  in abstract + conclusion (paper-jul-6 a7105dc) — names the two tested
+  prompts, adds "in this benchmark".
+- Installed the research-constitution kit (was `_base/`): `CLAUDE.md` (project
+  law), `docs/` (RESEARCH_CONSTITUTION, RESEARCH_MAP seeded, CITABLE_NUMBERS,
+  FAILURE_TAXONOMY, ERRATA, DECISION_LOG, PREREG_TEMPLATE), `bin/skills-lock.py`,
+  `.gitignore` updated (`_falsifier/` untracked; `.claude/agents|skills`
+  shareable). NOTE: the six agents + verdict-integrity skill still sit in
+  `_base/.claude/` — moving them into root `.claude/` needs the user
+  (permission-gated); then restart session + `python3 bin/skills-lock.py generate`.
+- PRE-SUBMISSION FALSIFIER PASS (two independent audit agents; full reports in
+  `_falsifier/2026-08-02_{behavioral,hiddenstate}_audit.md`, gitignored):
+  verdict — quantitative record unusually reproducible (all 30 Table 2 cells
+  exact; all 12 peak-AUC cells to 4 decimals from raw tensors; permutation,
+  bootstrap, Fisher ratios, probe-failure all reproduce). 9 sentence-level
+  errors CONFIRMED and fixed in paper-jul-6 2b43858: multiturn 0.725 computed
+  on ~100% post-flip states (reframed persistence vs prediction, caveat added);
+  "three of four at T0→T4" → later-pair wording; Table 4 DS LDA CIs were
+  half-width; "all twelve" LDA claim false for Llama-critical; T1-exclusion
+  "unchanged or slightly higher" false for DS (0.617→0.606, now stated);
+  teaser "holds or strengthens"→"holds"; keyword labeler description
+  (20 phrases, example fixed, 3rd rule added); unreproducible 75.5/63.8
+  keyword-probe numbers replaced with qualitative statement; L2 appendix
+  hold-definition + tiny-n disclosure; plus Llama T1–T2 timing, Wald CI label,
+  ordering-of-extremes scoping, Llama presup −9.5pp noted.
+  All entries logged in `docs/FAILURE_TAXONOMY.md`.
+- STILL OPEN from audits: Opus judge CSV + arbitration sheet not in repo
+  (κ appendix unverifiable); Fisher p=0.047 knife-edge (reseed rerun advised);
+  Table 2 uses Wald CIs (Wilson columns exist in flip_rate_cis.csv);
+  4 judge cells silently 1 question short vs keyword cells (parse failures).
+- Overleaf must pull BOTH f8229ea..2b43858 (footnote + scoping + verification
+  fixes) before tonight's ARR submission.

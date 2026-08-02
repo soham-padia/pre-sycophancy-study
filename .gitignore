@@ -31,8 +31,14 @@ consistency_anova_results.txt
 anova_syco_analysis.py
 output/
 
-# Claude Code project files
-.claude/
+# Claude Code local files (agents/skills are the shared process layer; settings stay local)
+.claude/*
+!.claude/agents/
+!.claude/skills/
+
+# The falsifier's write-confined workspace: MUST stay untracked, or its adversarial scratch and
+# evidence files pollute the very record it audits (and risk being committed as if they were results).
+_falsifier/
 
 # Unused/intermediate analysis scripts and plots
 analysis/plot_flip_turn_distribution_combined.py

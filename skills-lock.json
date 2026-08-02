@@ -1,0 +1,14 @@
+{
+  "_comment": "Process-layer lock. Regenerating this file is a DELIBERATE, reviewed act \u2014 commit it with a message saying WHAT process change it blesses.",
+  "generated": "2026-08-02 14:46:38 -0400",
+  "files": {
+    ".claude/agents/big-picture-synthesist.md": "sha256:4c109bb7367d388b735549fd8c0401d7f92aefeb28e8af4d74af361f27acbbc9",
+    ".claude/agents/code-verifier.md": "sha256:147b37ac9d5bf98987e366e3e5ae3c3962af3321ea1d1282784b2e1bd9e8c2b4",
+    ".claude/agents/confound-interrogator.md": "sha256:8016ea3d006fcd20aefe8ec10aa04892166104a92f98abbf86ccd17d0fa12a28",
+    ".claude/agents/falsifier.md": "sha256:f390b7609531ff9b034e87045f78d694d8e1d413a2f493cb02ea19f32047d77e",
+    ".claude/agents/research-director.md": "sha256:d00a2d9a0adc52290cd49a0f8b1ec0eec52ba4fa77a837b65d9ee610c740361f",
+    ".claude/agents/results-auditor.md": "sha256:7bfc476366e13123a19a6f869f9951ac2780f630435a2b4930530de8ffe34c8c",
+    ".claude/skills/verdict-integrity/SKILL.md": "sha256:3294e0be1a17fe21864b81948ba16318a9cc0843e665a007d1ed2fd0956af47a",
+    "CLAUDE.md.template": "sha256:409dd619273e0bfcea82d9ccfa1f4f71f690a6153d2702de40a35133eb43bcf2"
+  }
+}
