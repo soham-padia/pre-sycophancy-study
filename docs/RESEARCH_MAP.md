@@ -22,6 +22,12 @@ register as ARR reviewers by Aug 5; commitment to EACL Oct 11.
 - Positive control on the probe instrument: can the identical probe pipeline decode a construct
   it SHOULD decode (turn index, prompt condition) from the same hidden states? Bears directly on
   the "linear probes fail" null (constitution rule M1). Blocked on hidden-state tensor access.
+- Advisor experiment queue for the ARR author response (opened 2026-08-02, from the advisor's
+  17-point review; all three are named in the paper as planned checks): (a) T0-correctness
+  fraction + rerun restricted to verified-correct T0 (~1 day, Haiku judge over 2,290 T0
+  responses, CREPE gold corrections as reference); (b) pressure-blind judge seeing only T0/Tk
+  responses (~1 day, re-judge 11,450 turns, compare kappa); (c) neutral non-pressure control
+  arm (the causal control; pilot Qwen2.5 T0-to-T1 first, ~2-3 days cluster; full arm 1-2 weeks).
 - Populate `docs/CITABLE_NUMBERS.md` from the verification pass; freeze with data-snapshot SHAs.
 - Hidden-state release upon acceptance (~22GB): hosting plan + de-anonymization transition.
 - Global-workspace (J-space) follow-up study — post-submission.

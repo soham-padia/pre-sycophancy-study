@@ -8,9 +8,11 @@ Paper: "Before the Flip: Hidden-State Precursors of Multi-Turn Sycophancy" (pape
 - [ ] **Re-upload the PDF.** Any PDF compiled before `d758797` contains a duplicated
   Ethics block with contradictory DeepSeek licenses and illegible references
   (lowercase "llm/ai/llama"). Pull `d758797` into Overleaf, recompile, re-upload.
-- [ ] **Confirm author order before submitting.** PDF and author list are the ONLY
-  fields NOT editable after the grace period. Current form entry: Utkarsh, Soham,
-  Tomas, Vedant, Malihe, Asteria (May submission had Asteria before Malihe — team call).
+- [ ] **Confirm author order before submitting.** The PDF and the author list lock at
+  the deadline (other metadata may stay editable during a short grace period, but the
+  form's boilerplate references past cycles — treat the deadline as final for everything).
+  Current form entry: Utkarsh, Soham, Tomas, Vedant, Malihe, Asteria (the May submission
+  had Asteria before Malihe — team call).
 - [ ] Verify in the compiled PDF: title says "Before the Flip", page 9 starts with
   "Limitations", no author names anywhere, 4open footnote link resolves.
 - [ ] Immediately after submitting: **all six authors complete the author registration
@@ -55,7 +57,7 @@ Answers that CHANGED since the May submission are marked **(changed)**.
 |---|---|---|
 | A1 potential risks | Yes | Ethics Statement |
 | B artifacts | Yes | — |
-| B1 cite creators | Yes | Sections 3.1, 3.3, 4.2; Appendix I |
+| B1 cite creators | Yes | Sections 3.1, 4.2; Appendices A and I (model papers are cited in the Table 10 caption, not in Section 3.3 itself) |
 | B2 licenses | Yes | Ethics Statement |
 | B3 PII | N/A | Artifacts derive from public benchmarks (SYCON-Bench, CREPE); Section 3.1 notes they contain no personally identifiable information |
 | B4 offensive content | N/A | Same; open-domain factual questions, Section 3.1 |
@@ -77,7 +79,8 @@ Answers that CHANGED since the May submission are marked **(changed)**.
 
 ## After submission
 
-- All authors register as ARR reviewers by **Aug 5** (author console).
+- All authors register as ARR reviewers by **Aug 5** (per the EACL CFP; confirm the
+  exact date in the author console after submitting).
 - EACL 2027 commitment deadline: **Oct 11** (select the Human in Language theme track there).
 - Post-submission experiment queue (for author response): T0-correctness fraction +
   restricted rerun (~1 day), pressure-blind judge (~1 day), neutral-pressure control
