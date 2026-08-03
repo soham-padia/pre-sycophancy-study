@@ -27,7 +27,7 @@ Paper: "Before the Flip: Hidden-State Precursors of Multi-Turn Sycophancy" (pape
 | TL;DR | Extending SYCON-Bench's false-presupposition setting into multi-turn dialogues, we find a weak, layer-localized hidden-state precursor of sycophantic capitulation at the first pressure turn, though reliable detection remains beyond current probing methods. |
 | Abstract | Use the exact abstract from the tex at `d758797` (matches the PDF) |
 | Paper Type | Long |
-| Research Area | Interpretability and Analysis of Models for NLP (theme track is chosen at EACL commitment in October, not here; pick "Special Theme (conference specific)" only if the team explicitly wants theme-pool reviewers) |
+| Research Area | **Interpretability and Analysis of Models for NLP** (single-select; no secondary). The EACL 2027 CFP does not require selecting "Special Theme" at ARR time; the Human in Language track is chosen at the Oct 11 commitment. Interpretability gets reviewers who can evaluate the permutation/CI methodology, which is this paper's armor; the theme framing is visible to any reviewer. If certainty is wanted, ask Asteria whether EACL expects theme papers to pick the Special Theme area at ARR. |
 | Research Area Keywords | probing, robustness, calibration/uncertainty |
 | Contribution Types | Model analysis & interpretability; NLP engineering experiment; Publicly available software and/or pre-trained models; Data analysis |
 | Languages Studied | English |
