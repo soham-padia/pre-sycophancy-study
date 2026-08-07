@@ -46,3 +46,6 @@ analysis_claude/flip_turn_distribution_combined.png
 
 # Local working folder (scratch files, not for repo)
 _local/
+
+# Personal interview-prep pack (Soham's SASH prep) — local only, never commit or export
+_eacl_context/
