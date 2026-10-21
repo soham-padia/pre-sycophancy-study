@@ -133,7 +133,7 @@ def build_preflip_dataset(hs, flip_data: dict, layer: int):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def pca_variance(X: np.ndarray, n_components: int = 10) -> np.ndarray:
-    pca = PCA(n_components=min(n_components, X.shape[1], X.shape[0] - 1))
+    pca = PCA(n_components=min(n_components, X.shape[1], X.shape[0] - 1), random_state=42)
     pca.fit(X)
     return pca.explained_variance_ratio_
 
@@ -141,7 +141,7 @@ def pca_variance(X: np.ndarray, n_components: int = 10) -> np.ndarray:
 def silhouette(X: np.ndarray, y: np.ndarray, n_pca: int = 50) -> float:
     if len(np.unique(y)) < 2 or len(X) < 10:
         return np.nan
-    pca = PCA(n_components=min(n_pca, X.shape[1], X.shape[0] - 1))
+    pca = PCA(n_components=min(n_pca, X.shape[1], X.shape[0] - 1), random_state=42)
     Xr = pca.fit_transform(X)
     try:
         return float(silhouette_score(Xr, y, sample_size=min(1000, len(y)), random_state=42))
@@ -157,7 +157,7 @@ def lda_accuracy(X: np.ndarray, y: np.ndarray, n_splits: int = 5) -> float:
     X = scaler.fit_transform(X)
     # Reduce to 50 dims first for numerical stability
     n_pca = min(50, X.shape[1], X.shape[0] - 1)
-    pca = PCA(n_components=n_pca)
+    pca = PCA(n_components=n_pca, random_state=42)
     X = pca.fit_transform(X)
 
     skf = StratifiedKFold(n_splits=min(n_splits, min(np.bincount(y.astype(int)))),
@@ -193,7 +193,7 @@ def tsne_coords(X: np.ndarray, y: np.ndarray, n_pca: int = 50):
     """Run PCA → t-SNE and return 2D coordinates."""
     try:
         from sklearn.manifold import TSNE
-        pca = PCA(n_components=min(n_pca, X.shape[1], X.shape[0] - 1))
+        pca = PCA(n_components=min(n_pca, X.shape[1], X.shape[0] - 1), random_state=42)
         Xr = pca.fit_transform(StandardScaler().fit_transform(X))
         tsne = TSNE(n_components=2, perplexity=min(30, len(X) // 4),
                     random_state=42, n_iter=1000)

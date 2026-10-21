@@ -83,7 +83,7 @@ def lda_accuracy_pooled(X, y, n_splits=5):
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
     n_pca = min(50, X.shape[1], X.shape[0] - 1)
-    X = PCA(n_components=n_pca).fit_transform(X)
+    X = PCA(n_components=n_pca, random_state=42).fit_transform(X)
     skf = StratifiedKFold(n_splits=min(n_splits, min(np.bincount(y.astype(int)))),
                           shuffle=True, random_state=42)
     preds, truths = [], []
