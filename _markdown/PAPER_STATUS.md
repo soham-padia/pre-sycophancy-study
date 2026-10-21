@@ -68,3 +68,63 @@ synced from `_local/main.tex` (gitignored).
 - [x] No identifying filenames; single commit authored Anonymous
 - [ ] New anonymous.4open.science link created (user, browser) + footnote updated in tex/Overleaf
 - [ ] Figures in Overleaf `new_figures/` match latest regenerated versions
+
+---
+
+## ARR August 2026 outcome (added 2026-09-16)
+
+Submission **#1220**, "Before the Flip: Hidden-State Precursors of Multi-Turn Sycophancy". Note the
+title Malihe suggested WAS applied in the end (the note above says it was not — that is stale).
+
+| Reviewer | Overall | Soundness | Excitement | Reproducibility | Datasets | Software |
+|---|---|---|---|---|---|---|
+| paET | 2.5 borderline Findings | 3 | 2.5 | 3 | 4 | **1** |
+| L9dW | 2 resubmit next cycle | 2.5 | 3.5 | 4 | 2 | **1** |
+| vHre | 2 resubmit next cycle | 2.5 | 4 | 3 | 1 | **1** |
+
+Excitement is fine (2.5–4); **soundness is what sank it**. No ethics concerns from any reviewer.
+
+### Root cause of the three Software: 1 scores — a checklist item, not a science problem
+The submission checklist above still reads `[ ] New anonymous.4open.science link created (user,
+browser) + footnote updated in tex/Overleaf`. The scrubbed single-commit snapshot WAS built
+(2026-07-27) — only the anonymous mirror link was never created, so the artifact footnote pointed
+nowhere. Three reviewers each scored Software: 1 and two scored datasets 1–2 for a gap that was one
+browser action wide. Cheapest recovery available for the next cycle.
+
+### What each reviewer asked for, and what we already knew
+- **vHre** (excitement 4, the most sympathetic): says the paper "feels rushed"; wants attention-head
+  activations instead of hidden states, citing three papers. This is a new-experiment request, not a
+  correction — worth a scoped reply, not a rerun.
+- **L9dW**: wants human-vs-judge agreement (not just Haiku-vs-Opus) in the MAIN text, and wants the
+  "layers that move most are not the layers that predict best" evidence moved out of the appendix.
+  Both are presentation moves over work already done. Their "Krippendorff alpha" is our Cohen's
+  kappa, and their "disagreement with Haiku 60%" is not a number in the paper — see ERRATA E9.
+- **paET** (most technical): task mismatch between the cosine and probe arms, no non-hidden-state
+  baseline, unverified T0 correctness, PCA-256 transfer not aligning two representation spaces,
+  no power analysis. **All confirmed.** Their 2/3/9 hold-group figure is misattributed to the cosine
+  arm — it belongs to the L2 appendix loader (ERRATA E7). Their closing line — "there are some tasks
+  left behind for revision, and I'm not sure why" — refers to items (a) and (b) of the advisor
+  experiment queue, opened 2026-08-02 and still open.
+
+### The adjudication that followed, and why the revision is not a patch job
+Three adjudicators ran on 2026-09-16 (rulings: `docs/DECISION_LOG.md`; 16 rows in
+`docs/FAILURE_TAXONOMY.md`; `docs/ERRATA.md` E1–E9). Two findings go beyond anything the reviewers
+raised:
+1. **`probe_judge_comparison.py` never got the `b40e3ff` off-by-one fix.** Every §6.3 number,
+   including the 6.6 pp headline, is computed on **at-flip** (post-behavioural) states while the text
+   says pre-flip. Confirmed independently by two agents via reproduction. ERRATA E1–E2.
+2. **Finding 3 ("pre-flip geometry is nonlinear") is reproduced in full by a turn-index-only
+   classifier with no hidden states.** The 6.6 pp gap is linear probes falling 6 pp *below* chance
+   while nonlinear probes sit *at* chance — a fitting pathology on a censoring artifact, not curved
+   stance geometry. ERRATA E3.
+
+What survives: the behavioural results, the judge instrument (the strongest part of the record — the
+entire Haiku side reproduces exactly), and the T0→T1 cosine arm **narrowed to Qwen2.5-base**, which
+is clean on all seven axes tested. That is a single-model, single-condition, n=155 existence result.
+The revision is a re-scoping, not a patch.
+
+### Blocking item for the next submission
+`docs/CITABLE_NUMBERS.md` is still empty and currently **cannot** be populated as the rule is
+written — `/data/` is gitignored, `analysis_claude/` is the analyzer's own summary, and
+`download_data.py` pins no revision. Committing the behavioural CSVs (~20 MB, not the 22 GB) fixes
+the frozen chain and the Software score at the same time.

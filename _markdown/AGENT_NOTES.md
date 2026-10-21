@@ -331,3 +331,71 @@ Template:
 - Overleaf pull now = f8229ea..b7e9eb9 (7 commits). IMPORTANT: Overleaf may
   contain Utkarsh's version — pulling git over it will conflict; resolve by
   taking the git version (it already contains his accepted changes).
+
+## 2026-09-16 — Soham + Claude (Opus 5) (branch: main — NOT YET COMMITTED, see below)
+- **What changed:** ARR August reviews for #1220 arrived (2 / 2 / 2.5; soundness
+  2.5 / 2.5 / 3; Software 1 from all three). Ran the full adjudication route —
+  results-auditor, confound-interrogator, falsifier — and recorded everything.
+  Nothing was fixed in code or in the paper; this session is record-keeping only.
+- **Process layer installed.** The six agent definitions and the `verdict-integrity`
+  skill CLAUDE.md mandates were NOT in `.claude/` — they were sitting in an
+  untracked `_base/.claude/`, so none of them could be invoked at all. Moved to
+  `.claude/`; all seven matched the existing `skills-lock.json` hashes bit-for-bit.
+  `CLAUDE.md.template` had also been renamed to `CLAUDE.md`, leaving project law
+  unlocked. Lock regenerated (blesses the rename, the operational sections appended
+  to CLAUDE.md this session, and the pairing correction below). `verify` passes.
+  **Caveat:** the agent registry is built at session start, so the three adjudicators
+  ran as general-purpose agents carrying each contract verbatim (hash-verified),
+  not as registered agent types. Restart a session to address them by name.
+- **Two findings bigger than anything the reviewers raised:**
+  1. `probe_judge_comparison.py::build_preflip_features` (lines 122-135) never got
+     the `b40e3ff` off-by-one fix — it is still at-flip. All 1,245 positives are
+     post-behavioral. At-flip pairing reproduces all 108 published cells of
+     `probe_judge_sweep.csv` to ≤5e-5; the reference pairing reproduces 0/28.
+     Confirmed independently by two agents. The 2026-08-02 audit graded this
+     artifact without opening its producer, and ONBOARDING asserted the fix was
+     complete for six weeks. Both records corrected.
+  2. Submission finding 3 ("pre-flip geometry is nonlinear") is reproduced in full
+     by a **turn-index-only classifier with no hidden states** (mean Δ over chance
+     +0.0050 vs best-nonlinear +0.0057; turn-only wins 6/12 cells). The 6.6 pp gap
+     is linear probes falling 6 pp BELOW chance while nonlinear sit AT chance.
+     Ruled fatal to the interpretation; the numbers themselves reproduce.
+- **What survives, and it is worth protecting:** all 12 cosine peak AUCs and the
+  T1-exclusion variants reproduce from raw tensors to ≤5e-5; the judge-agreement
+  appendix is the strongest thing in the record (every Haiku-side number exact, 2×2
+  internally consistent — the "unverifiable from the repo" line was overstated, do
+  NOT concede it to L9dW); judge CSVs clean; three of CLAUDE.md's key facts exact.
+  The cosine ever-flip arm is structurally immune to the turn-index confound.
+  **Qwen2.5-base is clean on all seven axes tested** — that is the paper you can
+  still write (n=155, one model, one condition).
+- **Why we got Software: 1 from all three reviewers:** `PAPER_STATUS.md`'s own
+  submission checklist left `[ ] New anonymous.4open.science link created` unchecked.
+  The scrubbed snapshot exists; the link was never made. One browser action.
+- **Files touched:** `docs/FAILURE_TAXONOMY.md` (16 new dated rows),
+  `docs/ERRATA.md` (E1–E9, replacing the template stub), `docs/DECISION_LOG.md`
+  (first real entry), `docs/RESEARCH_MAP.md` (status superseded, positive control
+  marked unblocked, 11 new frontier tickets), `_markdown/PAPER_STATUS.md` (ARR
+  outcome section), `_markdown/ONBOARDING.md` (3 corrections), `CLAUDE.md`
+  (operational sections + pairing law corrected), `skills-lock.json`, `.claude/`
+  (process layer installed), `_falsifier/2026-09-16_*` (falsifier evidence files,
+  untracked by design).
+- **Blocked on / needs review:**
+  - **Nothing is committed.** Per this folder's rule 1 I stayed off a commit on
+    `main`; someone needs to branch (`git checkout -b record-arr-august-adjudication`)
+    and PR. `.claude/agents/` and `.claude/skills/` are new tracked files.
+  - Every wording verdict against the *submitted* abstract is provisional — the
+    ARR-August tex is not in this repo (newest local is `current_paper_may_21/`,
+    May 22). Re-confirm against Overleaf before quoting any of it to reviewers.
+  - `docs/CITABLE_NUMBERS.md` is still empty and currently cannot be populated as
+    the rule is written (`/data/` gitignored, `analysis_claude/` is the analyzer's
+    own summary, `download_data.py` pins no revision).
+- **Handoff notes for next session:**
+  1. Decide the venue call before touching anything else — the same framing cannot
+     be resubmitted.
+  2. `idx = t` → `idx = t - 1` in `probe_judge_comparison.py`, regenerate, re-audit.
+     Quote a seed range for the corrected gap, never the point estimate.
+  3. Before ANY anonymized export: 13 tracked files carrying author identity pass
+     CLAUDE.md's exclusion filter, including `PAPER_MAY_21/latex/acl_latex.tex` with
+     the full author block and five institutional e-mails. That is the exact
+     mechanism of the first desk-rejection. CLAUDE.md's list and RESEARCH_MAP's
+     out-of-scope ruling also disagree — reconcile to one filter and test it.
