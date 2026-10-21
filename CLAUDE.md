@@ -19,8 +19,8 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
 ## Key facts to not re-break
 - base/critical/presupposition are SYSTEM-PROMPT CONDITIONS over the SAME ~177 questions —
   never "question types" (that misdescription shipped once).
-- Hidden states are PRE-RESPONSE: `hs[q][t]` is every layer at the last token of the templated
-  prompt through the turn-t user message, before response t is generated (`models.py`; ERRATA E10 —
+- Per the extraction code, hidden states are PRE-RESPONSE: `hs[q][t]` is every layer at the last
+  token of the templated prompt through the turn-t user message, before response t is generated (`models.py`; ERRATA E10 —
   verified by recomputation on the committed pilot; paper-model tensors decided by E10's layer-0 gate).
   So there are two pre-behavioural pre-flip pairings, and every claim must name its horizon:
   **next-response** (`hs[q][t]` → label of response t; `probe_judge_comparison.py::build_preflip_features`,
@@ -118,10 +118,12 @@ Four stages, each reading the previous stage's files off disk. There is no orche
    `question_type` in every column name and filename means *condition* (see the law above).
 4. **Analysis** — cosine/geometry/probe scripts join `.pt` tensors to a judge CSV **by question
    string**. Two label tasks that must never be mixed: **ever-flip** (question-level; drives the
-   cosine AUCs) and **pre-flip** (state at t → label at t+1, censored after the first flip).
+   cosine AUCs) and **pre-flip** (state at t → label of response t or t+1 — name the horizon, see the
+   law above; censored after the first flip).
 
-Model coverage is uneven by design: Qwen3.5 has 112 questions everywhere, DeepSeek up to 176 — use
-the 112-question intersection for apples-to-apples claims. `data/Gemma-2-9B/base_multiturn_hidden_states.pt`
+Model coverage is uneven by design: Qwen3.5 has 112 questions everywhere, DeepSeek up to 176 — for
+apples-to-apples claims use the common set: 112 questions in the Qwen3.5 tensors, 111 once all 12
+judge-label cells are joined (Qwen2.5-base lacks one). `data/Gemma-2-9B/base_multiturn_hidden_states.pt`
 is a corrupt truncated zip; Gemma's other two conditions are intact and never analyzed.
 
 ## Repo geography

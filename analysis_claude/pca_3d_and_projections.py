@@ -260,7 +260,7 @@ fig3d.legend(handles=legend_handles, loc="lower center", ncol=4,
 
 fig3d.suptitle(
     "Hidden-State Trajectory in 3D PCA Space  "
-    "(critical questions · T0-fitted PCA · ★ = first flip turn)",
+    "(critical condition · T0-fitted PCA · ★ = first flip turn)",
     fontsize=10.5, y=0.97,
 )
 plt.savefig(OUT_3D, dpi=300, bbox_inches="tight")
@@ -353,7 +353,7 @@ fig2d.legend(handles=leg_handles, loc="lower center", ncol=8,
 
 fig2d.suptitle(
     "Hidden-State Trajectory: 2D Projection Pairs  "
-    "(critical questions · T0-fitted 3-component PCA · ★ = first flip turn)",
+    "(critical condition · T0-fitted 3-component PCA · ★ = first flip turn)",
     fontsize=11, y=0.975,
 )
 plt.savefig(OUT_PROJ, dpi=160, bbox_inches="tight")

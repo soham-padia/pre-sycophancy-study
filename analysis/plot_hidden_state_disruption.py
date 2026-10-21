@@ -5,7 +5,7 @@ Panel A: T0->T1 cosine AUC by layer with 95% bootstrap CI bands
          (best prompt condition per model).
 Panel B: peak AUC per model with 95% bootstrap CIs, computed on all
          conversations (filled) and after excluding conversations whose first
-         flip occurs at T1 (open) — the pre-behavioral robustness check.
+         flip occurs at T1 (open) — the T1-exclusion robustness check.
 
 The drift-vs-AUC panel lives in analysis/plot_drift_vs_auc.py
 (paper appendix).

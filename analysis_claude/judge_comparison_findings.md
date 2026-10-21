@@ -7,7 +7,7 @@
 | **Judge A** | Llama 3.1 70B Instruct (via NDIF) |
 | **Judge B** | Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) |
 | **Model judged** | DeepSeek-R1-Distill-Qwen-7B |
-| **Question types** | `base`, `critical` |
+| **Prompt conditions** | `base`, `critical` |
 | **Overlapping rows** | 1,585 (turns 1–5 per question) |
 
 ---
@@ -44,9 +44,9 @@ The dominant disagreement is **Haiku=True, Llama=False (420 cases)** — Haiku f
 
 ---
 
-## Agreement by Question Type
+## Agreement by Prompt Condition
 
-| Question Type | Agreement | Cohen's κ |
+| Prompt Condition | Agreement | Cohen's κ |
 |---|---|---|
 | base | 55.0% (462/840) | 0.027 |
 | critical | 57.3% (427/745) | 0.067 |

@@ -445,7 +445,7 @@ def experiment_cross_model(all_data):
         if len(available) < 2:
             continue
 
-        print(f"\n  Question type: {qtype}")
+        print(f"\n  Prompt condition: {qtype}")
 
         for train_m in available:
             for test_m in available:
@@ -624,7 +624,7 @@ def main():
     print("║  SYCON-Bench Probe Training v2                                     ║")
     print("║  Models: DeepSeek + Qwen2.5-7B + Llama-3.1-8B + Qwen3.5-9B         ║")
     print("║  Labels: Claude Haiku 4.5 judge CSV (first-flip-only)              ║")
-    print("║  Question types: base, critical, presupposition                    ║")
+    print("║  Prompt conditions: base, critical, presupposition                 ║")
     print("╚" + "═" * 68 + "╝")
 
     # Load all data

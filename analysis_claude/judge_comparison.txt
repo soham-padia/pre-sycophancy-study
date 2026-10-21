@@ -21,7 +21,7 @@ Llama=False           680         420
 Llama=True            276         209
 
 ======================================================================
-AGREEMENT BY QUESTION TYPE
+AGREEMENT BY PROMPT CONDITION
 ======================================================================
   base                  agreement=462/840 (55.0%)  κ=0.0267
   critical              agreement=427/745 (57.3%)  κ=0.0665

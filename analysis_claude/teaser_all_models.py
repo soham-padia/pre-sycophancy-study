@@ -304,7 +304,7 @@ fig.legend(handles=handles, loc="lower center", ncol=3,
 
 fig.suptitle(
     "Pre-Capitulation Hidden-State Drift Across Models\n"
-    "critical questions · LLM-as-judge labels · each model's best pre-flip layer",
+    "critical condition · LLM-as-judge labels · each model's best pre-flip layer",
     fontsize=11, y=0.995, color="#111",
 )
 

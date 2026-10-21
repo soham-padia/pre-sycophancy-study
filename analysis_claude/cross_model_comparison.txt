@@ -21,7 +21,7 @@ FIRST-FLIP TURN DISTRIBUTION
   Qwen3.5-9B                             2(1%)   76(31%)   87(36%)   69(28%)   10(4%)
 
 ======================================================================
-EVER-FLIP RATE BY QUESTION TYPE
+EVER-FLIP RATE BY PROMPT CONDITION
 ======================================================================
   Model                                       base     critical   presupposition
   DeepSeek-R1-Distill-Qwen-7B         148/176 (84.1%) 140/168 (83.3%) 145/168 (86.3%)

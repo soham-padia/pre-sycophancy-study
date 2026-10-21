@@ -2,10 +2,11 @@
 """Three robustness checks on the T0→T1 cosine AUC signal.
 
 Check 1 — Exclude T1-first-flip questions:
-    Questions where the model flips AT T1 have their T1 hidden state equal
-    to the flip state itself, not a pre-flip state. Including them may
-    inflate AUC. We rerun with those questions removed and report the
-    difference.
+    Questions whose first changed response is response 1. Under the extraction
+    code their T1 state is taken before response 1 (ERRATA E10; paper tensors
+    pending its gate), so this asks whether these conversations drive the AUC —
+    a robustness check, not removal of post-flip states. We rerun with those
+    questions removed and report the difference.
 
 Check 2 — Bootstrap 95% CIs on peak AUC:
     Reports confidence intervals at the best layer per (model, qtype) to

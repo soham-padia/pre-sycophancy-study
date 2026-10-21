@@ -6,8 +6,9 @@ root cause. If the root cause generalizes, it also becomes a rule (FAILURE_TAXON
 checklist / agent mandate).
 
 ## E1 (2026-09-16) — The `+6.6 pp` nonlinear-over-linear gap was computed on at-flip states
-> **Superseded in part by E10 (2026-10-21):** the per-turn states precede the response, so the
-> "at-flip (post-behavioural)" reading below does not stand. The reproduction, and the point that
+> **Superseded in part by E10 (2026-10-21):** the extraction code takes each per-turn state before the
+> response (verified on the committed pilot; paper tensors pending E10's gate), so the
+> "at-flip (post-behavioural)" reading below does not stand under it. The reproduction, and the point that
 > §6.3 uses a different horizon from the other pre-flip analyses, do.
 
 **Recorded:** README:15 and the ARR-August submission report that nonlinear classifiers outperform
@@ -112,8 +113,8 @@ analysis. They are an artifact of this one appendix loader; the cosine arm's hol
 Correct the attribution in the response rather than conceding the design.
 
 ## E8 (2026-09-16) — The 2026-08-02 pairing audit's all-clear, and "fixed in commit b40e3ff"
-> **Superseded in part by E10 (2026-10-21):** no post-behavioural leak survived `b40e3ff`, because
-> there was none to fix — `b40e3ff` changed three scripts' horizon. The lesson (audit an artifact's
+> **Superseded in part by E10 (2026-10-21):** under the extraction code there was no post-behavioural
+> leak for `b40e3ff` to fix — it changed three scripts' horizon (paper tensors pending E10's gate). The lesson (audit an artifact's
 > producer, never only its siblings) stands.
 
 **Recorded:** `_falsifier/2026-08-02_hiddenstate_audit.md` states "probe/geometry/layer-sweep
@@ -143,7 +144,7 @@ paper reports **Cohen's kappa** (value 0.599 correct). L9dW's "disagreement with
 time" is not a number in the paper — the nearest is Haiku matching the *human* verdict in 73/120 = 61%
 of disagreement cases (Opus 40/120 = 33%).
 
-## E10 (2026-10-21) — The hidden states precede the response; neither probe pairing is "at-flip (post-behavioural)"
+## E10 (2026-10-21) — The extraction code takes each hidden state before the response; under it neither probe pairing is "at-flip (post-behavioural)"
 **Recorded:** `_markdown/ONBOARDING.md` (from 2026-07-06: "Final generated token, every layer"),
 CLAUDE.md and the submission describe each per-turn hidden state as the final generated token of
 response t. E1, E2, E8, FAILURE_TAXONOMY 2026-09-16 rows 1, 2 and 16, and CLAUDE.md's pairing law
@@ -153,8 +154,8 @@ label of response t "at-flip (post-behavioural)". **True:** `false-presuppositio
 separate forward pass over the chat-templated input prompt — the conversation through the turn-t
 user message, with `add_generation_prompt=True` — and keeps every layer at its last token. Response t
 is never in that pass. This has been the only extraction path since it was written (2131f23,
-2026-03-05; all-layer form 1b97b10, 2026-03-09), on every branch. So `hs[q][t]` is the state after
-reading pressure t and **before** response t. The repo's two pairings are both pre-behavioural and
+2026-03-05; all-layer form 1b97b10, 2026-03-09), on every branch of this repo. So wherever this code
+produced a tensor, `hs[q][t]` is the state after reading pressure t and **before** response t. The repo's two pairings are both pre-behavioural and
 differ only in horizon: **next-response** (`hs[q][t]` → label of response t;
 `probe_judge_comparison.py::build_preflip_features`, every §6.3 number) and **one-turn-ahead**
 (`hs[q][t]` → label of response t+1; `train_probes_v2.py::build_preflip_dataset` and the three
@@ -165,11 +166,16 @@ scripts `b40e3ff` moved to it). `b40e3ff` changed a horizon; it did not remove a
 the template's final token exactly. Prompt-plus-response hypotheses fail (median cosine 0.62; 0.32 with
 the end-of-turn token), and stored[t] matches recompute[t] and no other turn in 12/12 matrices. CPU
 job 1449390; scripts in `/work/neu/p2026_0037_neu/hs_extraction_verify_20261021/`.
-**Not yet verified:** the paper-model tensors in `data/` (not on the verifying machine). Gate, fixed
-before looking: row 0 of every state equals the embedding of that model's final
-`add_generation_prompt` token ⇒ pre-response extraction confirmed; equals the end-of-turn token ⇒
-generated-token extraction; varies across states ⇒ neither; constant but matching neither ⇒
-instrument failure, no turn-timing claim until resolved. E5's constant row 0 is predicted by the first
+**Not yet verified:** the paper-model tensors in `data/` (not on the verifying machine). Generation
+also ran from working copies no branch here captures (e.g. the Discovery checkout named in
+`sbatch/run_false_presuppositions_full.sbatch`), so the code path alone does not settle them. Gate,
+fixed before looking: row 0 of every state equals the model's own layer-0 output for that model's
+final `add_generation_prompt` token ⇒ pre-response extraction confirmed; equals it for the end-of-turn
+token ⇒ generated-token extraction; varies across states ⇒ neither; constant but matching neither ⇒
+instrument failure, no turn-timing claim until resolved. (Amended 2026-10-21, before any paper tensor
+was examined: the comparison is against `hidden_states[0]` as the model computes it, not the raw
+embedding-weight row, because Gemma-2 scales embeddings by √d and a raw-row comparison would misfire.)
+E5's constant row 0 is predicted by the first
 two branches alike, so it does not discriminate.
 **What changes:** E1's reproduction stands (the published §6.3 cells are the next-response pairing),
 as does its point that §6.3 and the other pre-flip analyses use different horizons while the paper
@@ -188,15 +194,18 @@ verdict was built on the description. **Standing rule:** FAILURE_TAXONOMY 2026-1
 `analysis/plot_drift_vs_auc.py`), `_markdown/RESEARCH_SUMMARY.md` finding 5 ("Drift magnitude and
 predictive structure are dissociated") and `_markdown/REVISION_TASKS.md` (Panel D). The meta-review and
 reviewer L9dW ask for this evidence in the main text. **True:** in `analysis_claude/cosine_auc_ci_bands.csv`
-(best condition per model, constant layer 0 excluded) the max-drift layer is the peak-AUC layer or
-adjacent to it in three of four models (DeepSeek L22/L21, Qwen2.5 L24/L26, Llama L32/L32), and the
+(best condition per model, constant layer 0 excluded) the max-drift layer is within two layers of the
+peak-AUC layer in three of four models (DeepSeek L22/L21, Qwen2.5 L24/L26, Llama L32/L32), and the
 top-quartile drift and AUC layers overlap 6/7, 5/7 and 6/8. Per-layer Spearman ρ(drift, AUC) is
 +0.87 / +0.65 / +0.12 / −0.66 (DeepSeek, Qwen2.5, Llama, Qwen3.5), but adjacent layers are strongly
 autocorrelated (lag-1 0.70–0.96): against nulls that preserve it, only DeepSeek's positive ρ
 (p ≈ 0.02–0.04) and Qwen3.5's negative ρ (p = 0.006) are significant. In Qwen3.5 the high-drift layers
 are anti-predictive (per-layer AUC CIs wholly below 0.5 at L12–20, 24, 31–32; not corrected for the
-sweep), so |AUC − 0.5| rises with drift in all four models. Across models (ρ = +0.80, n = 4) and in the
-pooled Fig. 8 scatter (ρ = +0.535), drift and AUC rise together. **Narrowest supported wording:** "In
+sweep). |AUC − 0.5| rank-correlates positively with drift in all four models (ρ +0.59 to +0.71), but
+against the autocorrelation-preserving null that is significant for Qwen3.5 (p = 0.002) and not for
+DeepSeek (p = 0.17) or Qwen2.5 (p = 0.068); Llama was not tested against it. Across models
+(ρ = +0.80, n = 4) and in the pooled Fig. 8 scatter (ρ = +0.51 as plotted, with layer 0; +0.535
+without), drift and AUC rise together. **Narrowest supported wording:** "In
 three of four models drift and AUC peak in the same late layers; in Qwen3.5-9B (presupposition) the
 high-drift layers predict holding rather than flipping. Drift magnitude does not fix the direction of
 its association with position change." **Discovered:** coordinator recomputation, adjudicated by the

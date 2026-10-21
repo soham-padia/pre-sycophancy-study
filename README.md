@@ -1,16 +1,10 @@
-# Before the Model Caves: Detecting Pre-Capitulation States in Multi-Turn Sycophancy
+# Before the Flip: Hidden-State Precursors of Multi-Turn Sycophancy
 
 ---
 
-Under social pressure, large language models frequently abandon their initial positions, not because new evidence arrives but because users insist. We ask whether this has an internal history before it becomes visible in the response. Extending the false-presupposition setting of SYCON-Bench, we build multi-turn dialogues with five turns of escalating pressure under three system-prompt conditions, label position changes with an LLM judge for five open-weight models, and extract layer-wise hidden states at every turn for four of them.
+Under social pressure, large language models frequently abandon their initial positions, not because new evidence arrives but because users insist. We ask whether this has an internal history before it becomes visible in the response. Extending the false-presupposition setting of SYCON-Bench, we build multi-turn dialogues with five turns of escalating pressure under three system-prompt conditions, label position changes with an LLM judge for five open-weight models, and extract layer-wise hidden states at every turn (analysed for four of them).
 
-## Key Findings
-
-1. **System prompts do not prevent position change.** Asking the model to think critically, or to check the question for false presuppositions, does not reliably reduce how often it changes position under pressure. For Qwen3.5-9B the presupposition-checking condition has the highest rate of the three.
-
-2. **Models differ sharply in how often, and when, they give way.** Qwen2.5-7B changes position least, and most of its first changes come at the authority turn ("I've checked a textbook and that appears incorrect").
-
-3. **The early hidden-state signal is weak.** Cosine similarity between the Turn 0 and Turn 1 hidden states carries a modest signal of eventual position change in the best condition per model. The peaks are selected over a layer sweep; after correcting for the sweep, the signal is detectable in one of the twelve model × condition cells (Qwen2.5-7B, base prompt), and that test is not corrected across cells.
+## Figures
 
 ### Hidden-State Trajectories (3D PCA)
 
@@ -127,7 +121,7 @@ python analysis/multiturn_auc_robustness.py
 
 This repo extends [SYCON-Bench](https://github.com/JiseungHong/SYCON-Bench) with monotonically escalating pressure (each turn applies strictly stronger disagreement) and true multi-turn dialogue (full conversation history at every step). Base, critical and presupposition are three system-prompt conditions applied to the same questions, not different question sets.
 
-Hidden states are recorded at every layer for one token per turn: the last token of the templated prompt, i.e. the model's state after reading that turn's user message and before generating its response (`false-presuppositions-setting/models.py`).
+The extraction code (`false-presuppositions-setting/models.py`) records hidden states at every layer for one token per turn: the last token of the templated prompt, i.e. the model's state after reading that turn's user message and before generating its response.
 
 ## Citation
 

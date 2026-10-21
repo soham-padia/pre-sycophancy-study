@@ -1,5 +1,9 @@
 # Agent Notes — append-only session log
 
+> **Read with `docs/ERRATA.md` (2026-10-21).** Entries before that date describe the hidden states as
+> the "final generated token" and call the next-response pairing "at-flip" and `b40e3ff` a fix; under
+> the extraction code both readings are superseded (ERRATA E10). Entries are otherwise unedited.
+
 Convention: append a dated entry at the END of this file after any session that
 changed something. Never edit or delete previous entries. Read the whole log
 before starting work.

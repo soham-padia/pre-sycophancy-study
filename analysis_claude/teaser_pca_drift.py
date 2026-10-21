@@ -239,7 +239,7 @@ fig.legend(handles=legend_handles, loc="lower center", ncol=3,
 fig.suptitle(
     "Pre-Capitulation Drift in Hidden-State Space\n"
     r"$\it{Llama\text{-}3.1\text{-}8B}$"
-    "  ·  critical questions  ·  layer 9  ·  LLM-as-judge labels",
+    "  ·  critical condition  ·  layer 9  ·  LLM-as-judge labels",
     fontsize=11, y=0.99, color="#111",
 )
 

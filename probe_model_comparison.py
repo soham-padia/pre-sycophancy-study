@@ -184,7 +184,7 @@ def run_cv(X, y, qids, clf_fn, n_splits=5, use_pca=None):
 def main():
     print("╔" + "═" * 68 + "╗")
     print("║  Probe Model Comparison — Full Classifier Sweep                    ║")
-    print("║  11 classifiers × 2 tasks × 3 question types × 2 models           ║")
+    print("║  11 classifiers × 2 tasks × 3 prompt conditions × 2 models        ║")
     print("╚" + "═" * 68 + "╝")
 
     # Best layers from v2 results

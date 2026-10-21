@@ -54,7 +54,7 @@ ax.set_xlabel("Cross-validation accuracy (%)", fontsize=9.5)
 ax.set_xlim(55, 82)
 ax.set_title(
     "11-Classifier Sweep: Pre-Flip Prediction Accuracy\n"
-    "(Qwen2.5-7B, presupposition questions, pre-flip hidden states)",
+    "(Qwen2.5-7B, presupposition condition, pre-flip hidden states)",
     fontsize=10, pad=8,
 )
 
