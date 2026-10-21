@@ -176,6 +176,15 @@ token ⇒ generated-token extraction; varies across states ⇒ neither; constant
 instrument failure, no turn-timing claim until resolved. (Amended 2026-10-21, before any paper tensor
 was examined: the comparison is against `hidden_states[0]` as the model computes it, not the raw
 embedding-weight row, because Gemma-2 scales embeddings by √d and a raw-row comparison would misfire.)
+(Second amendment 2026-10-21, also before any paper tensor was examined: row 0 alone cannot decide
+Llama, because `models.py` loads its tokenizer with `add_eos_token=True`, so an appended end token may
+be the final INPUT token — constant, yet pre-response. The deciding test is therefore a recomputation,
+as on the pilot: for a fixed sample of states per (model, condition), rebuild each prompt from the
+metadata's `input_messages` through `models.py`'s own template and tokenizer settings and compare every
+layer under both hypotheses. Pre-response recompute matches at cosine ≥ 0.999 in every layer ⇒
+confirmed for that model; the prompt-plus-response recompute matches instead ⇒ generated-token
+extraction; neither ⇒ instrument failure for that model. The row-0 rule stays as a cheap screen over
+all states.)
 E5's constant row 0 is predicted by the first
 two branches alike, so it does not discriminate.
 **What changes:** E1's reproduction stands (the published §6.3 cells are the next-response pairing),
