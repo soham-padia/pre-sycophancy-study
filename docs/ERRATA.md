@@ -26,7 +26,8 @@ the artifact's own producer; both pairings yield identical n, so the n-equality 
 it. **Standing rule:** FAILURE_TAXONOMY 2026-09-16 row 1.
 
 ## E2 (2026-09-16) — "No classifier exceeds the majority baseline by more than 2.5 pp in any combination" is false
-> **Superseded in part by E10 (2026-10-21):** the bound is horizon-specific, not false. It holds at
+> **Superseded in part by E10 (2026-10-21):** under the extraction code the bound is horizon-specific,
+> not false. It holds at
 > the published next-response horizon (max 2.43 pp) and fails at the one-turn-ahead horizon (+2.95 pp).
 
 **Recorded:** §6.3 of the submission, as a universal bound (max observed 2.43 pp). **True:** the bound
@@ -202,8 +203,8 @@ autocorrelated (lag-1 0.70–0.96): against nulls that preserve it, only DeepSee
 (p ≈ 0.02–0.04) and Qwen3.5's negative ρ (p = 0.006) are significant. In Qwen3.5 the high-drift layers
 are anti-predictive (per-layer AUC CIs wholly below 0.5 at L12–20, 24, 31–32; not corrected for the
 sweep). |AUC − 0.5| rank-correlates positively with drift in all four models (ρ +0.59 to +0.71), but
-against the autocorrelation-preserving null that is significant for Qwen3.5 (p = 0.002) and not for
-DeepSeek (p = 0.17) or Qwen2.5 (p = 0.068); Llama was not tested against it. Across models
+against the autocorrelation-preserving null that is significant for Qwen3.5 (p = 0.002) and Llama
+(ρ = +0.71, p ≈ 0.03) and not for DeepSeek (p = 0.17) or Qwen2.5 (p = 0.068). Across models
 (ρ = +0.80, n = 4) and in the pooled Fig. 8 scatter (ρ = +0.51 as plotted, with layer 0; +0.535
 without), drift and AUC rise together. **Narrowest supported wording:** "In
 three of four models drift and AUC peak in the same late layers; in Qwen3.5-9B (presupposition) the
