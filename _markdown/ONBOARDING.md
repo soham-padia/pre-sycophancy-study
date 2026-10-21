@@ -46,7 +46,10 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
   — columns `Question`, `Response_Turn_0` … `Response_Turn_5`.
 - **Hidden states:** `data/<Model>/<cond>_multiturn_hidden_states.pt` — a dict
   `{question_string: [T0…T5 tensors]}`, each tensor `(n_layers+1, hidden_dim)`
-  (embedding layer = index 0). Final generated token, every layer.
+  (embedding layer = index 0). Every layer at ONE token per turn: the last token
+  of the templated input prompt, i.e. the state BEFORE that turn's response is
+  generated. (Correction 2026-10-21, `docs/ERRATA.md` E10: this line used to say
+  "final generated token"; the code never did that.)
 - **Judge labels:** `analysis_claude/*_judgements*.csv` — columns
   `model, question_type, question, turn, judgement, confidence, rationale`.
   Judge = Claude Haiku 4.5 for ALL models (DeepSeek's file is named
@@ -63,22 +66,21 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
 - A **flip** at turn t = judge says the model shifted from its prior factual
   position at that turn. **First-flip methodology**: everything after the first
   flip is censored.
-- **Pre-flip task pairing:** the hidden state at turn t is labeled by whether
-  the model flips at turn **t+1**, censored after the first flip. Reference
-  implementation: `train_probes_v2.py::build_preflip_dataset`.
-- **THE OFF-BY-ONE TRAP:** three scripts used to pair state-at-t with
-  label-at-t (i.e., *at-flip* states, post-behavioral). Fixed in commit
-  `b40e3ff` — **but NOT everywhere. Correction 2026-09-16:** `b40e3ff` touched
-  only `multiturn_auc_robustness.py`, `plot_layer_sweep.py` and
-  `plot_preflip_pca.py`. `probe_judge_comparison.py::build_preflip_features`
-  (lines 122-135) is STILL at-flip, so every §6.3 number and the 6.6 pp
-  nonlinear-over-linear headline are computed on post-behavioral states
-  (`docs/ERRATA.md` E1-E2). This paragraph asserted the fix was complete for six
-  weeks; the 2026-08-02 audit that graded the artifact never opened its producer.
-  If you write a new analysis, copy the pairing from `train_probes_v2.py`. Do
-  NOT rely on the n cross-check that used to be recommended here: both pairings
-  give IDENTICAL n, so it is structurally blind to this defect. Diff the index
-  arithmetic against the reference instead.
+- **Pre-flip task pairing — two horizons, both pre-behavioural** (correction
+  2026-10-21, `docs/ERRATA.md` E10). Because the state at turn t is taken before
+  response t:
+  - *one-turn-ahead*: state at t labeled by whether response **t+1** flips —
+    `train_probes_v2.py::build_preflip_dataset`, and the three scripts commit
+    `b40e3ff` moved to it (`multiturn_auc_robustness.py`, `plot_layer_sweep.py`,
+    `plot_preflip_pca.py`);
+  - *next-response*: state at t labeled by whether response **t** flips —
+    `probe_judge_comparison.py::build_preflip_features`, i.e. every §6.3 number.
+  Both censor after the first flip. Earlier versions of this paragraph (and
+  ERRATA E1/E8) called next-response "at-flip, post-behavioral" and `b40e3ff` a
+  fix; that rested on the wrong extraction description above. Name the horizon in
+  every claim — the paper must not call the two "the same pre-flip states". Both
+  give IDENTICAL n, so an n cross-check cannot tell them apart: diff the index
+  arithmetic.
 - **Ever-flip task:** question-level binary (did it ever flip), used for the
   cosine analyses; features from T0/T1.
 
@@ -93,11 +95,12 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
 - Nonlinear classifiers: +6.6pp over linear on average, but ≤2.5pp over majority
   baseline under judge labels (75.5% result is keyword-labels only → secondary).
   **DO NOT CITE either figure (correction 2026-09-16, `docs/ERRATA.md` E1-E3):**
-  both come from the at-flip artifact. Under the reference pairing the gap is
-  7.24pp (single seed), the ≤2.5pp bound is FALSE (RF/Llama-critical = +2.95pp),
-  and the whole gap is reproduced by a turn-index-only classifier with no hidden
-  states — nonlinear sits AT chance, linear falls 6pp BELOW it.
-- Ever-flip rates: Gemma 94–98%, DeepSeek 84–86%, Llama 76–86%, Qwen3.5 67–80%,
+  both come from the next-response horizon (§6.3). At the one-turn-ahead horizon
+  the gap is 7.24pp (single seed) and the ≤2.5pp bound fails (RF/Llama-critical =
+  +2.95pp). At the published horizon the whole gap is reproduced by a
+  turn-index-only classifier with no hidden states — nonlinear sits AT chance,
+  linear falls 6pp BELOW it (ERRATA E3).
+- Ever-flip rates: Gemma 94–98%, DeepSeek 83–86%, Llama 76–86%, Qwen3.5 67–80%,
   Qwen2.5 41–46% (flips mostly at the T4 authority turn).
 
 ## Script → output map
@@ -111,8 +114,8 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
 | `analysis/plot_preflip_pca.py` | PCA illustration figure |
 | `analysis/multiturn_auc_robustness.py` | signal persistence (T0→Tk) appendix figure |
 | `analysis/preflip_geometry.py` | Fisher ratios / LDA (Table: geometry) |
-| `probe_judge_comparison.py` | 9-classifier sweep (§6.3 numbers) |
-| `train_probes_v2.py` | probe experiments + reference pre-flip pairing |
+| `probe_judge_comparison.py` | 9-classifier sweep (§6.3 numbers; next-response pairing) |
+| `train_probes_v2.py` | probe experiments; one-turn-ahead pre-flip pairing |
 | `analysis/plot_flip_turn_comparison.py` | keyword vs judge bubble figure |
 | `analysis/judge_flip_claude.py` | runs the LLM-as-judge (needs ANTHROPIC_API_KEY) |
 

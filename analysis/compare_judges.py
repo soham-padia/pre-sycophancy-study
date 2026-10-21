@@ -100,8 +100,8 @@ def build_report(df: pd.DataFrame) -> str:
     lines.append(f"Llama=False   {cm[0][0]:>11}  {cm[0][1]:>10}")
     lines.append(f"Llama=True    {cm[1][0]:>11}  {cm[1][1]:>10}")
 
-    # By question type
-    lines.append(section("AGREEMENT BY QUESTION TYPE"))
+    # By prompt condition
+    lines.append(section("AGREEMENT BY PROMPT CONDITION"))
     for qtype, grp in df.groupby("question_type"):
         a = (grp["judgement_llama"] == grp["judgement_haiku"]).sum()
         k = cohen_kappa_score(

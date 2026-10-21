@@ -1,5 +1,7 @@
 # Research: Pre-Capitulation Hidden States in Multi-Turn Sycophancy
 
+> **Superseded in part (2026-10-21).** Claims here that no longer hold: the "nonlinear" pre-flip structure and +6.6 pp gap (ERRATA E3), cross-model transfer (E4), "across all four models" (E5) and the drift–AUC dissociation in finding 5 (E11). The per-turn hidden states are the last prompt token before each response, not the final generated token (E10). Check `docs/ERRATA.md` before reusing any claim from this file.
+
 ## Motivation
 
 Sycophancy — the tendency of large language models to agree with users even when users are factually wrong — is a well-documented alignment failure. Most prior work measures it as a binary output event: either the model changed its answer or it did not. This framing misses something important. If a model's internal representation is already shifting toward capitulation before the visible flip occurs, then the failure is not purely reactive. It has a measurable internal history.

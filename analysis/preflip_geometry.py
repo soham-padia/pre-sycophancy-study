@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Geometric analysis of pre-flip vs hold hidden states.
 
-Tests whether pre-flip and hold states form non-linearly separable clusters —
-i.e., that sycophancy is encoded in curved representational geometry rather than
-linearly separable directions (motivation for why nonlinear probes outperform linear).
+Tests whether pre-flip and hold states are linearly separable. Caution (ERRATA E3):
+the nonlinear-over-linear gap that once motivated this script is reproduced by turn
+index alone, and the Fisher ratio is indistinguishable from a turn-index-matched null
+in 10/12 cells — read every metric here against such a null, not as evidence of
+curved geometry.
 
 Metrics computed (no probe training):
   - PCA explained variance (first 5 components)
@@ -213,10 +215,8 @@ def run_analysis() -> tuple[str, list[dict]]:
         "PRE-FLIP STATE GEOMETRY ANALYSIS",
         "Geometric structure of pre-flip vs hold hidden states",
         "",
-        "Motivation: nonlinear classifiers consistently outperform linear probes.",
-        "This analysis tests whether the geometry of pre-flip representations",
-        "explains why — i.e., whether flip/hold states are linearly vs non-linearly",
-        "separable in the representation space.",
+        "Question: are flip/hold states linearly separable in the representation space?",
+        "Read every metric against a turn-index-matched null (ERRATA E3).",
         "",
         "Metrics:",
         "  Silhouette  : cluster cohesion in PCA-50 space (higher = more separated)",
@@ -309,9 +309,10 @@ def run_analysis() -> tuple[str, list[dict]]:
         )
 
     lines.append(
-        "\n  Interpretation: Low Fisher ratio + low LDA accuracy (near chance) despite"
-        "\n  nonlinear classifiers beating chance → signal is in curved geometry, not"
-        "\n  linear separable directions. Negative silhouette = overlapping distributions."
+        "\n  Interpretation: low Fisher ratio + near-chance LDA = no linear separation at"
+        "\n  this layer. It is NOT evidence of curved geometry: compare against a"
+        "\n  turn-index-matched null first (ERRATA E3). Negative silhouette = overlapping"
+        "\n  distributions."
     )
 
     return "\n".join(lines), rows

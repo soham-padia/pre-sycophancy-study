@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Multi-turn AUC robustness analysis.
 
-For each model × question-type, computes AUC of cos_sim(T0, Tk) as a
+For each model × prompt condition, computes AUC of cos_sim(T0, Tk) as a
 zero-shot predictor of ever-flip, for k = 1 through 5.  Uses the same
 fixed question set across all k so the comparison is apples-to-apples.
 

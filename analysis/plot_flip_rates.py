@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Plot question-level sycophancy flip rates by model and question type.
+"""Plot question-level sycophancy flip rates by model and prompt condition.
 
 This script reads false-presupposition metadata JSON artifacts from `data/`,
 labels turn-level flips using the same keyword heuristic as the probe code,
 and produces:
 
 1. A summary CSV with counts and rates.
-2. A grouped bar chart of "ever flipped" question rate by model/question type.
+2. A grouped bar chart of "ever flipped" question rate by model/prompt condition.
 
 Usage:
     python analysis/plot_flip_rates.py
@@ -165,9 +165,9 @@ def plot_grouped_bars(rows: list[dict], output_path: Path) -> None:
                     rotation=90,
                 )
 
-    ax.set_title("Flip Rate by Model and Question Type", fontsize=14)
+    ax.set_title("Flip Rate by Model and Prompt Condition", fontsize=14)
     ax.set_ylabel("Questions with at least one flip (%)")
-    ax.set_xlabel("Question type")
+    ax.set_xlabel("Prompt condition")
     ax.set_xticks(x)
     ax.set_xticklabels([q.title() for q in QUESTION_TYPES])
     ax.set_ylim(0, 100)

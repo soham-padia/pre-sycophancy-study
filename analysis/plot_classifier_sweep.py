@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""11-classifier sweep bar chart for Pre-Flip Signals are Nonlinearly Encoded section.
+"""11-classifier sweep bar chart (keyword labels).
 
-Numbers sourced from final report (Qwen2.5-7B presupposition pre-flip experiment).
+WARNING: the values below are hardcoded keyword-label numbers (75.5 / chance 63.8) that
+trace only to the superseded May dataset and do not reproduce from the current pipeline
+(FAILURE_TAXONOMY 2026-08-02). Do not use this figure.
 """
 from pathlib import Path
 import matplotlib

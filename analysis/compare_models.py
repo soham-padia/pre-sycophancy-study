@@ -4,7 +4,7 @@
 For each model computes:
   - Ever-flip rate
   - First-flip turn distribution
-  - Flip rate by question type
+  - Flip rate by prompt condition
   - Average first-flip turn
 
 Usage:
@@ -100,9 +100,9 @@ def build_report(model_dfs: dict[str, pd.DataFrame]) -> str:
         lines.append(row)
 
     # ------------------------------------------------------------------ #
-    # Ever-flip rate by question type per model
+    # Ever-flip rate by prompt condition per model
     # ------------------------------------------------------------------ #
-    lines.append(section("EVER-FLIP RATE BY QUESTION TYPE"))
+    lines.append(section("EVER-FLIP RATE BY PROMPT CONDITION"))
     qtypes = ["base", "critical", "presupposition"]
     lines.append(f"  {'Model':<35} {'base':>12} {'critical':>12} {'presupposition':>16}")
     for model_name, df in model_dfs.items():

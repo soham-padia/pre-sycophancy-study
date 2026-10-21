@@ -19,18 +19,22 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
 ## Key facts to not re-break
 - base/critical/presupposition are SYSTEM-PROMPT CONDITIONS over the SAME ~177 questions —
   never "question types" (that misdescription shipped once).
-- Pre-flip pairing: state at turn t predicts label at t+1, censored at/after the first flip.
-  Reference: `train_probes_v2.py::build_preflip_dataset`. Three scripts once used at-flip
-  pairing (the off-by-one trap — `_markdown/ONBOARDING.md`). **STILL OPEN as of 2026-09-16:**
-  `probe_judge_comparison.py::build_preflip_features` never got the `b40e3ff` fix and remains
-  at-flip; every §6.3 number including the 6.6 pp headline is affected (`docs/ERRATA.md` E1).
-  The defect is `tensor = hs[q][t]` against a label at the same `t`; the reference pairing is
-  `hs[q][t-1]` (that loader already censors to t ≤ first flip, so nothing else changes).
-  Both pairings yield IDENTICAL n, so an n-check cannot detect this — diff the index arithmetic
-  against the reference, and audit the producer of an artifact, never only its siblings.
+- Hidden states are PRE-RESPONSE: `hs[q][t]` is every layer at the last token of the templated
+  prompt through the turn-t user message, before response t is generated (`models.py`; ERRATA E10 —
+  verified by recomputation on the committed pilot; paper-model tensors decided by E10's layer-0 gate).
+  So there are two pre-behavioural pre-flip pairings, and every claim must name its horizon:
+  **next-response** (`hs[q][t]` → label of response t; `probe_judge_comparison.py::build_preflip_features`,
+  every §6.3 number) and **one-turn-ahead** (`hs[q][t]` → label of response t+1;
+  `train_probes_v2.py::build_preflip_dataset` and the three `b40e3ff` scripts). Neither is "at-flip" —
+  ERRATA E1/E2/E8's post-behavioural reading is superseded. Both censor after the first flip and yield
+  IDENTICAL n, so an n-check cannot tell them apart — diff the index arithmetic, and audit the producer
+  of an artifact, never only its siblings.
 - Peak cosine AUCs (0.596–0.636) are layer-sweep-selected: descriptive only. Under the
   sweep-corrected permutation test only Qwen2.5-base survives (p=0.035); Fisher-combined
   p=0.047 with condition choice uncorrected. Never cite individual peaks as significant.
+- The drift–AUC "dissociation" is NOT supported: in 3 of 4 models drift and AUC peak in the same
+  late layers (ERRATA E11 has the only wording the artifacts license).
+- Until T0 correctness is verified, the DV is "position change", not "capitulation".
 - Flip-rate class imbalance spans 66–91% chance levels (not 75–85%).
 - Qwen3.5 keyword>judge holds ONLY under base/critical; presupposition reverses it.
 - The judge does NOT concentrate flips at T1 (Qwen2.5 3%, Qwen3.5 1%); the keyword heuristic
@@ -103,7 +107,7 @@ Four stages, each reading the previous stage's files off disk. There is no orche
    `false-presuppositions-setting/output/<hf-basename>/<cond>_multiturn.csv` (its default and the
    sbatch default; columns `Question`, `Response_Turn_0..5`) and `<cond>_multiturn_hidden_states.pt`:
    a dict `{question: [T0…T5]}`, each tensor `(n_layers+1, hidden_dim)` — index 0 is the embedding
-   layer, final generated token only. `data/<Model>/` is what `download_data.py` pulls from the HF
+   layer; one token per turn, the last token of the templated input prompt (pre-response, see above). `data/<Model>/` is what `download_data.py` pulls from the HF
    dataset; its directory names differ from HF basenames (`data/Gemma-2-9B` vs `google/gemma-2-9b-it`).
    Naming trap: the scripts' `MODELS[...]["n_layers"]` (29/33) is the tensor ROW count, not depth, and
    sweeps slice `[:n_layers]`, which includes the constant row 0 — exclude it with `[1:n_layers]`.

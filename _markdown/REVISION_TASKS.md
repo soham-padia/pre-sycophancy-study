@@ -1,5 +1,7 @@
 # EMNLP Revision Task Split
 
+> **Superseded in part (2026-10-21).** Claims here that no longer hold: the "nonlinear" wording and +6.6 pp gap (ERRATA E3) and the Panel D drift–AUC dissociation (E11); this is the May EMNLP-era task split. The per-turn hidden states are the last prompt token before each response, not the final generated token (E10). Check `docs/ERRATA.md` before reusing any claim from this file.
+
 Four tracks. Each person owns their track end to end — writing, code, and figure edits where applicable. Target: full draft ready for Prof. Malihe review by end of next week.
 
 ---

@@ -97,7 +97,10 @@ browser action wide. Cheapest recovery available for the next cycle.
   correction — worth a scoped reply, not a rerun.
 - **L9dW**: wants human-vs-judge agreement (not just Haiku-vs-Opus) in the MAIN text, and wants the
   "layers that move most are not the layers that predict best" evidence moved out of the appendix.
-  Both are presentation moves over work already done. Their "Krippendorff alpha" is our Cohen's
+  Both are presentation moves over work already done. **Corrected 2026-10-21:** neither is. The
+  human data covers only the 120 Haiku–Opus disagreements, not a random sample, so a human–judge
+  agreement figure needs new annotation. The dissociation claim is not supported by its own figure's
+  data (ERRATA E11). Their "Krippendorff alpha" is our Cohen's
   kappa, and their "disagreement with Haiku 60%" is not a number in the paper — see ERRATA E9.
 - **paET** (most technical): task mismatch between the cosine and probe arms, no non-hidden-state
   baseline, unverified T0 correctness, PCA-256 transfer not aligning two representation spaces,
@@ -113,6 +116,9 @@ raised:
 1. **`probe_judge_comparison.py` never got the `b40e3ff` off-by-one fix.** Every §6.3 number,
    including the 6.6 pp headline, is computed on **at-flip** (post-behavioural) states while the text
    says pre-flip. Confirmed independently by two agents via reproduction. ERRATA E1–E2.
+   **Corrected 2026-10-21 (ERRATA E10):** the states precede the response, so §6.3 is a
+   next-response (pre-behavioural) pairing, not at-flip. What stands is that it uses a different
+   horizon from the other pre-flip analyses.
 2. **Finding 3 ("pre-flip geometry is nonlinear") is reproduced in full by a turn-index-only
    classifier with no hidden states.** The 6.6 pp gap is linear probes falling 6 pp *below* chance
    while nonlinear probes sit *at* chance — a fitting pathology on a censoring artifact, not curved

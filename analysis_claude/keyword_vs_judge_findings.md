@@ -1,5 +1,7 @@
 # Keyword Labels vs LLM-as-Judge Labels: Findings Summary
 
+> **Superseded in part (2026-10-21).** Claims here that no longer hold: the "Nonlinear > linear" and "Cross-model transfer: fails" rows (ERRATA E3, E4). The per-turn hidden states are the last prompt token before each response, not the final generated token (E10). Check `docs/ERRATA.md` before reusing any claim from this file.
+
 ## Overview
 
 We compared two labeling approaches for sycophancy detection:

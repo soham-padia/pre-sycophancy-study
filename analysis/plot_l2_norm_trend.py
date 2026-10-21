@@ -108,7 +108,7 @@ def run():
         color = MODEL_COLORS[model_name]
         labels = load_judge_labels(cfg)
 
-        # aggregate across all three question types
+        # aggregate across all three prompt conditions — ERRATA E7: this cross-condition collapse is a known defect; fix before reuse
         agg_flip = {t: [] for t in range(6)}
         agg_hold = {t: [] for t in range(6)}
 

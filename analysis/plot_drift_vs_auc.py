@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Drift magnitude vs. predictive AUC (paper Appendix: drift dissociation).
+"""Drift magnitude vs. predictive AUC (paper Appendix E). The "dissociation" reading of
+this figure is not supported — see ERRATA E11 for the wording the data license.
 
 One point per layer (best prompt condition per model): mean representational
 drift 1 - cos(h_T0, h_T1) against that layer's cosine ROC-AUC.

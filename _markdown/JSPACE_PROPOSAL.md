@@ -1,5 +1,7 @@
 # Proposal: Is the Pre-Capitulation Signal Inside the Verbalizable Workspace?
 
+> **Superseded in part (2026-10-21).** Claims here that no longer hold: its premise of a "nonlinear, pre-behavioral" signal: the nonlinear-over-linear gap is reproduced by turn index alone (ERRATA E3). The per-turn hidden states are the last prompt token before each response, not the final generated token (E10). Check `docs/ERRATA.md` before reusing any claim from this file.
+
 **Status:** research proposal (follow-up to the EACL sycophancy paper)
 **Data required:** existing hidden states + one new GPU computation (J-lens matrices)
 **References:** Anthropic, "Verbalizable Representations Form a Global Workspace in Language Models," Transformer Circuits, 2026 (https://transformer-circuits.pub/2026/workspace/index.html); overview at https://www.anthropic.com/research/global-workspace

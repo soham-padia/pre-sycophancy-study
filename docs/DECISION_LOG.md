@@ -84,3 +84,24 @@ precisely the analyzer-produced summary the rule forbids recomputing from, and `
 passes no `revision=` so no data-snapshot identifier exists to freeze against. The rule must either
 gain committed behavioural CSVs (~20 MB, not the 22 GB) or name and pin the snapshot host. This is
 also the direct fix for the three Software: 1 scores.
+
+## [coordinator · 2026-10-21] Corrections to two 2026-09-16 rulings: pairing timing and the drift dissociation
+
+**Examined.** The hidden-state extraction code and its history on every branch, and the committed
+Qwen2.5-0.5B pilot tensors recomputed under the pre-response and generated-token hypotheses
+(code-verifier, CPU job 1449390); `analysis_claude/cosine_auc_ci_bands.csv` for the drift–AUC relation
+(falsifier); the committed judge CSVs and `permutation_test.csv` for a power analysis (results-auditor).
+
+**Rulings.** (1) The per-turn states are pre-response for the extraction code path (ERRATA E10). The
+2026-09-16 characterisations "on top of an at-flip artifact" and "at-flip, metric-mismatched" do not
+stand. The ruling that submission finding 3 is fatal is unaffected, because the turn-index baseline ran
+on the published artifact. (2) The drift–AUC dissociation is not supported; the narrowest supported
+wording is in ERRATA E11. (3) Power analysis: the counts and the single-layer power (0.42–0.70 at a true
+AUC of 0.6) were confirmed by independent Monte-Carlo. The producer's Bonferroni bound was corrected: the
+permutation thresholds behave like about 6–14 independent layers, giving a sweep-corrected power of
+roughly 0.12–0.32 for a one-layer effect and 0.3–0.6 for a 4–8-layer band. The claim that the surviving
+cell is the highest-powered one holds by model, not by cell (Qwen2.5-critical has slightly more power
+and peaks at 0.531). Not frozen: it enters `docs/CITABLE_NUMBERS.md` with the meta-review work.
+
+**Not examined.** The paper-model tensors (absent from this machine; the layer-0 gate in E10 decides
+them), the Overleaf text, and the drift relation in the eight non-best (model, condition) cells.

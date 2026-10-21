@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bar chart: ever-flip rate by model and question type (LLM-as-judge labels)."""
+"""Bar chart: ever-flip rate by model and prompt condition (LLM-as-judge labels)."""
 from pathlib import Path
 import pandas as pd
 import matplotlib
@@ -55,14 +55,14 @@ for i, (qt, qt_label, color) in enumerate(zip(QTYPES, QTYPE_LABELS, COLORS)):
 ax.set_xticks(x)
 ax.set_xticklabels(models, fontsize=10)
 ax.set_ylabel("Ever-Flip Rate (%)", fontsize=11)
-ax.set_title("Sycophantic Flip Rate by Model and Question Type\n(Judge: Claude Haiku 4.5, first-flip methodology)",
+ax.set_title("Sycophantic Flip Rate by Model and Prompt Condition\n(Judge: Claude Haiku 4.5, first-flip methodology)",
              fontsize=11, pad=10)
 ax.set_ylim(0, 105)
 ax.yaxis.grid(True, linestyle="--", alpha=0.5, zorder=0)
 ax.set_axisbelow(True)
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
-ax.legend(title="Question Type", fontsize=9, title_fontsize=9,
+ax.legend(title="Prompt Condition", fontsize=9, title_fontsize=9,
           loc="upper right", framealpha=0.8)
 
 plt.tight_layout()

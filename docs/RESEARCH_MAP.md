@@ -60,9 +60,13 @@ ERRATA E1-E9. The EACL commitment decision is now a live call, not a formality.
 - **Decide the venue call first.** Two reviewers say resubmit next cycle, and the record now carries
   a fatal ruling on submission finding 3. Resubmitting the same framing is not available. Blocks
   everything below it.
-- **Fix `probe_judge_comparison.py:122-135`** to the reference pairing, regenerate
-  `probe_judge_sweep.csv`, and route the new numbers through results-auditor before any use. The
-  corrected 7.24 pp is a single-seed point estimate; quote a seed range (0/1/42), never the number.
+- ~~**Fix `probe_judge_comparison.py:122-135`** to the reference pairing, regenerate
+  `probe_judge_sweep.csv`, and route the new numbers through results-auditor before any use.~~
+  **Corrected 2026-10-21 (ERRATA E10): there is nothing to fix** — both pairings are pre-behavioural
+  and differ in horizon. Choose and name the §6.3 horizon (next-response as published, or
+  one-turn-ahead), regenerate only if it changes, and route new numbers through results-auditor before
+  any use. The one-turn-ahead 7.24 pp is a single-seed point estimate; quote a seed range (0/1/42),
+  never the number.
 - **Re-scope the paper to what survives.** Qwen2.5-base is clean on all seven tested axes
   (permutation, layer coherence, text baseline, question-only baseline, form coupling, zero
   keyword-visible pre-behavioural concessions, class balance). A single-cell n=155 existence result

@@ -205,7 +205,7 @@ def main():
     ax.set_ylabel("Cross-validation accuracy", fontsize=10)
     ax.set_title(
         "Layer-wise Logistic Regression Accuracy on Pre-Flip Hidden States\n"
-        "(best question type per model, LLM-as-judge labels)",
+        "(best prompt condition per model, LLM-as-judge labels)",
         fontsize=10, pad=8)
     ax.legend(fontsize=8, loc="upper left", framealpha=0.88)
     ax.set_ylim(0.45, 0.95)
