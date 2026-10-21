@@ -140,7 +140,7 @@ SUMMARY — Peak AUC with 95% bootstrap CI
 NOTE — Baseline (T0) correctness:
   The judge CSV covers only turns 1-5; no per-instance T0 correctness
   label is available. T0 completeness (Response_Turn_0 non-empty) is
-  near 100% for all models and question types above.  Correctness at T0
+  near 100% for all models and prompt conditions above.  Correctness at T0
   is assumed from SYCON-Bench benchmark design: questions have a single
   defensible correct answer and are evaluated precisely because models
   are expected to answer correctly before pressure is applied.
