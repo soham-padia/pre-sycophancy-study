@@ -13,8 +13,8 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
 - Judge labels: `analysis_claude/*judgements*.csv` — judge is Claude Haiku 4.5 for ALL models;
   first-flip methodology; baseline corrections are not counted as flips.
 - The anonymized public snapshot is a separate single-commit repo; commits there are authored
-  Anonymous ONLY. `_markdown/`, `_local/`, `docs/`, `.claude/`, `_falsifier/`, and this file
-  never enter any anonymized export.
+  Anonymous ONLY. `_markdown/`, `_local/`, `docs/`, `.claude/`, `_falsifier/`, `debate_setting/`,
+  `ethical-setting/`, and this file never enter any anonymized export.
 
 ## Key facts to not re-break
 - base/critical/presupposition are SYSTEM-PROMPT CONDITIONS over the SAME ~177 questions —
@@ -24,6 +24,8 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
   pairing (the off-by-one trap — `_markdown/ONBOARDING.md`). **STILL OPEN as of 2026-09-16:**
   `probe_judge_comparison.py::build_preflip_features` never got the `b40e3ff` fix and remains
   at-flip; every §6.3 number including the 6.6 pp headline is affected (`docs/ERRATA.md` E1).
+  The defect is `tensor = hs[q][t]` against a label at the same `t`; the reference pairing is
+  `hs[q][t-1]` (that loader already censors to t ≤ first flip, so nothing else changes).
   Both pairings yield IDENTICAL n, so an n-check cannot detect this — diff the index arithmetic
   against the reference, and audit the producer of an artifact, never only its siblings.
 - Peak cosine AUCs (0.596–0.636) are layer-sweep-selected: descriptive only. Under the
@@ -59,9 +61,9 @@ python download_data.py [--csv-only] [--model Qwen2.5-7B-Instruct]  # data/ is g
 python bin/skills-lock.py verify     # process-layer drift; `generate` only after a reviewed change
 ```
 
-No analysis script takes a model or condition flag — the model list is a `MODELS` dict at the top
-of each file, so a single-model run means editing that dict (or importing the module). The judge is
-the only script with a CLI.
+The cosine/geometry/probe/plot scripts take no flags — the model list is a `MODELS` dict at the top
+of each file, so a single-model run means editing that dict (or importing the module). The judge
+selects models and conditions on the command line (`--models`, `--question-types`).
 
 ```bash
 python analysis/cosine_disruption.py         # per-layer T0→T1 AUC → analysis_claude/cosine_disruption.{txt,csv}
@@ -75,14 +77,21 @@ python analysis/judge_flip_claude.py --judge-model claude-haiku-4-5-20251001 \
     --output analysis_claude/<name>.csv      # needs ANTHROPIC_API_KEY; --dry-run --limit 2 to preview
 ```
 
-The judge resumes by skipping keys already present in its output CSV; shard with
-`analysis/split_judge_csv_shards.py`. Full script→output map: `_markdown/ONBOARDING.md`.
+ALWAYS pass `--output` to the judge: the default is `analysis_claude/claude_judgements.csv`, which is
+the DeepSeek label file — a run resumes (appends) into it and `--overwrite` deletes it. The judge
+resumes by skipping keys already present in its output CSV and shards itself with
+`--num-shards N --shard-index i`; `analysis/split_judge_csv_shards.py` only re-splits an existing
+output CSV so a serial run can resume as shards. Full script→output map: `_markdown/ONBOARDING.md`.
 Everything under `analysis_claude/` is generated — regenerate via script, never hand-edit, and note
 regenerations in `_markdown/AGENT_NOTES.md`.
 
-GPU work (new inference, hidden-state extraction) runs only on the cluster:
-`sbatch/submit_*_loop.sh <hf-model-id>` wraps `false-presuppositions-setting/run_benchmark.py` with
-8-hour auto-resubmit. Paths inside the sbatch files are hardcoded to one user's home.
+GPU work (new inference, hidden-state extraction) runs only on a cluster:
+`sbatch/submit_false_presuppositions_qwen35_loop.sh <hf-model-id>` wraps
+`false-presuppositions-setting/run_benchmark.py` with 8-hour auto-resubmit (the deepseek7b/llama31
+submitters hardcode their model and call it). The scripts were written for the Discovery cluster
+(partition `gpu`, `module load python/3.13.5`, `set -euo pipefail`): elsewhere fix partition/account,
+and on AICR drop `set -u` — it kills the batch shell there. Only `run_false_presuppositions_full.sbatch`
+hardcodes a user home.
 
 ## Pipeline and artifact shapes
 Four stages, each reading the previous stage's files off disk. There is no orchestrator.
@@ -90,10 +99,14 @@ Four stages, each reading the previous stage's files off disk. There is no orche
 1. **Stimuli** — `analysis/generate_multiturn_dataset.py` expands each CREPE question into T0 plus
    five fixed escalating pressure turns (the ladder is the `PRESSURE_VARIANTS` list; T4 is the
    authority turn, where most flips land).
-2. **Generation (cluster)** — `run_benchmark.py` writes `data/<Model>/<cond>_multiturn.csv`
-   (`Question`, `Response_Turn_0..5`) and `<cond>_multiturn_hidden_states.pt`: a dict
-   `{question: [T0…T5]}`, each tensor `(n_layers+1, hidden_dim)` — index 0 is the embedding layer,
-   final generated token only.
+2. **Generation (cluster)** — `run_benchmark.py` writes
+   `false-presuppositions-setting/output/<hf-basename>/<cond>_multiturn.csv` (its default and the
+   sbatch default; columns `Question`, `Response_Turn_0..5`) and `<cond>_multiturn_hidden_states.pt`:
+   a dict `{question: [T0…T5]}`, each tensor `(n_layers+1, hidden_dim)` — index 0 is the embedding
+   layer, final generated token only. `data/<Model>/` is what `download_data.py` pulls from the HF
+   dataset; its directory names differ from HF basenames (`data/Gemma-2-9B` vs `google/gemma-2-9b-it`).
+   Naming trap: the scripts' `MODELS[...]["n_layers"]` (29/33) is the tensor ROW count, not depth, and
+   sweeps slice `[:n_layers]`, which includes the constant row 0 — exclude it with `[1:n_layers]`.
 3. **Labels** — two independent labelers over the same responses: `flip_labeling.py::response_flipped`
    (keyword heuristic, deliberately stricter than the original SYCON list) and
    `analysis/judge_flip_claude.py`. Judge CSV columns:
@@ -113,7 +126,8 @@ is a corrupt truncated zip; Gemma's other two conditions are intact and never an
 - **Ruled out of scope** (don't revive without a director memo): `debate_setting/`,
   `ethical-setting/` — inherited SYCON-Bench settings, excluded from the paper and the anonymized repo.
 - **Inert:** `PAPER_MAY_21/`, `Paper/`, `current_paper_may_21/`, `documents/`, `output/`,
-  `anova_syco_analysis.py`, `ex.csv` — gitignored stale working copies. Overleaf is the canonical paper.
+  `anova_syco_analysis.py`, `ex.csv` — stale working copies, gitignored and untracked (keep them out of
+  the index: `PAPER_MAY_21/` carries the author block). Overleaf is the canonical paper.
 - **Process layer:** `.claude/agents/*.md` and `.claude/skills/verdict-integrity/` are shared and
   hash-pinned in `skills-lock.json`; `.claude/settings.local.json` stays local.
 - **Anonymization:** no personal names, emails, or institution names in any tracked file outside
