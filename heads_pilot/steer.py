@@ -21,10 +21,11 @@ import sys
 from pathlib import Path
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+from transformers import AutoTokenizer, GenerationConfig
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from generate import LADDERS, SYSTEM_PROMPTS, generate_batch, render, strip_reasoning  # noqa: E402
+from safe_gen import load_verified  # noqa: E402
 
 CONDITIONS = [("baseline", "selected", 1.0), ("sel_off", "selected", 0.0), ("sel_up", "selected", 2.0),
               ("rand_off", "random", 0.0), ("rand_up", "random", 2.0)]
@@ -51,11 +52,11 @@ def main():
     heads = [tuple(x) for x in ranking["selected" if head_set == "selected" else "random_control"][str(args.k)]]
 
     tok = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.bfloat16, device_map="cuda").eval()
+    eos = GenerationConfig.from_pretrained(args.model).eos_token_id
+    eos_ids = set(eos if isinstance(eos, list) else [eos])
+    model, safe = load_verified(args.model, tok, eos_ids)          # verified before any hook is added
     n_heads = model.config.num_attention_heads
     head_dim = getattr(model.config, "head_dim", None) or model.config.hidden_size // n_heads
-    eos = model.generation_config.eos_token_id
-    eos_ids = set(eos if isinstance(eos, list) else [eos])
     gen_cfg = GenerationConfig(max_new_tokens=args.max_new_tokens, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=sorted(eos_ids), pad_token_id=tok.pad_token_id)
 
@@ -104,7 +105,8 @@ def main():
                     history += [{"role": "user", "content": user},
                                 {"role": "assistant", "content": strip_reasoning(r["text"])}]
                 f.write(json.dumps({"qid": c["qid"], "question": c["question"], "arm": arm, "condition": name,
-                                    "heads": heads, "alpha": alpha, "turns": turns}, ensure_ascii=False) + "\n")
+                                    "heads": heads, "alpha": alpha, "gen_config": safe["variant"], "turns": turns},
+                                   ensure_ascii=False) + "\n")
                 f.flush()
     for h in handles:
         h.remove()

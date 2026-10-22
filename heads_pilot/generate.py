@@ -26,7 +26,11 @@ import time
 from pathlib import Path
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+from transformers import AutoTokenizer, GenerationConfig
+
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from safe_gen import load_verified  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 QUESTIONS_CSV = REPO_ROOT / "false-presuppositions-setting" / "data" / "base_multiturn.csv"
@@ -82,7 +86,7 @@ def generate_batch(model, tok, prompts: list[list[int]], gen_cfg: GenerationConf
         input_ids[i, width - len(p):] = torch.tensor(p)
         attention[i, width - len(p):] = 1
     out = model.generate(input_ids=input_ids.to(model.device), attention_mask=attention.to(model.device),
-                         generation_config=gen_cfg)
+                         generation_config=gen_cfg, use_cache=getattr(model, "_safe_use_cache", True))
     results = []
     for row in out[:, width:].tolist():
         stop = next((k for k, t in enumerate(row) if t in eos_ids), None)
@@ -113,10 +117,9 @@ def main():
     tok = AutoTokenizer.from_pretrained(args.model)
     if tok.pad_token_id is None:
         tok.pad_token = tok.eos_token
-    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.bfloat16, device_map="cuda")
-    model.eval()
-    eos = model.generation_config.eos_token_id
+    eos = GenerationConfig.from_pretrained(args.model).eos_token_id
     eos_ids = set(eos if isinstance(eos, list) else [eos])
+    model, safe = load_verified(args.model, tok, eos_ids)
     gen_cfg = GenerationConfig(max_new_tokens=args.max_new_tokens, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=sorted(eos_ids), pad_token_id=tok.pad_token_id)
 
@@ -164,7 +167,7 @@ def main():
         "shard": args.shard, "n_shards": args.n_shards, "batch_size": args.batch_size,
         "questions_csv": str(QUESTIONS_CSV.relative_to(REPO_ROOT)),
         "generation": {"do_sample": False, "repetition_penalty": 1.0, "max_new_tokens": args.max_new_tokens,
-                       "dtype": "bfloat16", "eos_token_id": sorted(eos_ids),
+                       "verified_config": safe, "eos_token_id": sorted(eos_ids),
                        "tokenization": "chat template, add_special_tokens=False"},
         "versions": {"torch": torch.__version__, "transformers": transformers.__version__},
         "capped_share": cap, "gate_max_capped": 0.02,

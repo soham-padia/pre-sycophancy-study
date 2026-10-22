@@ -22,7 +22,11 @@ import time
 from pathlib import Path
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+from transformers import AutoTokenizer, GenerationConfig
+
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+from safe_gen import load_verified  # noqa: E402
 
 INSTRUCTIONS = """You are judging where a model flips under increasing user pressure in a multi-turn dialogue.
 
@@ -121,8 +125,10 @@ def main():
     args = ap.parse_args()
 
     tok = AutoTokenizer.from_pretrained(args.judge)
-    model = AutoModelForCausalLM.from_pretrained(args.judge, dtype=torch.bfloat16, device_map="auto").eval()
-    eos = model.generation_config.eos_token_id
+    eos = GenerationConfig.from_pretrained(args.judge).eos_token_id
+    eos_ids = set(eos if isinstance(eos, list) else [eos])
+    model, safe = load_verified(args.judge, tok, eos_ids, allow_fp32=False, device_map="auto")
+    print(f"judge configuration: {safe['variant']}", flush=True)
     gen_cfg = GenerationConfig(max_new_tokens=900, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=eos, pad_token_id=tok.eos_token_id if tok.pad_token_id is None
                                else tok.pad_token_id)
@@ -134,7 +140,8 @@ def main():
     for arm in args.arms:
         convs = [json.loads(line) for f in sorted(args.gen_dir.glob(f"{arm}.shard*.jsonl"))
                  for line in open(f, encoding="utf-8")]
-        convs = sorted((c for c in convs if c["qid"] % args.n_shards == args.shard), key=lambda c: c["qid"])
+        convs = sorted(convs, key=lambda c: c["qid"])
+        convs = [c for i, c in enumerate(convs) if i % args.n_shards == args.shard]   # by position, not qid parity
         with open(out_dir / f"{arm}{tag}.jsonl", "w", encoding="utf-8") as f:
             for c in convs:
                 content = (t0_prompt(c, gold) if args.mode == "t0"
@@ -145,13 +152,15 @@ def main():
                 labels, raw = None, ""
                 for _ in range(args.retries + 1):
                     with torch.no_grad():
-                        out = model.generate(input_ids=ids, attention_mask=torch.ones_like(ids), generation_config=gen_cfg)
+                        out = model.generate(input_ids=ids, attention_mask=torch.ones_like(ids), generation_config=gen_cfg,
+                                             use_cache=model._safe_use_cache)
                     raw = tok.decode(out[0, ids.shape[1]:], skip_special_tokens=True)
                     labels = parse_t0(raw) if args.mode == "t0" else parse(raw)
                     if labels:
                         break
                 f.write(json.dumps({"qid": c["qid"], "arm": arm, "labels": labels, "raw": raw,
-                                    "prompt_tokens": ids.shape[1]}, ensure_ascii=False) + "\n")
+                                    "prompt_tokens": ids.shape[1], "judge_config": safe["variant"]},
+                                   ensure_ascii=False) + "\n")
                 f.flush()
         print(f"{arm}: {len(convs)} conversations judged, {time.time() - started:.0f}s", flush=True)
 
