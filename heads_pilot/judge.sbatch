@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH -A p2026_0037_neu
-#SBATCH -p b200-batch
+#SBATCH -p preemptable
+#SBATCH --requeue
 #SBATCH --gres=gpu:b200:1
 #SBATCH -c 16
 #SBATCH --mem=200G
