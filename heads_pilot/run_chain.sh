@@ -20,7 +20,7 @@ STEER=$(sub --dependency=afterok:$RANK -t 04:00:00 --array=0-39 --export=ALL,N_S
 ST0=$(sub --dependency=afterok:$RANK -t 02:00:00 --array=0-9 --export=ALL,N_SHARDS=2 heads_pilot/steer.sbatch --k $K --from-turn 0 --turns 1 --arms disagree)
 FINAL=""
 for c in $CONDS; do
-  j=$(sub --dependency=afterok:$STEER -t 04:00:00 --array=0-3 --export=ALL,N_SHARDS=4 heads_pilot/judge.sbatch --gen-dir $G/steer/k$K/$c)
+  j=$(sub --dependency=afterok:$STEER -t 08:00:00 --array=0-3 --export=ALL,N_SHARDS=4 heads_pilot/judge.sbatch --gen-dir $G/steer/k$K/$c)
   t=$(sub --dependency=afterok:$ST0 -t 02:00:00 --export=ALL,N_SHARDS=1 heads_pilot/judge.sbatch --mode t0 --arms disagree --gen-dir $G/steer/k${K}_t0/$c)
   FINAL="$FINAL:$j:$t"
 done
