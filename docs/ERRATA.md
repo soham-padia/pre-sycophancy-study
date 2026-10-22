@@ -241,3 +241,45 @@ and missed Qwen3.5's anti-predictive layers); evidence `_falsifier/drift_auc_att
 four best-condition cells; needs the tensors) and the Overleaf Appendix E wording. **Root cause:** a
 structural claim read off a pooled scatter with no statistic. **Standing rule:** FAILURE_TAXONOMY
 2026-10-21 row 2.
+
+## E12 (2026-10-21) — Generation stopped most reasoning-model responses before an answer, and the labels track it
+**Recorded:** nothing in the record or the submission mentions the generation budget. Every stored
+response is treated as an answer, and every Haiku `True` as a position change. (The May 120-case
+arbitration file noted that Qwen3.5 responses "are formatted as thinking traces… Most are truncated
+before the final answer"; it never entered the record.) **True:** `models.py` generated greedily with
+`max_new_tokens=512` and `repetition_penalty=1.2`. Measured with each model's own tokenizer on snapshot
+955b6da (a response is *capped* at ≥ 505 tokens; it has *no final answer* if it has no `</think>` or
+fewer than 10 tokens after the last one):
+- DeepSeek-R1-Distill-Qwen-7B: capped 92–94% per condition; **no final answer in 51.6%** of responses
+  (base 53.1%, critical 52.2%, presupposition 49.4%), including 42–53% of T0s.
+- Qwen3.5-9B: capped 94–95%; **no final answer in 60.7%** (63.8 / 64.6 / 53.7%), including 87.5–100% of
+  T0s — T0 correctness is undefined for about 96% of its questions.
+- Qwen2.5-7B: capped in 68.2% of responses, rising from 4% at T0 to 97% at T5 (cut mid-answer).
+- Llama-3.1-8B 3.0%; Gemma-2-9B 0.2%.
+Truncated traces were fed back verbatim as the previous assistant turn (by T5 a prompt carries on
+average 2.3 for DeepSeek, 3.1 for Qwen3.5), while finished turns had their reasoning stripped by the
+chat template. The judge saw the raw first ~700 characters of a no-answer turn. On Qwen3.5 turns 1–4
+Haiku marks 9.9% of no-answer turns `True` against 55.5% of answered ones, and the gap holds within each
+turn (T2 1.6 vs 35.7%, T3 14.0 vs 64.5%, T4 35.3 vs 74.6%): for Qwen3.5 the label largely records whether
+the model finished thinking within 512 tokens. 46.9% of DeepSeek first flips land on no-answer turns.
+**Consequence:** every DeepSeek and Qwen3.5 behavioural number and every hidden-state result for those
+two models measures this mixture, not position change; Qwen2.5's later turns are cut mid-answer.
+**Discovered:** coordinator (phrasing heuristic), results-auditor (tokenizer measurement), falsifier
+(independent reproduction), 2026-10-21; evidence `/work/neu/p2026_0037_neu/audits/think_trunc_20261021/`
+and `_falsifier/t5trunc_20261021/`. **Root cause:** a generation budget sized for short answers, never
+checked against output completeness. **Standing rule:** FAILURE_TAXONOMY 2026-10-21 (truncation row).
+
+## E13 (2026-10-21) — The judge never saw any model's T5 response
+**Recorded:** the label CSVs carry Haiku judgements for turns 1–5, used throughout (ever-flip = any
+`True` in 1–5; pre-flip pairs at both horizons). **True:** the committed labels come from trajectory
+mode (rationales say the response is missing in 25–41% of T5 rows and 0–0.6% of T1–T4 rows; the failure
+logs show `trajectory-batch size=8`; no run command was recorded, so this is an inference).
+`iter_trajectory_bundles` builds each transcript from Turn_5's `input_messages`, which end at the T5
+user prompt, so no judge prompt contained a T5 response (0 of 336–528 bundles per model), while the
+schema still asked for `turn_5`. T5 `True` rates are 0.17–0.41. **Damage, across the four probed
+models:** 25 of 1,245 ever-flips rest only on T5 (per cell 0–6); all 517 questions labelled "never
+flipped" rest on a T5 `False` the judge never saw; 542 of 5,989 pre-flip pairs per horizon carry a blind
+T5 label (25 positive). 329 of 354 T5 `True` labels follow an earlier flip and are censored away.
+**Discovered:** results-auditor; reproduced by the falsifier with the committed judge code, 2026-10-21.
+**Root cause:** the judge's input was never rendered and inspected for the last turn it labels.
+**Standing rule:** FAILURE_TAXONOMY 2026-10-21 (judge-input row).

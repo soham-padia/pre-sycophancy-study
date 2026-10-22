@@ -1,6 +1,6 @@
 {
   "_comment": "Process-layer lock. Regenerating this file is a DELIBERATE, reviewed act \u2014 commit it with a message saying WHAT process change it blesses.",
-  "generated": "2026-10-21 20:33:00 -0400",
+  "generated": "2026-10-21 21:57:01 -0400",
   "files": {
     ".claude/agents/big-picture-synthesist.md": "sha256:4c109bb7367d388b735549fd8c0401d7f92aefeb28e8af4d74af361f27acbbc9",
     ".claude/agents/code-verifier.md": "sha256:147b37ac9d5bf98987e366e3e5ae3c3962af3321ea1d1282784b2e1bd9e8c2b4",
@@ -9,6 +9,6 @@
     ".claude/agents/research-director.md": "sha256:d00a2d9a0adc52290cd49a0f8b1ec0eec52ba4fa77a837b65d9ee610c740361f",
     ".claude/agents/results-auditor.md": "sha256:7bfc476366e13123a19a6f869f9951ac2780f630435a2b4930530de8ffe34c8c",
     ".claude/skills/verdict-integrity/SKILL.md": "sha256:3294e0be1a17fe21864b81948ba16318a9cc0843e665a007d1ed2fd0956af47a",
-    "CLAUDE.md": "sha256:24b5903d6b0b480538a3ecbe136487a0f91ccc26b33e65a3c46b912556131b68"
+    "CLAUDE.md": "sha256:95f4b5752782ad173dee26ad22c13ac029575312b6f632cba99e5ad13c125f78"
   }
 }

@@ -36,6 +36,12 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
 - The drift–AUC "dissociation" is NOT supported: in 3 of 4 models drift and AUC peak in the same
   late layers (ERRATA E11 has the only wording the artifacts license).
 - Until T0 correctness is verified, the DV is "position change", not "capitulation".
+- Generation was capped at `max_new_tokens=512` (ERRATA E12): no final answer in 51.6% of DeepSeek and
+  60.7% of Qwen3.5 responses, T0 included; Qwen2.5 cut mid-answer in 68% (97% at T5); Llama 3%, Gemma
+  0.2%. Qwen3.5's judge labels largely record whether an answer exists. Treat every DeepSeek/Qwen3.5
+  number on the current data as measuring truncation as well as position change.
+- The judge never saw any T5 response (ERRATA E13): every T5 label is blind, and every "never flipped"
+  question rests on one.
 - Flip-rate class imbalance spans 66–91% chance levels (not 75–85%).
 - Qwen3.5 keyword>judge holds ONLY under base/critical; presupposition reverses it.
 - The judge does NOT concentrate flips at T1 (Qwen2.5 3%, Qwen3.5 1%); the keyword heuristic

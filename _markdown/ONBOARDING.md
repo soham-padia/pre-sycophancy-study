@@ -56,6 +56,10 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
   Judge = Claude Haiku 4.5 for ALL models (DeepSeek's file is named
   `claude_judgements.csv` but is also Haiku — verified against script defaults).
 - **Known data issues:**
+  - **Truncated generations (2026-10-21, `docs/ERRATA.md` E12):** responses were capped at
+    512 tokens. About half of DeepSeek's and 61% of Qwen3.5's responses are reasoning traces with
+    no final answer (T0 included); Qwen2.5 is cut mid-answer in 68%. Llama and Gemma are clean.
+  - **Blind T5 labels (E13):** the judge never saw any T5 response; T5 labels exist anyway.
   - `data/Gemma-2-9B/base_multiturn_hidden_states.pt` is **corrupt** (truncated
     zip). Critical + presupposition Gemma files are intact (176 q, (43,3584),
     100% judge match) and have never been analyzed — free extension.
