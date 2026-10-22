@@ -127,7 +127,7 @@ def main():
     tok = AutoTokenizer.from_pretrained(args.judge)
     eos = GenerationConfig.from_pretrained(args.judge).eos_token_id
     eos_ids = set(eos if isinstance(eos, list) else [eos])
-    model, safe = load_verified(args.judge, tok, eos_ids, allow_fp32=False, device_map="auto")
+    model, safe = load_verified(args.judge, tok, eos_ids, allow_fp32=True, device_map="auto")   # fp32 70B: 2 GPUs
     print(f"judge configuration: {safe['variant']}", flush=True)
     gen_cfg = GenerationConfig(max_new_tokens=900, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=eos, pad_token_id=tok.eos_token_id if tok.pad_token_id is None

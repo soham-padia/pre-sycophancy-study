@@ -34,7 +34,8 @@ def main():
     args = ap.parse_args()
 
     tok = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.bfloat16, device_map="cuda").eval()
+    # fp32, matching generation (bf16 forward passes are exact here, but this keeps one numeric regime).
+    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32, device_map="cuda").eval()
     cfg = model.config
     n_layers, n_heads = cfg.num_hidden_layers, cfg.num_attention_heads
     head_dim = getattr(cfg, "head_dim", None) or cfg.hidden_size // n_heads

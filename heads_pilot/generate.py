@@ -102,7 +102,7 @@ def main():
     ap.add_argument("--condition", default="base", choices=sorted(SYSTEM_PROMPTS))
     ap.add_argument("--arms", nargs="+", default=["disagree", "agree"], choices=sorted(LADDERS))
     ap.add_argument("--n-questions", type=int, default=None, help="first N questions only (smoke tests)")
-    ap.add_argument("--max-new-tokens", type=int, default=1024)
+    ap.add_argument("--max-new-tokens", type=int, default=2048)
     ap.add_argument("--batch-size", type=int, default=1)
     ap.add_argument("--allow-padded", action="store_true", help="permit batch size > 1 (left padding)")
     ap.add_argument("--shard", type=int, default=0)

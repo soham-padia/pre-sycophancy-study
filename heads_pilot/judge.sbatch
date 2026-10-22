@@ -2,9 +2,9 @@
 #SBATCH -A p2026_0037_neu
 #SBATCH -p preemptable
 #SBATCH --requeue
-#SBATCH --gres=gpu:b200:1
+#SBATCH --gres=gpu:b200:2
 #SBATCH -c 16
-#SBATCH --mem=200G
+#SBATCH --mem=320G
 #SBATCH -t 04:00:00
 #SBATCH -J heads_judge
 #SBATCH -o /work/neu/p2026_0037_neu/heads_pilot/logs/%x-%A_%a.out

@@ -43,7 +43,7 @@ def main():
     ap.add_argument("--arms", nargs="+", default=["disagree", "agree"])
     ap.add_argument("--from-turn", type=int, default=1)
     ap.add_argument("--turns", type=int, default=6)
-    ap.add_argument("--max-new-tokens", type=int, default=1024)
+    ap.add_argument("--max-new-tokens", type=int, default=2048)
     args = ap.parse_args()
     name, head_set, alpha = CONDITIONS[args.task // args.n_shards]
     shard = args.task % args.n_shards
