@@ -19,9 +19,10 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
 ## Key facts to not re-break
 - base/critical/presupposition are SYSTEM-PROMPT CONDITIONS over the SAME ~177 questions —
   never "question types" (that misdescription shipped once).
-- Per the extraction code, hidden states are PRE-RESPONSE: `hs[q][t]` is every layer at the last
-  token of the templated prompt through the turn-t user message, before response t is generated (`models.py`; ERRATA E10 —
-  verified by recomputation on the committed pilot; paper-model tensors decided by E10's layer-0 gate).
+- Hidden states are PRE-RESPONSE: `hs[q][t]` is every layer at the last input token of the templated
+  prompt through the turn-t user message, before response t is generated (`models.py`; ERRATA E10 —
+  confirmed by recomputing paper-tensor states for all five models). For Llama that token is the
+  `<|eot_id|>` its tokenizer appends (`add_eos_token=True`), not the generation-prompt token.
   So there are two pre-behavioural pre-flip pairings, and every claim must name its horizon:
   **next-response** (`hs[q][t]` → label of response t; `probe_judge_comparison.py::build_preflip_features`,
   every §6.3 number) and **one-turn-ahead** (`hs[q][t]` → label of response t+1;

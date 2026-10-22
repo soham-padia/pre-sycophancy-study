@@ -62,8 +62,7 @@ ERRATA E1-E9. The EACL commitment decision is now a live call, not a formality.
   everything below it.
 - ~~**Fix `probe_judge_comparison.py:122-135`** to the reference pairing, regenerate
   `probe_judge_sweep.csv`, and route the new numbers through results-auditor before any use.~~
-  **Corrected 2026-10-21 (ERRATA E10): under the extraction code there is nothing to fix** (paper
-  tensors pending E10's gate) — both pairings are pre-behavioural
+  **Corrected 2026-10-21 (ERRATA E10, gate passed on the paper tensors): there is nothing to fix** — both pairings are pre-behavioural
   and differ in horizon. Choose and name the §6.3 horizon (next-response as published, or
   one-turn-ahead), regenerate only if it changes, and route new numbers through results-auditor before
   any use. The one-turn-ahead 7.24 pp is a single-seed point estimate; quote a seed range (0/1/42),

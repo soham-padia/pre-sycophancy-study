@@ -46,11 +46,10 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
   — columns `Question`, `Response_Turn_0` … `Response_Turn_5`.
 - **Hidden states:** `data/<Model>/<cond>_multiturn_hidden_states.pt` — a dict
   `{question_string: [T0…T5 tensors]}`, each tensor `(n_layers+1, hidden_dim)`
-  (embedding layer = index 0). Every layer at ONE token per turn. Per the
-  extraction code (`models.py`) that token is the last token of the templated
-  input prompt, i.e. the state BEFORE that turn's response is generated —
-  verified on the committed pilot, not yet on these files (`docs/ERRATA.md` E10
-  gate). (Correction 2026-10-21: this line used to say "final generated token";
+  (embedding layer = index 0). Every layer at ONE token per turn: the last input
+  token of the templated prompt, i.e. the state BEFORE that turn's response is
+  generated — confirmed on these files by recomputation (`docs/ERRATA.md` E10;
+  for Llama the token is the `<|eot_id|>` its tokenizer appends). (Correction 2026-10-21: this line used to say "final generated token";
   the code never did that.)
 - **Judge labels:** `analysis_claude/*_judgements*.csv` — columns
   `model, question_type, question, turn, judgement, confidence, rationale`.
@@ -70,8 +69,8 @@ condition. The paper (post-revision) says "prompt condition" everywhere.
   position at that turn. **First-flip methodology**: everything after the first
   flip is censored.
 - **Pre-flip task pairing — two horizons, both pre-behavioural** (correction
-  2026-10-21, `docs/ERRATA.md` E10). Because the extraction code takes the state
-  at turn t before response t (paper tensors pending E10's gate):
+  2026-10-21, `docs/ERRATA.md` E10). Because the state at turn t is taken before
+  response t (confirmed, ERRATA E10):
   - *one-turn-ahead*: state at t labeled by whether response **t+1** flips —
     `train_probes_v2.py::build_preflip_dataset`, and the three scripts commit
     `b40e3ff` moved to it (`multiturn_auc_robustness.py`, `plot_layer_sweep.py`,

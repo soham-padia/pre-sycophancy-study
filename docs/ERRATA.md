@@ -7,8 +7,8 @@ checklist / agent mandate).
 
 ## E1 (2026-09-16) — The `+6.6 pp` nonlinear-over-linear gap was computed on at-flip states
 > **Superseded in part by E10 (2026-10-21):** the extraction code takes each per-turn state before the
-> response (verified on the committed pilot; paper tensors pending E10's gate), so the
-> "at-flip (post-behavioural)" reading below does not stand under it. The reproduction, and the point that
+> response (confirmed on the paper tensors by E10's gate), so the "at-flip (post-behavioural)"
+> reading below does not stand. The reproduction, and the point that
 > §6.3 uses a different horizon from the other pre-flip analyses, do.
 
 **Recorded:** README:15 and the ARR-August submission report that nonlinear classifiers outperform
@@ -26,8 +26,7 @@ the artifact's own producer; both pairings yield identical n, so the n-equality 
 it. **Standing rule:** FAILURE_TAXONOMY 2026-09-16 row 1.
 
 ## E2 (2026-09-16) — "No classifier exceeds the majority baseline by more than 2.5 pp in any combination" is false
-> **Superseded in part by E10 (2026-10-21):** under the extraction code the bound is horizon-specific,
-> not false. It holds at
+> **Superseded in part by E10 (2026-10-21):** the bound is horizon-specific, not false. It holds at
 > the published next-response horizon (max 2.43 pp) and fails at the one-turn-ahead horizon (+2.95 pp).
 
 **Recorded:** §6.3 of the submission, as a universal bound (max observed 2.43 pp). **True:** the bound
@@ -114,8 +113,8 @@ analysis. They are an artifact of this one appendix loader; the cosine arm's hol
 Correct the attribution in the response rather than conceding the design.
 
 ## E8 (2026-09-16) — The 2026-08-02 pairing audit's all-clear, and "fixed in commit b40e3ff"
-> **Superseded in part by E10 (2026-10-21):** under the extraction code there was no post-behavioural
-> leak for `b40e3ff` to fix — it changed three scripts' horizon (paper tensors pending E10's gate). The lesson (audit an artifact's
+> **Superseded in part by E10 (2026-10-21):** there was no post-behavioural leak for `b40e3ff` to
+> fix — it changed three scripts' horizon (confirmed on the paper tensors by E10's gate). The lesson (audit an artifact's
 > producer, never only its siblings) stands.
 
 **Recorded:** `_falsifier/2026-08-02_hiddenstate_audit.md` states "probe/geometry/layer-sweep
@@ -167,7 +166,8 @@ scripts `b40e3ff` moved to it). `b40e3ff` changed a horizon; it did not remove a
 the template's final token exactly. Prompt-plus-response hypotheses fail (median cosine 0.62; 0.32 with
 the end-of-turn token), and stored[t] matches recompute[t] and no other turn in 12/12 matrices. CPU
 job 1449390; scripts in `/work/neu/p2026_0037_neu/hs_extraction_verify_20261021/`.
-**Not yet verified:** the paper-model tensors in `data/` (not on the verifying machine). Generation
+**Paper tensors (gate defined before looking; result at the end of this entry):** the paper-model
+tensors in `data/` were not on the verifying machine at first. Generation
 also ran from working copies no branch here captures (e.g. the Discovery checkout named in
 `sbatch/run_false_presuppositions_full.sbatch`), so the code path alone does not settle them. Gate,
 fixed before looking: row 0 of every state equals the model's own layer-0 output for that model's
@@ -198,6 +198,22 @@ state reflects the form of the judged response does not apply to response t; ear
 the context, so it still applies to response 0 inside the T1 state.
 **Root cause:** the instrument was described from prose, never from its extraction code, and a timing
 verdict was built on the description. **Standing rule:** FAILURE_TAXONOMY 2026-10-21 row 1.
+**Gate result (2026-10-21) — pre-response CONFIRMED for all five models.** code-verifier, CPU fp32,
+transformers 5.12.1 / tokenizers 0.22.2, model revisions pinned and predating the tensors; data snapshot
+955b6da. Fixed sample: the first 3 metadata questions × turns {0,1,2} × all conditions (27 states per
+model; Gemma critical + presupposition only, 18 — its base `.pt` is unreadable). Recomputing the
+pre-response state through `models.py`'s own template and tokenizer settings matches every layer of
+every sampled state (minimum cosine 0.99998, max relative L2 0.007); the response-appended hypotheses
+reach median cosine only 0.21–0.60. Each stored turn t matches recompute t and no other turn. Row 0 is
+constant within every file and equals the model's own layer-0 output at the final input token: `'\n'`
+for DeepSeek, Qwen2.5, Qwen3.5 and Gemma; for Llama the `<|eot_id|>` its tokenizer appends
+(`add_eos_token=True`), where the prompt-plus-end-token hypothesis also matches row 0 but fails 32 of 33
+deeper rows — so the second amendment was needed. Matching tokenization: single BOS (DeepSeek, Llama),
+none (Qwen2.5, Qwen3.5), double BOS (Gemma). Tensor rows = depth + 1 for all five (E6). Jobs
+1450838–1450842, 1451015; evidence in `/work/neu/p2026_0037_neu/hs_extraction_verify_20261021/paper/`.
+**Opened, not decided here:** if the generation pipeline tokenized prompts the same way, Llama's
+responses were generated after an appended `<|eot_id|>`; the recorded responses look normal, and
+generation was greedy, so re-decoding under both prompt variants decides it.
 
 ## E11 (2026-10-21) — "The layers that move the most are not the layers that predict the best" is not supported
 **Recorded:** the submission (a contribution in the introduction; evidence in Appendix E, Fig. 8, from

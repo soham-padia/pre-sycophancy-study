@@ -2,9 +2,8 @@
 """Three robustness checks on the T0→T1 cosine AUC signal.
 
 Check 1 — Exclude T1-first-flip questions:
-    Questions whose first changed response is response 1. Under the extraction
-    code their T1 state is taken before response 1 (ERRATA E10; paper tensors
-    pending its gate), so this asks whether these conversations drive the AUC —
+    Questions whose first changed response is response 1. Their T1 state is
+    taken before response 1 (ERRATA E10), so this asks whether these conversations drive the AUC —
     a robustness check, not removal of post-flip states. We rerun with those
     questions removed and report the difference.
 

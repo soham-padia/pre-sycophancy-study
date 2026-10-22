@@ -116,8 +116,8 @@ raised:
 1. **`probe_judge_comparison.py` never got the `b40e3ff` off-by-one fix.** Every §6.3 number,
    including the 6.6 pp headline, is computed on **at-flip** (post-behavioural) states while the text
    says pre-flip. Confirmed independently by two agents via reproduction. ERRATA E1–E2.
-   **Corrected 2026-10-21 (ERRATA E10):** per the extraction code the states precede the response
-   (pilot-verified; paper tensors pending E10's gate), so §6.3 is a
+   **Corrected 2026-10-21 (ERRATA E10):** the states precede the response (confirmed on the
+   paper tensors, ERRATA E10), so §6.3 is a
    next-response (pre-behavioural) pairing, not at-flip. What stands is that it uses a different
    horizon from the other pre-flip analyses.
 2. **Finding 3 ("pre-flip geometry is nonlinear") is reproduced in full by a turn-index-only
