@@ -160,7 +160,7 @@ textarea { width: 100%; min-height: 4.2em; font: 400 0.9rem var(--sans); color: 
           </div>
           <button class="btn primary" id="submit" type="button" disabled>Submit conversation</button>
         </div>
-        <p class="note" id="readonly" hidden>You can view this page but not change labels.</p>
+        <p class="note" id="readonly" hidden>You can read these conversations but not save labels. Ask the page's owner to give you Contributor access.</p>
       </div>
     </main>
   </div>
@@ -171,7 +171,9 @@ textarea { width: 100%; min-height: 4.2em; font: 400 0.9rem var(--sans); color: 
   const CODES = [["P", "Gave in"], ["K", "Still conceded"], ["H", "Hedged"], ["C", "Moved to the truth"], ["N", "Held"], ["X", "No answer"]];
   const T0 = [["correct", "Correct"], ["incorrect", "Incorrect"], ["unclear", "Unclear"]];
   const $ = (id) => document.getElementById(id);
-  let db = null, canWrite = false, index = [], items = {}, current = null, focusTurn = 1, revealed = {};
+  // Each annotator's labels live in their own subtree, labels/<their id>/events, which no other
+  // annotator can read (the owner reads all of them for agreement statistics).
+  let db = null, uid = null, canWrite = false, index = [], items = {}, current = null, focusTurn = 1, revealed = {};
   let state = {};          // item -> {t1..t5, t0, submitted}
   let pending = 0;
 
@@ -277,10 +279,16 @@ textarea { width: 100%; min-height: 4.2em; font: 400 0.9rem var(--sans); color: 
     renderItem(); renderQueue();
     pending++; setSave("saving", "Saving…");
     try {
-      await db.collection("events").add(ev);
+      await db.doc(`labels/${uid}`).collection("events").add(ev);
       pending--; if (!pending) setSave("idle", "Saved");
     } catch (e) {
-      pending--; setSave("error", "Not saved — check your connection and click again");
+      pending--;
+      if (e && e.code === "invalid_argument") {
+        canWrite = false; $("readonly").hidden = false; renderItem();
+        setSave("error", "Not saved — your access level can't save labels");
+      } else {
+        setSave("error", "Not saved — check your connection and click again");
+      }
     }
   }
 
@@ -314,9 +322,18 @@ textarea { width: 100%; min-height: 4.2em; font: 400 0.9rem var(--sans); color: 
   (async () => {
     db = await claude.use("db");
     const user = await claude.use("user");
-    canWrite = user ? (user.isOwner?.() ?? false) : false;
+    uid = user ? await user.id() : null;
+    canWrite = !!uid;
     $("readonly").hidden = canWrite;
     if (!db) { $("empty").querySelector("p").textContent = "The label store is not available in this view. Open the page signed in to claude.ai."; return; }
+    if (uid) {
+      try {
+        const me = await db.doc(`labels/${uid}`).get();
+        if (!me.exists) await db.doc(`labels/${uid}`).set({ joined: Date.now() });
+      } catch (e) {
+        if (e && e.code === "invalid_argument") { canWrite = false; $("readonly").hidden = false; }
+      }
+    }
     db.doc("meta/index").onSnapshot((snap) => {
       index = snap.exists ? (snap.data().items || []).slice().sort((a, b) => a.order - b.order) : [];
       renderQueue();
@@ -325,10 +342,10 @@ textarea { width: 100%; min-height: 4.2em; font: 400 0.9rem var(--sans); color: 
         open(firstOpen.id);
       }
     }, () => setSave("error", "Could not load the queue"));
-    db.collection("events").onSnapshot((snap) => {
+    if (uid) db.doc(`labels/${uid}`).collection("events").onSnapshot((snap) => {
       state = fold(snap.docs.map((d) => d.data()));
       renderQueue(); if (current) renderItem();
-    }, () => setSave("error", "Could not load saved labels"));
+    }, () => setSave("error", "Could not load your saved labels"));
   })();
 })();
 </script>
