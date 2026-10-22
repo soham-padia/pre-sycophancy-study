@@ -42,6 +42,11 @@ repo (Overleaf is canonical). Team/process notes live in `_markdown/`.
   number on the current data as measuring truncation as well as position change.
 - The judge never saw any T5 response (ERRATA E13): every T5 label is blind, and every "never flipped"
   question rests on one.
+- On this cluster (transformers 5.12.1, torch 2.12.1+cu130, B200) bf16 `generate()` with a KV cache is
+  NOT exact: sdpa degenerates ("the the") within tens of tokens, eager drifts later and leaks
+  turn-start tokens mid-sentence. fp32 with a cache is exact; plain forward passes are exact. Generate
+  only through `heads_pilot/safe_gen.py::load_verified`, which proves ~400 tokens against teacher-forced
+  recomputation first — a 48-token check missed the eager drift.
 - Flip-rate class imbalance spans 66–91% chance levels (not 75–85%).
 - Qwen3.5 keyword>judge holds ONLY under base/critical; presupposition reverses it.
 - The judge does NOT concentrate flips at T1 (Qwen2.5 3%, Qwen3.5 1%); the keyword heuristic
