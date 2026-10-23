@@ -43,7 +43,6 @@ def main():
     ap.add_argument("--arms", nargs="+", default=["disagree", "agree"])
     ap.add_argument("--from-turn", type=int, default=1)
     ap.add_argument("--turns", type=int, default=6)
-    ap.add_argument("--max-new-tokens", type=int, default=2048)
     args = ap.parse_args()
     name, head_set, alpha = CONDITIONS[args.task // args.n_shards]
     shard = args.task % args.n_shards
@@ -57,8 +56,14 @@ def main():
     model, safe = load_verified(args.model, tok, eos_ids)          # verified before any hook is added
     n_heads = model.config.num_attention_heads
     head_dim = getattr(model.config, "head_dim", None) or model.config.hidden_size // n_heads
-    gen_cfg = GenerationConfig(max_new_tokens=args.max_new_tokens, do_sample=False, repetition_penalty=1.0,
+    # Decode exactly as stage 1 did (read from its run_meta files), or baseline cannot reproduce it.
+    decoding = {(m["generation"]["repetition_penalty"], m["generation"]["max_new_tokens"])
+                for m in (json.loads(p.read_text()) for p in sorted(args.gen_dir.glob("run_meta*.json")))}
+    assert len(decoding) == 1, f"stage-1 run_meta files missing or disagreeing on decoding: {decoding}"
+    rep_penalty, max_new_tokens = decoding.pop()
+    gen_cfg = GenerationConfig(max_new_tokens=max_new_tokens, do_sample=False, repetition_penalty=rep_penalty,
                                eos_token_id=sorted(eos_ids), pad_token_id=tok.pad_token_id)
+    print(f"stage-1 decoding: repetition_penalty={rep_penalty}, max_new_tokens={max_new_tokens}", flush=True)
 
     state = {"on": False}
     by_layer: dict[int, list[int]] = {}
