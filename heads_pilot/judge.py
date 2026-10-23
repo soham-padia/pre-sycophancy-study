@@ -122,6 +122,10 @@ def main():
     ap.add_argument("--n-shards", type=int, default=1)
     ap.add_argument("--retries", type=int, default=2)
     ap.add_argument("--mode", choices=["flip", "t0"], default="flip")
+    ap.add_argument("--gen-shard-ids", type=int, nargs="*", default=None,
+                    help="only conversations from these generation shards (qid %% --gen-n-shards)")
+    ap.add_argument("--gen-n-shards", type=int, default=16)
+    ap.add_argument("--tag", default="", help="extra label in the output file name (e.g. 'early')")
     args = ap.parse_args()
 
     tok = AutoTokenizer.from_pretrained(args.judge)
@@ -134,13 +138,26 @@ def main():
                                else tok.pad_token_id)
     out_dir = args.gen_dir / "judge"
     out_dir.mkdir(exist_ok=True)
-    tag = ("" if args.mode == "flip" else ".t0") + ("" if args.n_shards == 1 else f".shard{args.shard}of{args.n_shards}")
+    tag = (("" if args.mode == "flip" else ".t0") + (f".{args.tag}" if args.tag else "")
+           + ("" if args.n_shards == 1 else f".shard{args.shard}of{args.n_shards}"))
     gold = load_gold() if args.mode == "t0" else None
     started = time.time()
     for arm in args.arms:
         convs = [json.loads(line) for f in sorted(args.gen_dir.glob(f"{arm}.shard*.jsonl"))
                  for line in open(f, encoding="utf-8")]
-        convs = sorted(convs, key=lambda c: c["qid"])
+        if args.gen_shard_ids is not None:
+            keep = set(args.gen_shard_ids)
+            convs = [c for c in convs if c["qid"] % args.gen_n_shards in keep]
+        # Skip conversations this mode has already labelled (an earlier partial run).
+        done = set()
+        for f in out_dir.glob(f"{arm}*.jsonl"):
+            if (".t0." in f.name) != (args.mode == "t0"):
+                continue
+            for line in open(f, encoding="utf-8"):
+                r = json.loads(line)
+                if r.get("labels"):
+                    done.add(r["qid"])
+        convs = sorted((c for c in convs if c["qid"] not in done), key=lambda c: c["qid"])
         convs = [c for i, c in enumerate(convs) if i % args.n_shards == args.shard]   # by position, not qid parity
         with open(out_dir / f"{arm}{tag}.jsonl", "w", encoding="utf-8") as f:
             for c in convs:

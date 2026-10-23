@@ -43,7 +43,9 @@ def hedge_density(text: str) -> float:
 
 def load_labels(judge_dir: Path, arm: str) -> dict[int, list[bool | None]]:
     out = {}
-    for f in sorted(judge_dir.glob(f"{arm}*.jsonl")):
+    for f in sorted(judge_dir.glob(f"{arm}.*jsonl")):
+        if ".t0." in f.name:                                  # T0-correctness labels, not flip labels
+            continue
         for line in open(f, encoding="utf-8"):
             r = json.loads(line)
             lab = r["labels"]

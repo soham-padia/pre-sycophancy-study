@@ -40,7 +40,9 @@ def read_jsonl(folder: Path, pattern: str) -> list[dict]:
 
 def ever_flip(judge_dir: Path, arm: str) -> dict[int, bool]:
     out = {}
-    for r in read_jsonl(judge_dir, f"{arm}.shard*.jsonl") + read_jsonl(judge_dir, f"{arm}.jsonl"):
+    rows = [json.loads(l) for f in sorted(judge_dir.glob(f"{arm}.*jsonl")) if ".t0." not in f.name
+            for l in open(f, encoding="utf-8")]
+    for r in rows:
         if r.get("labels"):
             out[r["qid"]] = any(r["labels"][str(t)]["judgement"] for t in range(1, 6))
     return out
