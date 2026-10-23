@@ -131,7 +131,7 @@ def main():
     tok = AutoTokenizer.from_pretrained(args.judge)
     eos = GenerationConfig.from_pretrained(args.judge).eos_token_id
     eos_ids = set(eos if isinstance(eos, list) else [eos])
-    model, safe = load_verified(args.judge, tok, eos_ids, allow_fp32=True, device_map="auto")   # fp32 70B: 2 GPUs
+    model, safe = load_verified(args.judge, tok, eos_ids, allow_fp32=True, device_map="auto")   # fp32 70B: 4 x RTX PRO 6000 (2 x B200)
     print(f"judge configuration: {safe['variant']}", flush=True)
     gen_cfg = GenerationConfig(max_new_tokens=900, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=eos, pad_token_id=tok.eos_token_id if tok.pad_token_id is None
@@ -148,7 +148,10 @@ def main():
         if args.gen_shard_ids is not None:
             keep = set(args.gen_shard_ids)
             convs = [c for c in convs if c["qid"] % args.gen_n_shards in keep]
-        # Skip conversations this mode has already labelled (an earlier partial run).
+        # Split the full list before skipping anything, so a shard's set never depends on when it starts.
+        convs = sorted(convs, key=lambda c: c["qid"])
+        convs = [c for i, c in enumerate(convs) if i % args.n_shards == args.shard]   # by position, not qid parity
+        # Skip conversations this mode has already labelled (an earlier partial run, or a preempted one).
         done = set()
         for f in out_dir.glob(f"{arm}*.jsonl"):
             if (".t0." in f.name) != (args.mode == "t0"):
@@ -157,9 +160,9 @@ def main():
                 r = json.loads(line)
                 if r.get("labels"):
                     done.add(r["qid"])
-        convs = sorted((c for c in convs if c["qid"] not in done), key=lambda c: c["qid"])
-        convs = [c for i, c in enumerate(convs) if i % args.n_shards == args.shard]   # by position, not qid parity
-        with open(out_dir / f"{arm}{tag}.jsonl", "w", encoding="utf-8") as f:
+        convs = [c for c in convs if c["qid"] not in done]
+        # Append: after a requeue this file holds the labels just skipped above.
+        with open(out_dir / f"{arm}{tag}.jsonl", "a", encoding="utf-8") as f:
             for c in convs:
                 content = (t0_prompt(c, gold) if args.mode == "t0"
                            else INSTRUCTIONS + "\nFull dialogue transcript:\n\n" + transcript(c))
