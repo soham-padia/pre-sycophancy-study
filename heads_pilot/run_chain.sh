@@ -2,6 +2,9 @@
 # Submit the whole heads pilot as one Slurm dependency chain. Every stage starts only if all of its
 # inputs finished successfully (afterok); a failure cancels everything downstream (--kill-on-invalid-dep).
 # Every text-generating stage verifies its own generation first (safe_gen.py) and fails if it cannot.
+# One-GPU stages (generate, capture, steer) are pinned to RTX PRO 6000 in their sbatch headers, so every
+# comparison stays on one GPU type (fp32 output can differ across types). The 70B judge runs on 4 x RTX PRO
+# 6000 (judge.sbatch): its queue is days shorter than 2 x B200, at 4 instead of 6 fairshare units per hour.
 # Usage: bash heads_pilot/run_chain.sh      (prints the job ids; logs in /work/.../heads_pilot/logs)
 
 cd /home/padia_so_neu/pre-sycophancy-study
@@ -11,7 +14,7 @@ CONDS="baseline sel_off sel_up rand_off rand_up"
 DEP="--kill-on-invalid-dep=yes"
 sub() { sbatch --parsable $DEP "$@"; }
 
-GEN=$(sub -p preemptable --requeue -t 04:00:00 --array=0-15 --export=ALL,N_SHARDS=16 heads_pilot/generate.sbatch)
+GEN=$(sub -t 04:00:00 --array=0-15 --export=ALL,N_SHARDS=16 heads_pilot/generate.sbatch)
 CAP=$(sub --dependency=afterok:$GEN -J heads_capture heads_pilot/gpu.sbatch heads_pilot/capture_heads.py)
 JUD=$(sub --dependency=afterok:$GEN -t 06:00:00 --array=0-7 --export=ALL,N_SHARDS=8 heads_pilot/judge.sbatch)
 JT0=$(sub --dependency=afterok:$GEN -t 03:00:00 --array=0-1 --export=ALL,N_SHARDS=2 heads_pilot/judge.sbatch --mode t0 --arms disagree)

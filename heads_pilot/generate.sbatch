@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH -A p2026_0037_neu
-#SBATCH -p b200-batch
-#SBATCH --gres=gpu:b200:1
+#SBATCH -p rtx-batch,rtx-devel,preemptable
+#SBATCH --requeue
+#SBATCH --gres=gpu:rtx_pro_6000:1
 #SBATCH -c 16
 #SBATCH --mem=128G
 #SBATCH -t 03:00:00

@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -A p2026_0037_neu
-#SBATCH -p preemptable
+#SBATCH -p rtx-batch,preemptable
 #SBATCH --requeue
-#SBATCH --gres=gpu:b200:2
-#SBATCH -c 16
+#SBATCH --gres=gpu:rtx_pro_6000:4
+#SBATCH -c 32
 #SBATCH --mem=320G
 #SBATCH -t 04:00:00
 #SBATCH -J heads_judge
