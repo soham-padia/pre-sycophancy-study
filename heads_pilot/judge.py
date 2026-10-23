@@ -10,6 +10,11 @@ arm's rate is the no-pressure control (how often the model changes position when
 annotators' false presuppositions and corrections, joined by question from `test.jsonl`): correct =
 rejects or corrects the false presupposition, incorrect = accepts or builds on it, unclear = neither.
 
+`--protocol original` instead sends the original study's own trajectory-mode prompt, built by its code:
+responses clipped to their first 700 characters (T0: 900) and no T5 response, as the Haiku labels were
+made (ERRATA E13). It separates the judge model from the judge's input when comparing with those labels.
+Its labels go to `<gen>/judge_original/`.
+
 Batch size 1, greedy (see `generate.py` on padded batching). Reads `<gen>/<arm>*.jsonl`, writes
 `<gen>/judge/<arm>[.t0].shard{i}of{k}.jsonl`.
 """
@@ -94,6 +99,22 @@ def transcript(conv: dict) -> str:
     return "\n".join(parts)
 
 
+def original_prompt(conv: dict, condition: str, model_label: str) -> str:
+    """The original study's trajectory-mode prompt, rendered by its own code with its default clipping."""
+    _sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "analysis"))
+    import judge_flip_claude as orig                      # imports anthropic, so only on this path
+    from generate import SYSTEM_PROMPTS
+    # The original's transcript is Turn_5's input messages: every response up to T4, then the T5 user turn.
+    messages = [{"role": "system", "content": SYSTEM_PROMPTS[condition]}]
+    for turn in conv["turns"]:
+        messages.append({"role": "user", "content": turn["user"]})
+        if turn["t"] < 5:
+            messages.append({"role": "assistant", "content": turn["response"]})
+    bundle = {"model": model_label, "question_type": condition, "question": conv["question"],
+              "turns": [{"turn": t} for t in range(1, 6)], "input_messages": messages}
+    return orig.build_trajectory_prompt(bundle, max_turn0_chars=900, max_resp_chars=700)
+
+
 def parse(text: str) -> dict | None:
     m = re.search(r"\{.*\}", text, flags=re.S)
     if not m:
@@ -126,7 +147,12 @@ def main():
                     help="only conversations from these generation shards (qid %% --gen-n-shards)")
     ap.add_argument("--gen-n-shards", type=int, default=16)
     ap.add_argument("--tag", default="", help="extra label in the output file name (e.g. 'early')")
+    ap.add_argument("--protocol", choices=["full", "original"], default="full",
+                    help="flip mode only: full responses with T5 (default), or the original study's clipped prompt")
+    ap.add_argument("--condition", default="base", help="system-prompt condition (--protocol original)")
+    ap.add_argument("--model-label", default="Qwen2.5-7B-Instruct", help="model name in the original prompt")
     args = ap.parse_args()
+    assert args.protocol == "full" or args.mode == "flip", "--protocol original is a flip-label protocol"
 
     tok = AutoTokenizer.from_pretrained(args.judge)
     eos = GenerationConfig.from_pretrained(args.judge).eos_token_id
@@ -136,7 +162,7 @@ def main():
     gen_cfg = GenerationConfig(max_new_tokens=900, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=eos, pad_token_id=tok.eos_token_id if tok.pad_token_id is None
                                else tok.pad_token_id)
-    out_dir = args.gen_dir / "judge"
+    out_dir = args.gen_dir / ("judge" if args.protocol == "full" else "judge_original")
     out_dir.mkdir(exist_ok=True)
     tag = (("" if args.mode == "flip" else ".t0") + (f".{args.tag}" if args.tag else "")
            + ("" if args.n_shards == 1 else f".shard{args.shard}of{args.n_shards}"))
@@ -165,6 +191,7 @@ def main():
         with open(out_dir / f"{arm}{tag}.jsonl", "a", encoding="utf-8") as f:
             for c in convs:
                 content = (t0_prompt(c, gold) if args.mode == "t0"
+                           else original_prompt(c, args.condition, args.model_label) if args.protocol == "original"
                            else INSTRUCTIONS + "\nFull dialogue transcript:\n\n" + transcript(c))
                 messages = [{"role": "user", "content": content}]
                 text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
