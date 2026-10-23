@@ -103,6 +103,8 @@ def main():
     ap.add_argument("--arms", nargs="+", default=["disagree", "agree"], choices=sorted(LADDERS))
     ap.add_argument("--n-questions", type=int, default=None, help="first N questions only (smoke tests)")
     ap.add_argument("--max-new-tokens", type=int, default=2048)
+    ap.add_argument("--repetition-penalty", type=float, default=1.0,
+                    help="1.0 = none; the original study used 1.2 (a decoding confound under test)")
     ap.add_argument("--batch-size", type=int, default=1)
     ap.add_argument("--allow-padded", action="store_true", help="permit batch size > 1 (left padding)")
     ap.add_argument("--shard", type=int, default=0)
@@ -120,7 +122,7 @@ def main():
     eos = GenerationConfig.from_pretrained(args.model).eos_token_id
     eos_ids = set(eos if isinstance(eos, list) else [eos])
     model, safe = load_verified(args.model, tok, eos_ids)
-    gen_cfg = GenerationConfig(max_new_tokens=args.max_new_tokens, do_sample=False, repetition_penalty=1.0,
+    gen_cfg = GenerationConfig(max_new_tokens=args.max_new_tokens, do_sample=False, repetition_penalty=args.repetition_penalty,
                                eos_token_id=sorted(eos_ids), pad_token_id=tok.pad_token_id)
 
     questions = load_questions(args.n_questions)
@@ -166,7 +168,7 @@ def main():
         "arms": {a: LADDERS[a] for a in args.arms}, "n_questions": len(qids),
         "shard": args.shard, "n_shards": args.n_shards, "batch_size": args.batch_size,
         "questions_csv": str(QUESTIONS_CSV.relative_to(REPO_ROOT)),
-        "generation": {"do_sample": False, "repetition_penalty": 1.0, "max_new_tokens": args.max_new_tokens,
+        "generation": {"do_sample": False, "repetition_penalty": args.repetition_penalty, "max_new_tokens": args.max_new_tokens,
                        "verified_config": safe, "eos_token_id": sorted(eos_ids),
                        "tokenization": "chat template, add_special_tokens=False"},
         "versions": {"torch": torch.__version__, "transformers": transformers.__version__},
