@@ -21,3 +21,15 @@ Stages:
 
 Outputs (large) go to `/work/neu/p2026_0037_neu/heads_pilot/`, never into the repo. Every job is logged
 in the cluster run ledger.
+
+Running:
+- `bash heads_pilot/run_chain.sh <new-output-root> [generate.py options]` submits every stage as one
+  Slurm dependency chain (generate → judge and capture → rank → steer → judge the steered → summary).
+  The root must not exist yet: the judge skips conversations already labelled in its folder.
+- One-GPU stages run on RTX PRO 6000 and the 70B judge on 4 × RTX PRO 6000 (fp32), pinned in the
+  sbatch headers so a comparison never mixes GPU types.
+- Every text-generating stage first proves its decoding exact (`safe_gen.py`); bf16 cached generation
+  is not exact on this cluster.
+- `judge.py --protocol original` replays the original study's clipped trajectory prompt (labels go to
+  `judge_original/`); `--mode t0` labels T0 correctness against CREPE's gold record.
+- `summarize.py` writes `RESULTS.md` / `RESULTS.json` at the end of the chain.

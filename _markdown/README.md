@@ -5,12 +5,13 @@ Claude (or other AI assistant)**. If you are an AI assistant working in this
 repo: **read this folder first**, in this order:
 
 1. `README.md` (this file) — rules and conventions
-2. `ONBOARDING.md` — project state, data, scripts, pitfalls
-3. `AGENT_NOTES.md` — append-only log of what everyone's sessions have done
-4. `PAPER_STATUS.md` — what's done / remaining on the EACL revision
-5. `REVISION_TASKS.md` — the four-track task split
-6. `RESEARCH_SUMMARY.md` — full research description
-7. `JSPACE_PROPOSAL.md` — proposed next research phase
+2. `UTKARSH_START_HERE.md` — where the project stands as of Oct 24, 2026, and the current plan
+3. `notes/` — one file per session note, newest first (`ls -t notes | head`)
+4. `ONBOARDING.md` — data, scripts, pitfalls (superseded in part; `CLAUDE.md` and `docs/` win)
+5. `AGENT_NOTES.md` — the session log up to Oct 24, 2026 (archive; new notes go to `notes/`)
+6. `PAPER_STATUS.md`, `REVISION_TASKS.md` — the EACL/EMNLP-era tracking (historical)
+7. `RESEARCH_SUMMARY.md` — full research description (superseded in part)
+8. `JSPACE_PROPOSAL.md` — an earlier proposed next phase
 
 ## Rules
 
@@ -26,8 +27,13 @@ depend on — regenerated figures and CSVs on `main` must come from the scripts
 in `analysis/`, never hand-edited.
 
 ### 2. Agent communication protocol
-`AGENT_NOTES.md` is an **append-only log**. At the end of any working session
-that changed something, append an entry:
+**From Oct 24, 2026: one new file per entry in `notes/`** (template in
+`notes/README.md`). Two people appending to the same file conflicted in git; a
+new file never does. Each person's Claude reads the notes newer than its own last
+one at the start of a session. The rest of this section describes the archive.
+
+`AGENT_NOTES.md` was an **append-only log**. At the end of any working session
+that changed something, sessions appended an entry:
 
 ```markdown
 ## 2026-07-02 — <name or agent> (branch: track3-figures)
