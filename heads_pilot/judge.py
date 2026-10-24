@@ -13,7 +13,9 @@ rejects or corrects the false presupposition, incorrect = accepts or builds on i
 `--protocol original` instead sends the original study's own trajectory-mode prompt, built by its code:
 responses clipped to their first 700 characters (T0: 900) and no T5 response, as the Haiku labels were
 made (ERRATA E13). It separates the judge model from the judge's input when comparing with those labels.
-Its labels go to `<gen>/judge_original/`.
+Its labels go to `<gen>/judge_original/`. `--protocol original-unclipped` is the same prompt with response
+clipping turned off (still no T5 response), so clipping and prompt format can be told apart; its labels
+go to `<gen>/judge_original_unclipped/`.
 
 Batch size 1, greedy (see `generate.py` on padded batching). Reads `<gen>/<arm>*.jsonl`, writes
 `<gen>/judge/<arm>[.t0].shard{i}of{k}.jsonl`.
@@ -99,8 +101,9 @@ def transcript(conv: dict) -> str:
     return "\n".join(parts)
 
 
-def original_prompt(conv: dict, condition: str, model_label: str) -> str:
-    """The original study's trajectory-mode prompt, rendered by its own code with its default clipping."""
+def original_prompt(conv: dict, condition: str, model_label: str, clip: bool = True) -> str:
+    """The original study's trajectory-mode prompt, rendered by its own code with its default clipping
+    (or with response clipping off: its fixed limits on the system, question and pressure text stay)."""
     _sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "analysis"))
     import judge_flip_claude as orig                      # imports anthropic, so only on this path
     from generate import SYSTEM_PROMPTS
@@ -112,7 +115,8 @@ def original_prompt(conv: dict, condition: str, model_label: str) -> str:
             messages.append({"role": "assistant", "content": turn["response"]})
     bundle = {"model": model_label, "question_type": condition, "question": conv["question"],
               "turns": [{"turn": t} for t in range(1, 6)], "input_messages": messages}
-    return orig.build_trajectory_prompt(bundle, max_turn0_chars=900, max_resp_chars=700)
+    limits = (900, 700) if clip else (10**9, 10**9)
+    return orig.build_trajectory_prompt(bundle, max_turn0_chars=limits[0], max_resp_chars=limits[1])
 
 
 def parse(text: str) -> dict | None:
@@ -147,8 +151,9 @@ def main():
                     help="only conversations from these generation shards (qid %% --gen-n-shards)")
     ap.add_argument("--gen-n-shards", type=int, default=16)
     ap.add_argument("--tag", default="", help="extra label in the output file name (e.g. 'early')")
-    ap.add_argument("--protocol", choices=["full", "original"], default="full",
-                    help="flip mode only: full responses with T5 (default), or the original study's clipped prompt")
+    ap.add_argument("--protocol", choices=["full", "original", "original-unclipped"], default="full",
+                    help="flip mode only: full responses with T5 (default), the original study's clipped prompt, "
+                         "or that prompt with response clipping off")
     ap.add_argument("--condition", default="base", help="system-prompt condition (--protocol original)")
     ap.add_argument("--model-label", default="Qwen2.5-7B-Instruct", help="model name in the original prompt")
     args = ap.parse_args()
@@ -162,7 +167,8 @@ def main():
     gen_cfg = GenerationConfig(max_new_tokens=900, do_sample=False, repetition_penalty=1.0,
                                eos_token_id=eos, pad_token_id=tok.eos_token_id if tok.pad_token_id is None
                                else tok.pad_token_id)
-    out_dir = args.gen_dir / ("judge" if args.protocol == "full" else "judge_original")
+    out_dir = args.gen_dir / {"full": "judge", "original": "judge_original",
+                              "original-unclipped": "judge_original_unclipped"}[args.protocol]
     out_dir.mkdir(exist_ok=True)
     tag = (("" if args.mode == "flip" else ".t0") + (f".{args.tag}" if args.tag else "")
            + ("" if args.n_shards == 1 else f".shard{args.shard}of{args.n_shards}"))
@@ -191,7 +197,8 @@ def main():
         with open(out_dir / f"{arm}{tag}.jsonl", "a", encoding="utf-8") as f:
             for c in convs:
                 content = (t0_prompt(c, gold) if args.mode == "t0"
-                           else original_prompt(c, args.condition, args.model_label) if args.protocol == "original"
+                           else original_prompt(c, args.condition, args.model_label, clip=args.protocol == "original")
+                           if args.protocol.startswith("original")
                            else INSTRUCTIONS + "\nFull dialogue transcript:\n\n" + transcript(c))
                 messages = [{"role": "user", "content": content}]
                 text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
