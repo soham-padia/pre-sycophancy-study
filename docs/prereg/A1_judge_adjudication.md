@@ -63,3 +63,8 @@ hypothesis under test: `reading_labels.csv`, sha256 `5393e5264a4fc7b0526bb964e85
 (17 of 25 is the smallest clear two-thirds majority. Readings 2 and 3 cannot both hold.)
 FORBIDDEN in every branch: any claim beyond Qwen2.5-7B base on these 59 questions; "Haiku's labels are
 wrong" or "the paper's flips are artifacts" as a finding — that needs the results-auditor and an erratum.
+
+## Addendum (2026-10-24, before any label of A1 exists)
+The results-auditor found that the agent's reading cited under Motivation was not blind (it was made with
+both judges' labels and rationales in view, on flagged cells only). It remains the stated hypothesis and
+counts as no evidence. Nothing in the sample, outcomes or readings changes.

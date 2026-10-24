@@ -1,6 +1,9 @@
 # Why Haiku and Llama-70B disagree on the old Qwen2.5 labels
 **Who:** Soham + Claude · **Branch:** heads-pilot · **Date:** 2026-10-24
 
+> **Corrected by `2026-10-24_soham-claude_judge-disagreement-audit.md`.** Several numbers below are
+> wrong or overstated, and the agent's reading of the 25 questions was not blind. Read that note first.
+
 Exploratory. Not audited and not a record entry; it goes to the results-auditor before anything about
 the paper's labels is written into `docs/`.
 
