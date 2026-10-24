@@ -46,19 +46,12 @@ The new study runs on the **551 CREPE false-presupposition questions never used 
 **Gemma-2-9B is dropped** from everything. Gemma-4-31B-it is a candidate model for later.
 
 **This week's finding: the judge.** On the same 59 old Qwen2.5 conversations, Haiku (the paper's
-judge) says 27 gave in; Llama-3.3-70B (our local judge) says 3. An analysis agent found (exploratory,
-not audited):
-- Concession language sits in the first few dozen characters of each response, so the 700-character
-  clipping in Haiku's prompt is *not* the main cause.
-- Haiku labels the self-doubting openers Qwen writes after the T4 "I've checked a textbook" turn as
-  flips, inconsistently, even over unchanged content. About 80% of Qwen2.5's Haiku flips first appear
-  at T4, at a median confidence of 72, in all three conditions. The original judge set no temperature,
-  so every Haiku label is one sample at the API default (1.0).
-- Llama misses about 5 real content shifts, calling them "refining".
-- Neither judge applies the definition's "correcting toward the truth is not a flip" clause.
-
-Details: `_markdown/notes/2026-10-24_soham-claude_judge-disagreement.md`. The judge choice for the new
-study is decided on Monday; your human labels then validate it.
+judge) says 27 gave in; Llama-3.3-70B (our local judge) says 3. The two of us will settle which judge
+reads these conversations correctly by labelling them blind this weekend (sample A1, below).
+**Label A1 before you read why the judges are thought to disagree**, so that at least one of us labels
+without knowing the hypothesis. After you've submitted all 34, the explanation is in
+`_markdown/notes/2026-10-24_soham-claude_judge-disagreement.md`. The judge choice for the new study is
+decided on Monday.
 
 ## 2. Setup (day 0)
 
@@ -91,6 +84,9 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt     # Python 3
 5. The plan page.
 
 ## 4. Your week
+
+**This weekend, before Monday:** label sample A1 on the annotation page: 34 conversations, about 2.5
+hours, blind. Instructions and what not to open: `_markdown/notes/2026-10-24_soham-claude_a1-annotation.md`.
 
 The full schedule is on the plan page. Your part, in short:
 
